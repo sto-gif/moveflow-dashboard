@@ -98,7 +98,7 @@ function DashboardPage() {
                 <YAxis tick={{ fontSize: 11 }} stroke="oklch(0.5 0.02 257)"
                   tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
                 <Tooltip
-                  formatter={(v: number) => dkk(v)}
+                  formatter={(v: any) => dkk(Number(v))}
                   contentStyle={{ borderRadius: 8, fontSize: 12, border: "1px solid oklch(0.92 0.01 255)" }}
                 />
                 <Line
