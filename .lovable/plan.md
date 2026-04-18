@@ -1,115 +1,81 @@
 
 
-# Audit Fix Plan
+## Goal
+Add a consistent **filter feature** alongside the existing search across the main list/kanban views (Leads, Jobs, Customers, Quotes, Brief, Tasks, Lager, etc.).
 
-Comprehensive fix for 32 issues. I'll explore key files first, then group fixes by area to minimize churn.
+## Design
 
-## Investigation needed before coding
+A reusable **`FilterBar`** component placed next to the search input on each page. It opens a popover with checkbox groups. Active filters render as small dismissable chips below the search row.
 
-I need to verify current state of these files (will read in implementation phase):
-- `_app.calendar.tsx` — current view modes
-- `_app.tasks.tsx` — Kalender tab structure
-- `_app.brief.index.tsx` + `_app.koretojer.tsx` — Kalender tab routing
-- `_app.jobs.tsx` — job detail sheet (already touched recently)
-- `_app.leads.$leadId.tsx` + `_app.customers.$customerId.tsx` — why detail content isn't rendering
-- `_app.leads.tsx` + `_app.customers.tsx` + parent layouts — likely missing `<Outlet />` (same bug we fixed for `/brief`)
-- `topbar.tsx` — language toggle
-- `_app.index.tsx` — dashboard chart, activity, jobs, alerts
-- `_app.reports.tsx` — date range, legend, margin source
-- `_app.settings.tsx` — integrations, onboarding links, notifications
-- `_app.tasks.tsx` — filter bar
-- `_app.quotes.tsx`, `_app.lager.tsx`, `_app.inventory.tsx`, `_app.crew.tsx`, `kanban-board.tsx` — various polish
-- `mocks/*.ts` — date updates to 2026, revenue trajectory, customer job counts
+```text
+[ Search…    ] [ ⏷ Filter (2) ]   ← in PageHeader actions
+[ Status: I gang ✕ ] [ Kilde: Google ✕ ] [ Ryd alle ]   ← chips row
+```
 
-## Fix groups
+## Component API
 
-### Group A — Routing bugs (HIGH, blocking)
-**5. Lead/Customer detail not rendering** — likely `_app.leads.tsx` and `_app.customers.tsx` are parent layouts without `<Outlet />` (same root cause as the brief bug). Fix:
-- Rename `_app.leads.tsx` → `_app.leads.index.tsx`
-- Rename `_app.customers.tsx` → `_app.customers.index.tsx`
-- Verify the `_app.leads.index.tsx` and `_app.customers.index.tsx` files don't already exist; if they do, merge.
+```tsx
+<FilterBar
+  filters={[
+    { key: "status", label: "Status", options: [{value, label, count?}] },
+    { key: "source", label: "Kilde", options: [...] },
+    { key: "owner",  label: "Ejer",   options: [...] },
+  ]}
+  value={activeFilters}              // Record<string, string[]>
+  onChange={setActiveFilters}
+/>
+```
 
-**Runtime error**: `routeTree.gen.ts` still references `_app.brief.tsx` — regenerate by ensuring file rename is clean.
+Multi-select per group, OR within a group, AND across groups. Counts shown next to each option.
 
-### Group B — Calendar views (HIGH)
-**1. Calendar Dag/Uge views**: Build real Day view (single column, 07:00–20:00 hourly slots, jobs positioned by time) and Week view (7 columns × hourly rows). Reuse jobs mock data with `scheduledAt`.
+## Per-page filter sets
 
-**3. Brief calendar tab**: Build dedicated brief-calendar view inside `_app.brief.index.tsx` showing month grid with brief markers per date.
+| Page | Filters |
+|---|---|
+| Leads | Status (stage), Kilde, Ejer, Type (privat/erhverv) |
+| Jobs | Status, Crew-medlem, Køretøj tildelt (ja/nej), Måned |
+| Customers | Stage, Kilde, By |
+| Quotes | Status, Pakke, Måned |
+| Brief | Status, Tildelt til |
+| Tasks | Status, Prioritet, Tildelt |
+| Lager / Inventory | Lokation, Status |
 
-**3. Vehicles calendar tab**: Same in `_app.koretojer.tsx` showing vehicle assignments per date.
+Existing ad-hoc filters (e.g. Customers' privat/erhverv pill row) get folded into the unified FilterBar so there's only one place to filter.
 
-**2. Tasks calendar tab**: Build a simple month grid showing tasks by deadline (with priority color dots).
+## URL persistence
 
-### Group C — Job detail (HIGH)
-**4. Rich job detail** in `_app.jobs.tsx` Sheet:
-- Pickup/delivery addresses, assigned crew (names), assigned vehicle
-- Timeline section (created → confirmed → started → completed)
-- Customer info card linking to customer
-- Original quote with line items (already partly there)
-- New "Fotos" tab with placeholder photo grid
-- Tabs: Oversigt | Økonomi | Tidslinje | Fotos
+Filters serialize to search params via TanStack Router `validateSearch` + zod adapter (`fallback`/`default`), so filter state survives reloads and is shareable. Pattern:
+```ts
+validateSearch: zodValidator(z.object({
+  status: fallback(z.string().array(), []).default([]),
+  source: fallback(z.string().array(), []).default([]),
+}))
+```
 
-### Group D — Mock data refresh (HIGH)
-**6. Dates → 2026**: Update `mocks/crew.ts` (Friansker), `mocks/vehicles.ts` (service dates), and audit `_helpers.ts` for any hard-coded years.
-**8. Revenue chart**: Update dashboard chart data to growth trajectory with winter dip.
-**10. Customer job counts**: Compute or store job count per customer; show on customer kanban cards.
+## Integration with existing pieces
 
-### Group E — Topbar & nav polish
-**7. "AN" → "EN"** in `topbar.tsx`.
+- `RowCount` already shows `(filtreret)` automatically when `shown !== total` — no change needed.
+- Kanban + Table both consume the same `filtered` array, so applying the new filter once filters both views.
+- Sticky-header tables stay as-is.
 
-### Group F — Calendar event labels
-**9. Event labels**: `"13:00 #105 Hansen"` format on calendar cells.
+## Files
 
-### Group G — Reports page
-**11. Date range selector** (Select with presets).
-**30. Pie chart legend** (visible).
-**31. Margin source**: ensure jobs have `cost` field (already added in earlier turn) — link in tooltip.
+**Create**
+- `src/components/filter-bar.tsx` — popover + chips + clear-all
+- `src/hooks/use-filters.ts` — small helper to apply a filter map to a list
 
-### Group H — Settings page
-**12. Danish integrations**: Add MobilePay, Dinero, Fortnox cards (replace/append Mailchimp).
-**13. Onboarding links**: Wrap remaining checklist items in `<Link>` to relevant settings sections.
-**16. Daglig morgensummering**: default `true` in notifications state.
+**Edit (one page at a time, same pattern)**
+- `src/routes/_app.leads.index.tsx`
+- `src/routes/_app.jobs.tsx`
+- `src/routes/_app.customers.index.tsx`
+- `src/routes/_app.quotes.tsx`
+- `src/routes/_app.brief.index.tsx`
+- `src/routes/_app.tasks.tsx`
+- `src/routes/_app.lager.tsx`, `_app.inventory.tsx`
 
-### Group I — Tasks page
-**14. Filter bar**: assignee Select, priority Select, due-date range Select.
+## Rollout suggestion
 
-### Group J — Kanban polish
-**15. Lead type vs source**: type = outlined pill, source = colored tag.
-**19. Apply card styling** from customers kanban to jobs and leads kanbans (borders, column backgrounds, spacing).
-**18. Leads "ALDER" column** → "TEMPERATUR" with Kold/Varm/Hed badges.
-**23. Jobs kanban "Vis flere"** after 10 cards per column.
-
-### Group K — Brief polish
-**17. Brief titles**: descriptive — "Tirsdag 15. apr: 5 jobs, fuldt team" computed from brief data.
-
-### Group L — Dashboard polish
-**20. Activity feed**: icons + left timestamps + dividers.
-**21. Dagens jobs cards**: more padding.
-**22. Alerts**: bolder titles, muted descriptions.
-
-### Group M — Other pages
-**24. Warehouse search bar** on `/lager`.
-**25. Warehouse BEMÆRKNINGER**: populate with mock remarks.
-**26. Automation timing labels**: "Med det samme" / clearer delays.
-**27. Remove "Synkroniseret med mobilapp"** badge on `/inventory`.
-**28. Quotes status badges**: muted pill style.
-**29. Quotes age**: "Sendt for X dage siden".
-**32. Crew table**: move "Holdleder" out of STATUS into ROLLE; status only Aktiv/Syg/Ferie/Inaktiv.
-
-## Execution order
-
-1. Group A (routing) + brief.tsx leftover → unblocks demos
-2. Group D (data refresh) → underpins many other fixes (job counts, chart, dates)
-3. Group C (job detail) → biggest single feature
-4. Group B (calendars) → 4 separate calendar implementations
-5. Groups E, F, G, H, I → page-level features
-6. Groups J, K, L, M → polish
-
-## Notes & assumptions
-
-- "Fotos" tab will use placeholder image grid (no upload backend) — clearly a demo.
-- Customer job count derived live from `jobs` mock filtered by customerId.
-- Calendar Day/Week views will be CSS-grid based, not a heavy library.
-- Hydration mismatch in console (timeline showing 12.00 vs 14.00) likely from `Math.random()`/`Date.now()` in brief mocks — will switch to seeded values when touching brief mock titles (#17).
-- No new dependencies required.
+Ship in two steps to keep PRs reviewable:
+1. Build `FilterBar` + wire **Leads** and **Jobs** end-to-end (highest demo value).
+2. Roll out to Customers, Quotes, Brief, Tasks, Lager.
 
