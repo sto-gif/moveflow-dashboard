@@ -22,7 +22,7 @@ export const Route = createFileRoute("/_app/customers")({
   component: CustomersPage,
 });
 
-const STAGES: CustomerStage[] = ["ny_henvendelse", "tilbud_sendt", "booket", "afsluttet", "tabt"];
+const STAGES: CustomerStage[] = ["booket", "i_gang", "afsluttet"];
 
 function CustomersPage() {
   const [tab, setTab] = useState<"alle" | CustomerType>("alle");

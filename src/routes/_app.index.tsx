@@ -12,8 +12,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/page-header";
 import { todaysJobs, jobs, JOB_STATUS_LABELS, JOB_STATUS_COLORS } from "@/mocks/jobs";
-import { invoices } from "@/mocks/invoices";
-import { customers, STAGE_LABELS } from "@/mocks/customers";
+import { customers } from "@/mocks/customers";
+import { leads, LEAD_STAGE_LABELS } from "@/mocks/leads";
 import { crew } from "@/mocks/crew";
 import { dkk, pct, number } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -21,7 +21,7 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_app/")({
   head: () => ({
     meta: [
-      { title: "Dashboard — Flyt" },
+      { title: "Dashboard — Movena" },
       { name: "description", content: "Dagens overblik over jobs, omsætning og crew." },
     ],
   }),
@@ -35,14 +35,9 @@ function DashboardPage() {
   );
   const revenueMTD = completedThisMonth.reduce((s, j) => s + j.revenue, 0);
   const avgValue = completedThisMonth.length ? revenueMTD / completedThisMonth.length : 0;
-  const outstanding = invoices
-    .filter((i) => i.status === "sendt" || i.status === "forfalden")
-    .reduce((s, i) => s + i.amount, 0);
-  const overdue = invoices.filter((i) => i.status === "forfalden");
+  const activeJobs = jobs.filter((j) => j.status === "i_gang" || j.status === "bekraeftet" || j.status === "planlagt").length;
   const conversion =
-    (customers.filter((c) => c.stage === "booket" || c.stage === "afsluttet").length /
-      Math.max(1, customers.length)) *
-    100;
+    (customers.length / Math.max(1, customers.length + leads.length)) * 100;
   const utilization = 78.4;
 
   const revenueData = Array.from({ length: 12 }, (_, i) => {
@@ -54,15 +49,15 @@ function DashboardPage() {
     };
   });
 
-  const funnel = (["ny_henvendelse", "tilbud_sendt", "booket", "afsluttet", "tabt"] as const).map(
-    (s) => ({ name: STAGE_LABELS[s], v: customers.filter((c) => c.stage === s).length }),
+  const funnel = (["ny", "kontaktet", "tilbud_sendt", "forhandling", "vundet", "tabt"] as const).map(
+    (s) => ({ name: LEAD_STAGE_LABELS[s], v: leads.filter((l) => l.stage === s).length }),
   );
 
   return (
     <div>
       <PageHeader
         title="Dashboard"
-        description={`God morgen, Anders — ${today.length} jobs i dag, ${overdue.length} forfaldne fakturaer.`}
+        description={`God morgen, Anders — ${today.length} jobs i dag, ${activeJobs} aktive jobs.`}
         actions={
           <>
             <Button variant="outline" size="sm">Eksportér</Button>
@@ -77,7 +72,7 @@ function DashboardPage() {
           <Kpi label="Jobs udført" value={number(completedThisMonth.length)} delta="+8" up icon={Briefcase} />
           <Kpi label="Crew-udnyttelse" value={pct(utilization)} delta="+3,1 %" up icon={Activity} />
           <Kpi label="Gns. jobværdi" value={dkk(avgValue)} delta="-2,1 %" icon={TrendingUp} />
-          <Kpi label="Udestående" value={dkk(outstanding)} delta={`${overdue.length} forfaldne`} warn icon={AlertTriangle} />
+          <Kpi label="Aktive jobs" value={number(activeJobs)} delta={`${today.length} i dag`} icon={Briefcase} />
           <Kpi label="Konvertering" value={pct(conversion)} delta="+1,8 %" up icon={Users} />
         </div>
 
@@ -112,7 +107,7 @@ function DashboardPage() {
           <Card className="p-5">
             <div className="mb-4">
               <h3 className="text-sm font-semibold">Lead funnel</h3>
-              <p className="text-xs text-muted-foreground">Antal kunder pr. fase</p>
+              <p className="text-xs text-muted-foreground">Antal leads pr. fase</p>
             </div>
             <ResponsiveContainer width="100%" height={240}>
               <BarChart data={funnel} layout="vertical" margin={{ left: 0 }}>
@@ -192,9 +187,6 @@ function DashboardPage() {
               <Alert icon={AlertTriangle} tone="warn"
                 title="Job #142 starter om 2 timer"
                 meta="1 medarbejder mangler" />
-              <Alert icon={AlertTriangle} tone="danger"
-                title={`${overdue.length} forfaldne fakturaer`}
-                meta={dkk(overdue.reduce((s, i) => s + i.amount, 0))} />
               <Alert icon={Clock} tone="info"
                 title="Tilbud Q-3015 udløber i morgen"
                 meta="Lars Hansen — 24.500 DKK" />
@@ -204,6 +196,9 @@ function DashboardPage() {
               <Alert icon={AlertTriangle} tone="warn"
                 title="Lager: flyttekasser under min."
                 meta="18 stk. tilbage" />
+              <Alert icon={Clock} tone="info"
+                title="Daglig brief mangler at blive sendt"
+                meta="Send inden 06:00" />
             </div>
           </Card>
         </div>
@@ -214,11 +209,11 @@ function DashboardPage() {
           <div className="space-y-3 text-sm">
             {[
               "Anne Pedersen accepterede tilbud Q-3015 (24.500 DKK)",
-              "Faktura I-4012 betalt af Søren Christensen",
               "Mette Sørensen anmodede om fri 24. apr",
               "Job #145 oprettet — København → Aarhus, 65 m³",
               "Ny anmeldelse på Trustpilot fra Emilie Jensen (5★)",
               "Crew-tildeling ændret på job #142 (Anders → Mikkel)",
+              "Nyt lead modtaget fra hjemmesiden — Søren Christensen",
             ].map((t, i) => (
               <div key={i} className="flex items-start gap-3 border-b pb-3 last:border-0 last:pb-0">
                 <div className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />

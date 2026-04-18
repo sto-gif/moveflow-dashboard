@@ -20,7 +20,6 @@ import { Route as AppLeadsRouteImport } from './routes/_app.leads'
 import { Route as AppLagerRouteImport } from './routes/_app.lager'
 import { Route as AppKoretojerRouteImport } from './routes/_app.koretojer'
 import { Route as AppJobsRouteImport } from './routes/_app.jobs'
-import { Route as AppInvoicesRouteImport } from './routes/_app.invoices'
 import { Route as AppInventoryRouteImport } from './routes/_app.inventory'
 import { Route as AppCustomersRouteImport } from './routes/_app.customers'
 import { Route as AppCrewRouteImport } from './routes/_app.crew'
@@ -81,11 +80,6 @@ const AppJobsRoute = AppJobsRouteImport.update({
   path: '/jobs',
   getParentRoute: () => AppRoute,
 } as any)
-const AppInvoicesRoute = AppInvoicesRouteImport.update({
-  id: '/invoices',
-  path: '/invoices',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppInventoryRoute = AppInventoryRouteImport.update({
   id: '/inventory',
   path: '/inventory',
@@ -119,7 +113,6 @@ export interface FileRoutesByFullPath {
   '/crew': typeof AppCrewRoute
   '/customers': typeof AppCustomersRoute
   '/inventory': typeof AppInventoryRoute
-  '/invoices': typeof AppInvoicesRoute
   '/jobs': typeof AppJobsRoute
   '/koretojer': typeof AppKoretojerRoute
   '/lager': typeof AppLagerRoute
@@ -136,7 +129,6 @@ export interface FileRoutesByTo {
   '/crew': typeof AppCrewRoute
   '/customers': typeof AppCustomersRoute
   '/inventory': typeof AppInventoryRoute
-  '/invoices': typeof AppInvoicesRoute
   '/jobs': typeof AppJobsRoute
   '/koretojer': typeof AppKoretojerRoute
   '/lager': typeof AppLagerRoute
@@ -156,7 +148,6 @@ export interface FileRoutesById {
   '/_app/crew': typeof AppCrewRoute
   '/_app/customers': typeof AppCustomersRoute
   '/_app/inventory': typeof AppInventoryRoute
-  '/_app/invoices': typeof AppInvoicesRoute
   '/_app/jobs': typeof AppJobsRoute
   '/_app/koretojer': typeof AppKoretojerRoute
   '/_app/lager': typeof AppLagerRoute
@@ -177,7 +168,6 @@ export interface FileRouteTypes {
     | '/crew'
     | '/customers'
     | '/inventory'
-    | '/invoices'
     | '/jobs'
     | '/koretojer'
     | '/lager'
@@ -194,7 +184,6 @@ export interface FileRouteTypes {
     | '/crew'
     | '/customers'
     | '/inventory'
-    | '/invoices'
     | '/jobs'
     | '/koretojer'
     | '/lager'
@@ -213,7 +202,6 @@ export interface FileRouteTypes {
     | '/_app/crew'
     | '/_app/customers'
     | '/_app/inventory'
-    | '/_app/invoices'
     | '/_app/jobs'
     | '/_app/koretojer'
     | '/_app/lager'
@@ -309,13 +297,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppJobsRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/invoices': {
-      id: '/_app/invoices'
-      path: '/invoices'
-      fullPath: '/invoices'
-      preLoaderRoute: typeof AppInvoicesRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/_app/inventory': {
       id: '/_app/inventory'
       path: '/inventory'
@@ -360,7 +341,6 @@ interface AppRouteChildren {
   AppCrewRoute: typeof AppCrewRoute
   AppCustomersRoute: typeof AppCustomersRoute
   AppInventoryRoute: typeof AppInventoryRoute
-  AppInvoicesRoute: typeof AppInvoicesRoute
   AppJobsRoute: typeof AppJobsRoute
   AppKoretojerRoute: typeof AppKoretojerRoute
   AppLagerRoute: typeof AppLagerRoute
@@ -379,7 +359,6 @@ const AppRouteChildren: AppRouteChildren = {
   AppCrewRoute: AppCrewRoute,
   AppCustomersRoute: AppCustomersRoute,
   AppInventoryRoute: AppInventoryRoute,
-  AppInvoicesRoute: AppInvoicesRoute,
   AppJobsRoute: AppJobsRoute,
   AppKoretojerRoute: AppKoretojerRoute,
   AppLagerRoute: AppLagerRoute,
