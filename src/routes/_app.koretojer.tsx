@@ -146,7 +146,7 @@ function VehiclesPage() {
 
           <TabsContent value="kalender" className="mt-4">
             <Card className="p-5">
-              <h3 className="text-section mb-3">April 2025 · vognassignments</h3>
+              <h3 className="text-section mb-3">April 2026 · vognassignments</h3>
               <div className="grid grid-cols-7 gap-1 text-xs">
                 {DAYS.map((d) => <div key={d} className="text-center font-semibold text-muted-foreground py-1">{d}</div>)}
                 {Array.from({ length: 30 }).map((_, i) => {
