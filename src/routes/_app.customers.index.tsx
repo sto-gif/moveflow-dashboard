@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
 import { CustomerDrawer } from "@/components/customer-drawer";
 import { Plus, Search, Building2, User, LayoutGrid, Table as TableIcon } from "lucide-react";
@@ -30,7 +30,7 @@ const STAGES: CustomerStage[] = ["booket", "i_gang", "afsluttet"];
 
 function CustomersPage() {
   const { customers, createCustomer, updateCustomerStage } = useMockStore();
-  const navigate = useNavigate();
+  
   const [typeFilter, setTypeFilter] = useState<"alle" | CustomerType>("alle");
   const [search, setSearch] = useState("");
   const [drawerId, setDrawerId] = useState<string | null>(null);
