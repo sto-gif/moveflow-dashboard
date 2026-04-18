@@ -12,7 +12,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PageHeader } from "@/components/page-header";
 import { CreateDialog } from "@/components/create-dialog";
-import { QUOTE_STATUS_LABELS, QUOTE_STATUS_COLORS, PRICING_LABELS, type PricingModel, type QuoteLineItem, buildQuoteLineItems } from "@/mocks/quotes";
+import { QUOTE_STATUS_LABELS, QUOTE_STATUS_COLORS, PRICING_LABELS, type PricingModel, type QuoteLineItem, type QuoteStatus, buildQuoteLineItems } from "@/mocks/quotes";
 import { movingPackages } from "@/mocks/packages";
 import { useMockStore } from "@/store/mock-store";
 import { dkk } from "@/lib/format";
@@ -31,7 +31,7 @@ export const Route = createFileRoute("/_app/quotes")({
 const STEPS = ["Kunde", "Volumen", "Layout", "Services", "Parkering", "Transport", "Tillæg"] as const;
 
 function QuotesPage() {
-  const { quotes, createQuote, convertQuoteToJob } = useMockStore();
+  const { quotes, createQuote, convertQuoteToJob, updateQuoteStatus } = useMockStore();
   const navigate = useNavigate();
 
   const handleConvert = (id: string) => {
