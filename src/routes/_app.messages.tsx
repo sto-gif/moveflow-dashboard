@@ -61,7 +61,18 @@ function FlowsPage() {
                   </div>
                   <div>
                     <Label className="text-xs">Timing</Label>
-                    <Input defaultValue="0 dage" className="mt-1 h-9" />
+                    <Select defaultValue={inferTiming(s.trigger)}>
+                      <SelectTrigger className="mt-1 h-9"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="now">Med det samme</SelectItem>
+                        <SelectItem value="30min">30 min. før</SelectItem>
+                        <SelectItem value="1h">1 time før</SelectItem>
+                        <SelectItem value="24h">24 timer før job</SelectItem>
+                        <SelectItem value="1d_after">1 dag efter job</SelectItem>
+                        <SelectItem value="3d_after">3 dage efter job</SelectItem>
+                        <SelectItem value="7d_after">7 dage efter job</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div>
                     <Label className="text-xs">Kanal</Label>
