@@ -287,7 +287,7 @@ export function MockStoreProvider({ children }: { children: ReactNode }) {
     leads, customers, jobs, quotes, briefs, notifications, settings, unreadCount,
     createLead, updateLeadStage, convertLeadToCustomer,
     createCustomer, updateCustomerStage,
-    createJob, updateJobStatus,
+    createJob, updateJobStatus, updateJob,
     createQuote, updateQuoteStatus, convertQuoteToJob,
     createBrief,
     markNotificationRead, markAllNotificationsRead,
