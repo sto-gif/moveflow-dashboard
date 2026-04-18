@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { leads as seedLeads, LEAD_STAGE_LABELS, LEAD_STAGE_COLORS } from "@/mocks/leads";
+import { leads as seedLeads, LEAD_STAGE_LABELS, LEAD_STAGE_COLORS, LEAD_SOURCES } from "@/mocks/leads";
 import { quotes, QUOTE_STATUS_LABELS, QUOTE_STATUS_COLORS } from "@/mocks/quotes";
 import { useMockStore } from "@/store/mock-store";
 import { dkk } from "@/lib/format";
@@ -103,7 +103,16 @@ function LeadDetailPage() {
                   ))}
                 </SelectContent>
               </Select>
-              <Badge variant="outline" className="text-[11px]">{lead.source}</Badge>
+              <Select value={lead.source} onValueChange={(v) => updateLead(lead.id, { source: v as typeof lead.source })}>
+                <SelectTrigger className="h-7 w-auto gap-1.5 px-2 text-[11px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {LEAD_SOURCES.map((s) => (
+                    <SelectItem key={s} value={s}>{s}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -166,10 +175,17 @@ function LeadDetailPage() {
                 <div className="text-caption text-muted-foreground">Oprettet</div>
                 <div className="text-label py-2">{lead.createdAt.toLocaleDateString("da-DK")}</div>
               </div>
-              <div>
-                <div className="text-caption text-muted-foreground">Kilde</div>
-                <div className="text-label py-2">{lead.source}</div>
-              </div>
+              <label className="space-y-1">
+                <span className="text-caption text-muted-foreground">Kilde</span>
+                <Select value={lead.source} onValueChange={(v) => updateLead(lead.id, { source: v as typeof lead.source })}>
+                  <SelectTrigger className="h-9 text-sm"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {LEAD_SOURCES.map((s) => (
+                      <SelectItem key={s} value={s}>{s}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </label>
             </div>
           </Card>
         </div>

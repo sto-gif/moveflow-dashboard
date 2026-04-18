@@ -46,9 +46,10 @@ export interface Lead {
   owner: string;
 }
 
-const SOURCES: LeadSourceUI[] = [
+export const LEAD_SOURCES: LeadSourceUI[] = [
   "Hjemmeside", "Telefon", "Anbefaling", "Facebook", "Google", "Instagram", "Trustpilot",
 ];
+const SOURCES = LEAD_SOURCES;
 const STAGES: LeadStage[] = ["ny", "kontaktet", "tilbud_sendt", "forhandling", "vundet", "tabt"];
 const STAGE_WEIGHTS = [8, 6, 5, 4, 3, 2];
 const OWNERS = ["Anders N.", "Sofie P.", "Mette S.", "Kasper J."];
