@@ -20,12 +20,12 @@ import { Route as AppLeadsRouteImport } from './routes/_app.leads'
 import { Route as AppLagerRouteImport } from './routes/_app.lager'
 import { Route as AppKoretojerRouteImport } from './routes/_app.koretojer'
 import { Route as AppJobsRouteImport } from './routes/_app.jobs'
-import { Route as AppInvoicesRouteImport } from './routes/_app.invoices'
 import { Route as AppInventoryRouteImport } from './routes/_app.inventory'
 import { Route as AppCustomersRouteImport } from './routes/_app.customers'
 import { Route as AppCrewRouteImport } from './routes/_app.crew'
 import { Route as AppCalendarRouteImport } from './routes/_app.calendar'
 import { Route as AppBriefRouteImport } from './routes/_app.brief'
+import { Route as AppBriefBriefIdRouteImport } from './routes/_app.brief.$briefId'
 
 const AppRoute = AppRouteImport.update({
   id: '/_app',
@@ -81,11 +81,6 @@ const AppJobsRoute = AppJobsRouteImport.update({
   path: '/jobs',
   getParentRoute: () => AppRoute,
 } as any)
-const AppInvoicesRoute = AppInvoicesRouteImport.update({
-  id: '/invoices',
-  path: '/invoices',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppInventoryRoute = AppInventoryRouteImport.update({
   id: '/inventory',
   path: '/inventory',
@@ -111,15 +106,19 @@ const AppBriefRoute = AppBriefRouteImport.update({
   path: '/brief',
   getParentRoute: () => AppRoute,
 } as any)
+const AppBriefBriefIdRoute = AppBriefBriefIdRouteImport.update({
+  id: '/$briefId',
+  path: '/$briefId',
+  getParentRoute: () => AppBriefRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
-  '/brief': typeof AppBriefRoute
+  '/brief': typeof AppBriefRouteWithChildren
   '/calendar': typeof AppCalendarRoute
   '/crew': typeof AppCrewRoute
   '/customers': typeof AppCustomersRoute
   '/inventory': typeof AppInventoryRoute
-  '/invoices': typeof AppInvoicesRoute
   '/jobs': typeof AppJobsRoute
   '/koretojer': typeof AppKoretojerRoute
   '/lager': typeof AppLagerRoute
@@ -129,14 +128,14 @@ export interface FileRoutesByFullPath {
   '/reports': typeof AppReportsRoute
   '/settings': typeof AppSettingsRoute
   '/tasks': typeof AppTasksRoute
+  '/brief/$briefId': typeof AppBriefBriefIdRoute
 }
 export interface FileRoutesByTo {
-  '/brief': typeof AppBriefRoute
+  '/brief': typeof AppBriefRouteWithChildren
   '/calendar': typeof AppCalendarRoute
   '/crew': typeof AppCrewRoute
   '/customers': typeof AppCustomersRoute
   '/inventory': typeof AppInventoryRoute
-  '/invoices': typeof AppInvoicesRoute
   '/jobs': typeof AppJobsRoute
   '/koretojer': typeof AppKoretojerRoute
   '/lager': typeof AppLagerRoute
@@ -147,16 +146,16 @@ export interface FileRoutesByTo {
   '/settings': typeof AppSettingsRoute
   '/tasks': typeof AppTasksRoute
   '/': typeof AppIndexRoute
+  '/brief/$briefId': typeof AppBriefBriefIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteWithChildren
-  '/_app/brief': typeof AppBriefRoute
+  '/_app/brief': typeof AppBriefRouteWithChildren
   '/_app/calendar': typeof AppCalendarRoute
   '/_app/crew': typeof AppCrewRoute
   '/_app/customers': typeof AppCustomersRoute
   '/_app/inventory': typeof AppInventoryRoute
-  '/_app/invoices': typeof AppInvoicesRoute
   '/_app/jobs': typeof AppJobsRoute
   '/_app/koretojer': typeof AppKoretojerRoute
   '/_app/lager': typeof AppLagerRoute
@@ -167,6 +166,7 @@ export interface FileRoutesById {
   '/_app/settings': typeof AppSettingsRoute
   '/_app/tasks': typeof AppTasksRoute
   '/_app/': typeof AppIndexRoute
+  '/_app/brief/$briefId': typeof AppBriefBriefIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -177,7 +177,6 @@ export interface FileRouteTypes {
     | '/crew'
     | '/customers'
     | '/inventory'
-    | '/invoices'
     | '/jobs'
     | '/koretojer'
     | '/lager'
@@ -187,6 +186,7 @@ export interface FileRouteTypes {
     | '/reports'
     | '/settings'
     | '/tasks'
+    | '/brief/$briefId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/brief'
@@ -194,7 +194,6 @@ export interface FileRouteTypes {
     | '/crew'
     | '/customers'
     | '/inventory'
-    | '/invoices'
     | '/jobs'
     | '/koretojer'
     | '/lager'
@@ -205,6 +204,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/tasks'
     | '/'
+    | '/brief/$briefId'
   id:
     | '__root__'
     | '/_app'
@@ -213,7 +213,6 @@ export interface FileRouteTypes {
     | '/_app/crew'
     | '/_app/customers'
     | '/_app/inventory'
-    | '/_app/invoices'
     | '/_app/jobs'
     | '/_app/koretojer'
     | '/_app/lager'
@@ -224,6 +223,7 @@ export interface FileRouteTypes {
     | '/_app/settings'
     | '/_app/tasks'
     | '/_app/'
+    | '/_app/brief/$briefId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -309,13 +309,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppJobsRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/invoices': {
-      id: '/_app/invoices'
-      path: '/invoices'
-      fullPath: '/invoices'
-      preLoaderRoute: typeof AppInvoicesRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/_app/inventory': {
       id: '/_app/inventory'
       path: '/inventory'
@@ -351,16 +344,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppBriefRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/brief/$briefId': {
+      id: '/_app/brief/$briefId'
+      path: '/$briefId'
+      fullPath: '/brief/$briefId'
+      preLoaderRoute: typeof AppBriefBriefIdRouteImport
+      parentRoute: typeof AppBriefRoute
+    }
   }
 }
 
+interface AppBriefRouteChildren {
+  AppBriefBriefIdRoute: typeof AppBriefBriefIdRoute
+}
+
+const AppBriefRouteChildren: AppBriefRouteChildren = {
+  AppBriefBriefIdRoute: AppBriefBriefIdRoute,
+}
+
+const AppBriefRouteWithChildren = AppBriefRoute._addFileChildren(
+  AppBriefRouteChildren,
+)
+
 interface AppRouteChildren {
-  AppBriefRoute: typeof AppBriefRoute
+  AppBriefRoute: typeof AppBriefRouteWithChildren
   AppCalendarRoute: typeof AppCalendarRoute
   AppCrewRoute: typeof AppCrewRoute
   AppCustomersRoute: typeof AppCustomersRoute
   AppInventoryRoute: typeof AppInventoryRoute
-  AppInvoicesRoute: typeof AppInvoicesRoute
   AppJobsRoute: typeof AppJobsRoute
   AppKoretojerRoute: typeof AppKoretojerRoute
   AppLagerRoute: typeof AppLagerRoute
@@ -374,12 +385,11 @@ interface AppRouteChildren {
 }
 
 const AppRouteChildren: AppRouteChildren = {
-  AppBriefRoute: AppBriefRoute,
+  AppBriefRoute: AppBriefRouteWithChildren,
   AppCalendarRoute: AppCalendarRoute,
   AppCrewRoute: AppCrewRoute,
   AppCustomersRoute: AppCustomersRoute,
   AppInventoryRoute: AppInventoryRoute,
-  AppInvoicesRoute: AppInvoicesRoute,
   AppJobsRoute: AppJobsRoute,
   AppKoretojerRoute: AppKoretojerRoute,
   AppLagerRoute: AppLagerRoute,

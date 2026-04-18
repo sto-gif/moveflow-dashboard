@@ -63,23 +63,43 @@ const PLANS = [
   },
 ];
 
+const SECTIONS = [
+  { id: "company", label: "Virksomhed" },
+  { id: "team", label: "Team & roller" },
+  { id: "quoteform", label: "Tilbudsformular" },
+  { id: "subscription", label: "Abonnement" },
+  { id: "notif", label: "Notifikationer" },
+  { id: "integ", label: "Integrationer" },
+  { id: "start", label: "Kom i gang" },
+  { id: "feedback", label: "Feedback" },
+  { id: "support", label: "Support" },
+];
+
 function SettingsPage() {
+  const [active, setActive] = useState("company");
   return (
     <div>
       <PageHeader title="Indstillinger" description="Konfigurér din konto, virksomhed og platform" />
-      <div className="p-6">
-        <Tabs defaultValue="company">
-          <TabsList className="flex-wrap">
-            <TabsTrigger value="company">Virksomhed</TabsTrigger>
-            <TabsTrigger value="team">Team & roller</TabsTrigger>
-            <TabsTrigger value="quoteform">Tilbudsformular</TabsTrigger>
-            <TabsTrigger value="subscription">Abonnement</TabsTrigger>
-            <TabsTrigger value="notif">Notifikationer</TabsTrigger>
-            <TabsTrigger value="integ">Integrationer</TabsTrigger>
-            <TabsTrigger value="start">Kom i gang</TabsTrigger>
-            <TabsTrigger value="feedback">Feedback</TabsTrigger>
-            <TabsTrigger value="support">Support</TabsTrigger>
-          </TabsList>
+      <div className="grid gap-6 p-6 md:grid-cols-[200px_1fr]">
+        <nav className="sticky top-4 h-fit space-y-0.5 rounded-md border bg-card p-2">
+          {SECTIONS.map((s) => (
+            <button
+              key={s.id}
+              onClick={() => setActive(s.id)}
+              className={cn(
+                "block w-full rounded px-3 py-1.5 text-left text-sm transition-colors",
+                active === s.id ? "bg-primary text-primary-foreground font-medium" : "hover:bg-muted",
+              )}
+            >
+              {s.label}
+            </button>
+          ))}
+        </nav>
+        <div>
+          <Tabs value={active} onValueChange={setActive}>
+            <TabsList className="hidden">
+              {SECTIONS.map((s) => <TabsTrigger key={s.id} value={s.id}>{s.label}</TabsTrigger>)}
+            </TabsList>
 
           <TabsContent value="company" className="mt-4">
             <Card className="p-6 max-w-2xl">

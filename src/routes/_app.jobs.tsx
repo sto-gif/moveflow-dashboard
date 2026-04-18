@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Plus, Search, Image as ImageIcon, Upload, Camera } from "lucide-react";
+import { Plus, Search, Image as ImageIcon, Upload, Camera, Building2, User, Mail, Phone } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,8 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { PageHeader } from "@/components/page-header";
 import { jobs, JOB_STATUS_LABELS, JOB_STATUS_COLORS, type JobStatus, type Job } from "@/mocks/jobs";
 import { crew } from "@/mocks/crew";
+import { customerById } from "@/mocks/customers";
+import { quotes, PRICING_LABELS } from "@/mocks/quotes";
 import { dkk } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -155,6 +157,8 @@ function JobsPage() {
 }
 
 function JobSheet({ job }: { job: Job }) {
+  const customer = customerById(job.customerId);
+  const quote = quotes.find((q) => q.customerId === job.customerId);
   return (
     <>
       <SheetHeader>
@@ -170,6 +174,27 @@ function JobSheet({ job }: { job: Job }) {
         </TabsList>
 
         <TabsContent value="detaljer" className="mt-4 space-y-4">
+          {customer && (
+            <Card className="border-primary/20 bg-primary/5 p-4">
+              <div className="mb-2 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  {customer.type === "erhverv"
+                    ? <Building2 className="h-4 w-4 text-primary" strokeWidth={1.5} />
+                    : <User className="h-4 w-4 text-primary" strokeWidth={1.5} />}
+                  <span className="text-sm font-semibold">{customer.name}</span>
+                </div>
+                <Badge variant="outline" className="text-[10px] capitalize">{customer.type}</Badge>
+              </div>
+              <div className="space-y-1 text-xs text-muted-foreground">
+                <div className="flex items-center gap-1.5"><Phone className="h-3 w-3" strokeWidth={1.5} /> {customer.phone}</div>
+                <div className="flex items-center gap-1.5"><Mail className="h-3 w-3" strokeWidth={1.5} /> {customer.email}</div>
+                <div>{customer.address.street}, {customer.address.zip} {customer.address.city}</div>
+                {customer.cvr && <div>CVR {customer.cvr}</div>}
+                {customer.notes && <div className="mt-2 rounded bg-background/60 p-2 text-foreground">{customer.notes}</div>}
+              </div>
+            </Card>
+          )}
+
           <div className="grid grid-cols-2 gap-3">
             <Card className="p-3">
               <div className="text-[11px] uppercase text-muted-foreground">Fra</div>
@@ -272,6 +297,29 @@ function JobSheet({ job }: { job: Job }) {
             <div className="text-xs text-muted-foreground">Margin %</div>
             <div className="mt-1 text-2xl font-bold">{(((job.revenue - job.cost) / job.revenue) * 100).toFixed(1)}%</div>
           </Card>
+          {quote && (
+            <Card className="p-4">
+              <div className="mb-3 flex items-center justify-between">
+                <div>
+                  <div className="text-xs uppercase text-muted-foreground">Oprindeligt tilbud</div>
+                  <div className="text-sm font-semibold">Q-{quote.number} · {PRICING_LABELS[quote.pricingModel]}</div>
+                </div>
+                {quote.manuallyAdjusted && <Badge variant="outline" className="text-[10px] bg-amber-50 text-amber-700 border-amber-200">Justeret</Badge>}
+              </div>
+              <div className="space-y-1 border-t pt-3 text-xs">
+                {quote.lineItems.slice(0, 8).map((li) => (
+                  <div key={li.id} className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{li.label}</span>
+                    <span className="font-mono">{dkk(li.amount)}</span>
+                  </div>
+                ))}
+                <div className="mt-2 flex items-center justify-between border-t pt-2 text-sm font-semibold">
+                  <span>Total tilbudt</span>
+                  <span>{dkk(quote.total)}</span>
+                </div>
+              </div>
+            </Card>
+          )}
         </TabsContent>
       </Tabs>
     </>
