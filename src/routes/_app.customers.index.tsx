@@ -11,7 +11,7 @@ import { customers, STAGE_LABELS, type CustomerStage, type CustomerType } from "
 import { dkk } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/_app/customers")({
+export const Route = createFileRoute("/_app/customers/")({
   head: () => ({
     meta: [
       { title: "Kunder — Movena" },

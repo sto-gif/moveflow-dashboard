@@ -11,7 +11,7 @@ import { leads, LEAD_STAGE_LABELS, LEAD_STAGE_COLORS, type LeadStage } from "@/m
 import { dkk } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/_app/leads")({
+export const Route = createFileRoute("/_app/leads/")({
   head: () => ({
     meta: [
       { title: "Leads — Movena" },
