@@ -25,13 +25,16 @@ export const Route = createFileRoute("/_app/leads/$leadId")({
 
 function LeadDetailPage() {
   const { leadId } = Route.useParams();
-  const { leads, updateLeadStage, convertLeadToCustomer, createQuote } = useMockStore();
+  const { leads, updateLeadStage, updateLead, convertLeadToCustomer, createQuote } = useMockStore();
   const navigate = useNavigate();
   const lead = leads.find((l) => l.id === leadId) ?? seedLeads.find((l) => l.id === leadId);
   const [notes, setNotes] = useState<{ id: string; text: string; at: Date }[]>(
     lead ? [{ id: "n1", text: lead.note, at: lead.createdAt }] : [],
   );
   const [draft, setDraft] = useState("");
+  const [activities, setActivities] = useState<{ id: string; type: "opkald" | "moede" | "email" | "sms"; note: string; at: Date }[]>([]);
+  const [actType, setActType] = useState<"opkald" | "moede" | "email" | "sms">("opkald");
+  const [actNote, setActNote] = useState("");
   if (!lead) {
     return (
       <div className="p-10 text-center">
