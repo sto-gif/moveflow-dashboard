@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
-import { Plus, Phone, Calendar as CalIcon, Car, Sparkles, X, Check } from "lucide-react";
+import { Plus, Phone, Calendar as CalIcon, Car, Sparkles, X, Check, Table as TableIcon, List } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -70,8 +70,8 @@ function CrewPage() {
 
         <Tabs defaultValue="tabel">
           <TabsList>
-            <TabsTrigger value="tabel">Tabel</TabsTrigger>
-            <TabsTrigger value="kalender">Kalender</TabsTrigger>
+            <TabsTrigger value="tabel"><TableIcon className="mr-1.5 h-3.5 w-3.5" strokeWidth={1.5} /> Tabel</TabsTrigger>
+            <TabsTrigger value="kalender"><CalIcon className="mr-1.5 h-3.5 w-3.5" strokeWidth={1.5} /> Kalender</TabsTrigger>
           </TabsList>
 
           <TabsContent value="tabel" className="mt-4">
@@ -264,8 +264,8 @@ function CrewCalendar() {
       <div className="flex flex-wrap items-center gap-2">
         <Tabs value={view} onValueChange={(v) => setView(v as "kalender" | "oversigt")}>
           <TabsList>
-            <TabsTrigger value="kalender">Kalender</TabsTrigger>
-            <TabsTrigger value="oversigt">Oversigt</TabsTrigger>
+            <TabsTrigger value="kalender"><CalIcon className="mr-1.5 h-3.5 w-3.5" strokeWidth={1.5} /> Kalender</TabsTrigger>
+            <TabsTrigger value="oversigt"><List className="mr-1.5 h-3.5 w-3.5" strokeWidth={1.5} /> Oversigt</TabsTrigger>
           </TabsList>
         </Tabs>
         <Select value={employeeId} onValueChange={setEmployeeId}>

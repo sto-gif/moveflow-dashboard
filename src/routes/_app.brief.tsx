@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { Plus, Send, FileText, CheckCircle2 } from "lucide-react";
+import { Plus, Send, FileText, CheckCircle2, List, Calendar as CalendarIcon } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -50,8 +50,8 @@ function BriefPage() {
       <div className="p-6">
         <Tabs defaultValue="liste">
           <TabsList>
-            <TabsTrigger value="liste">Liste</TabsTrigger>
-            <TabsTrigger value="kalender">Kalender</TabsTrigger>
+            <TabsTrigger value="liste"><List className="mr-1.5 h-3.5 w-3.5" strokeWidth={1.5} /> Liste</TabsTrigger>
+            <TabsTrigger value="kalender"><CalendarIcon className="mr-1.5 h-3.5 w-3.5" strokeWidth={1.5} /> Kalender</TabsTrigger>
           </TabsList>
 
           <TabsContent value="liste" className="mt-4">

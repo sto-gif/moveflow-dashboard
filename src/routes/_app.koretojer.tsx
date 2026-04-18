@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Plus, Truck, Wrench, CalendarDays } from "lucide-react";
+import { Plus, Truck, Wrench, CalendarDays, Table as TableIcon, CalendarRange } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -51,9 +51,9 @@ function VehiclesPage() {
       <div className="space-y-4 p-6">
         <Tabs defaultValue="tabel">
           <TabsList>
-            <TabsTrigger value="tabel">Tabel</TabsTrigger>
-            <TabsTrigger value="ugentlig">Ugentlig</TabsTrigger>
-            <TabsTrigger value="kalender">Kalender</TabsTrigger>
+            <TabsTrigger value="tabel"><TableIcon className="mr-1.5 h-3.5 w-3.5" strokeWidth={1.5} /> Tabel</TabsTrigger>
+            <TabsTrigger value="ugentlig"><CalendarRange className="mr-1.5 h-3.5 w-3.5" strokeWidth={1.5} /> Ugentlig</TabsTrigger>
+            <TabsTrigger value="kalender"><CalendarDays className="mr-1.5 h-3.5 w-3.5" strokeWidth={1.5} /> Kalender</TabsTrigger>
           </TabsList>
 
           <TabsContent value="tabel" className="mt-4">

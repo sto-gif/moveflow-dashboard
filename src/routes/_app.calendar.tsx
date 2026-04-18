@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Sun, CalendarRange, CalendarDays } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -39,9 +39,9 @@ function CalendarPage() {
       <PageHeader title="Kalender" description="Alle jobs, crew og deadlines" actions={
         <Tabs defaultValue="month">
           <TabsList>
-            <TabsTrigger value="day">Dag</TabsTrigger>
-            <TabsTrigger value="week">Uge</TabsTrigger>
-            <TabsTrigger value="month">Måned</TabsTrigger>
+            <TabsTrigger value="day"><Sun className="mr-1.5 h-3.5 w-3.5" strokeWidth={1.5} /> Dag</TabsTrigger>
+            <TabsTrigger value="week"><CalendarRange className="mr-1.5 h-3.5 w-3.5" strokeWidth={1.5} /> Uge</TabsTrigger>
+            <TabsTrigger value="month"><CalendarDays className="mr-1.5 h-3.5 w-3.5" strokeWidth={1.5} /> Måned</TabsTrigger>
           </TabsList>
         </Tabs>
       } />
