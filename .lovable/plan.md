@@ -1,52 +1,34 @@
 
-# Movena — Detail Pages, Kanban Polish & Vagtplan Calendar
+# Fix detail-page routing + verify kanban styling
 
-## 1. Kanban polish (global, single source of truth)
-Add reusable utilities in `src/styles.css`:
-- `.kanban-column` → `bg-[#F8FAFC] rounded-lg p-3` 
-- `.kanban-column-header` → `pb-3 mb-3 border-b border-border flex items-center justify-between`
-- `.kanban-card` → `bg-white border border-[#E2E8F0] rounded-md p-3 transition-shadow duration-150 hover:shadow-sm cursor-pointer`
-- `.kanban-cards` → `flex flex-col gap-3` (12px)
+## Root cause: detail pages don't render
 
-Apply across `_app.jobs.tsx`, `_app.leads.tsx`, `_app.customers.tsx` kanban renderers — replace ad-hoc card classes with these utilities.
+In TanStack file-based routing, `_app.leads.tsx` is a **layout route** for its children (`_app.leads.$leadId.tsx`). A layout route must render `<Outlet />` for child routes to display. Currently `_app.leads.tsx` renders the leads list directly with no `<Outlet />`, so `/leads/L-5000` matches the child route but the parent's list UI overwrites it. Same issue for `_app.customers.tsx`.
 
-## 2. Lead detail — full page (`/leads/$leadId`)
-- New route `src/routes/_app.leads.$leadId.tsx`. Header (back link, name, type/status/source badges, "Send tilbud" + "Konverter til kunde" buttons), contact card, quote info card.
-- Tabs: **Timeline | Tilbud | Noter**.
-  - Timeline: derive mock activity feed from lead (`createdAt`, stage transitions, generated contact/quote/sms entries) — icon + date + description.
-  - Tilbud: filter `quotes` mock by matching customer name/lead id (best-effort) → list with status badge + amount + link.
-  - Noter: textarea + list of mock notes (in-memory `useState`).
-- `_app.leads.tsx`: rows/kanban cards become `<Link to="/leads/$leadId">`. Remove existing inline drawer if present.
+The page title updates because `head()` from the matched child route still applies — only the rendered tree is wrong.
 
-## 3. Customer detail — full page (`/customers/$customerId`)
-- New route `src/routes/_app.customers.$customerId.tsx`. Header (back, name, type badge, CVR if erhverv, lifetime value, back arrow), contact card, stats row (total value, # moves, source, first move date).
-- Tabs: **Flytninger | Tilbud | Kommunikation | Lager | Noter**.
-  - Flytninger: table of jobs filtered by `job.customerId === customer.id` (job#, date, from→to, volume, crew, status, price) — rows link to jobs page (anchor by id).
-  - Tilbud: filtered quotes table.
-  - Kommunikation: chronological SMS/email mock list.
-  - Lager: filter `storage` mock by customer.
-  - Noter: notes textarea (local state).
-- `_app.customers.tsx`: rows/kanban cards link to `/customers/$customerId`.
-- Hydration fix: customer table description (`986.000 kr. … 13 nye`) is recomputed from random mock — pin via `MOCK_TODAY` or memoized seed so SSR/client match. Same sweep for leads description string causing the current hydration warning.
+## Fix: split list route from layout
 
-## 4. Vagtplan calendar (`_app.crew.tsx`)
-Restructure Kalender tab:
-- Sub-tabs: **Kalender | Oversigt** (rename existing grid to "Oversigt").
-- Kalender: month/week/day view (reuse Jobs `CalendarGrid` pattern) where each day cell lists employees scheduled and their job IDs. Color dots per employee.
-- Add **employee filter** `<Select>` above the calendar: "Alle medarbejdere" or single member → filters cells to that person and shows total hours for the period.
-- Keep existing Dag/Uge/Måned range toggle.
+Standard TanStack pattern — convert each parent into a pure layout, move list content to an index route:
 
-## 5. Consistent kanban tab labels
-- `_app.leads.tsx`: tabs `Kanban | Tabel` (already done — verify spacing matches Jobs).
-- `_app.customers.tsx`: rename tabs to `Pipeline | Tabel` (Pipeline = kanban view, since customer stages differ).
-- `_app.jobs.tsx`: keep `Kanban | Kalender | Tabel`.
-All three use identical `<Tabs>` styling/position directly under PageHeader.
+1. **Rename** `src/routes/_app.leads.tsx` → `src/routes/_app.leads.index.tsx` (keeps URL `/leads`, contains the existing list/kanban/table UI unchanged).
+2. **Create** new `src/routes/_app.leads.tsx` as a 4-line layout: `createFileRoute("/_app/leads")` with `component: () => <Outlet />`.
+3. Same for customers: rename `_app.customers.tsx` → `_app.customers.index.tsx`, create new `_app.customers.tsx` as Outlet-only layout.
+
+Result: `/leads` renders list (via index), `/leads/$leadId` renders detail — both nested under the new pure layout, no UI conflict.
+
+## Kanban styling — already consistent
+
+Verified: `_app.jobs.tsx`, `_app.leads.tsx`, and `_app.customers.tsx` all use identical `.kanban-column`, `.kanban-column-header`, `.kanban-cards`, `.kanban-card` utility classes (defined once in `styles.css`). The perceived inconsistency was likely caused by the detail-page bug masking interaction differences. No CSS changes needed; will visually confirm after the routing fix.
+
+## Quiet hydration fix
+
+Dashboard description ("28 aktive jobs" vs "37") drifts between SSR and client because `_app.index.tsx` recomputes counts each render against a mock that uses non-deterministic logic. Memoize the count from the seeded mock data once at module level (or pin via `MOCK_TODAY`) so SSR and client agree.
 
 ## Files
-**Create**: `src/routes/_app.leads.$leadId.tsx`, `src/routes/_app.customers.$customerId.tsx`.
-**Modify**: `src/styles.css`, `_app.jobs.tsx`, `_app.leads.tsx`, `_app.customers.tsx`, `_app.crew.tsx`. Touch `mocks/_helpers.ts` only if needed for deterministic counts.
+**Create**: `_app.leads.index.tsx`, `_app.customers.index.tsx`, new pure-layout `_app.leads.tsx`, new pure-layout `_app.customers.tsx`.
+**Modify**: `_app.index.tsx` (deterministic count).
+**Auto-regenerated**: `routeTree.gen.ts`.
 
 ## Out of scope
-- Real notes persistence (in-memory only).
-- Drag-and-drop on kanban.
-- Editing lead/customer fields from detail page (read-only with action buttons stubbed).
+Kanban CSS changes (already consistent), drag-and-drop, real persistence.
