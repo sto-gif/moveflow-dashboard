@@ -72,22 +72,42 @@ function CustomerDetailPage() {
 
   const TypeIcon = customer.type === "erhverv" ? Building2 : User;
 
+  const patch = (p: Partial<typeof customer>) => updateCustomer(customer.id, p);
+
   return (
     <div>
       <div className="flex flex-col gap-3 border-b border-border px-6 py-4">
         <Link to="/customers" className="inline-flex w-fit items-center gap-1.5 text-body-sm text-muted-foreground hover:text-foreground">
           <ArrowLeft className="h-4 w-4" strokeWidth={1.5} /> Tilbage til kunder
         </Link>
-        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h1 className="flex items-center gap-2 text-page-title">
-              <TypeIcon className="h-6 w-6 text-muted-foreground" strokeWidth={1.5} />
-              {customer.name}
-            </h1>
+        <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+          <div className="flex-1">
+            <div className="flex items-center gap-2">
+              <TypeIcon className="h-6 w-6 text-muted-foreground shrink-0" strokeWidth={1.5} />
+              <Input
+                value={customer.name}
+                onChange={(e) => patch({ name: e.target.value })}
+                className="h-10 max-w-md border-0 px-2 text-page-title shadow-none focus-visible:ring-1 focus-visible:ring-ring"
+              />
+            </div>
             <div className="mt-2 flex flex-wrap items-center gap-2">
-              <Badge variant="outline" className="text-[11px] capitalize">{customer.type}</Badge>
+              <Select value={customer.type} onValueChange={(v) => patch({ type: v as CustomerType })}>
+                <SelectTrigger className="h-7 w-auto gap-1 px-2 text-[11px] capitalize">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {TYPES.map((t) => <SelectItem key={t} value={t} className="capitalize">{t}</SelectItem>)}
+                </SelectContent>
+              </Select>
+              <Select value={customer.stage} onValueChange={(v) => patch({ stage: v as CustomerStage })}>
+                <SelectTrigger className="h-7 w-auto gap-1 px-2 text-[11px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {STAGES.map((s) => <SelectItem key={s} value={s}>{STAGE_LABELS[s]}</SelectItem>)}
+                </SelectContent>
+              </Select>
               {customer.cvr && <Badge variant="outline" className="text-[11px]">CVR {customer.cvr}</Badge>}
-              <Badge variant="outline" className="text-[11px]">{STAGE_LABELS[customer.stage]}</Badge>
               <span className="text-body-sm text-muted-foreground">
                 Lifetime value: <span className="font-semibold text-foreground tabular-nums">{dkk(customer.totalValue)}</span>
               </span>
@@ -104,11 +124,34 @@ function CustomerDetailPage() {
         <div className="grid gap-6 md:grid-cols-2">
           <Card className="p-4">
             <div className="text-caption uppercase text-muted-foreground">Kontakt</div>
-            <div className="mt-3 space-y-2 text-body">
-              <div className="flex items-center gap-2"><Mail className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} /> {customer.email}</div>
-              <div className="flex items-center gap-2"><Phone className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} /> {customer.phone}</div>
-              <div className="text-body-sm text-muted-foreground">
-                {customer.address.street}, {customer.address.zip} {customer.address.city}
+            <div className="mt-3 space-y-3">
+              <div className="space-y-1">
+                <Label className="text-[11px] uppercase tracking-wide text-muted-foreground">Email</Label>
+                <div className="relative">
+                  <Mail className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" strokeWidth={1.5} />
+                  <Input className="pl-8" value={customer.email} onChange={(e) => patch({ email: e.target.value })} />
+                </div>
+              </div>
+              <div className="space-y-1">
+                <Label className="text-[11px] uppercase tracking-wide text-muted-foreground">Telefon</Label>
+                <div className="relative">
+                  <Phone className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" strokeWidth={1.5} />
+                  <Input className="pl-8" value={customer.phone} onChange={(e) => patch({ phone: e.target.value })} />
+                </div>
+              </div>
+              <div className="grid grid-cols-[1fr_auto_1fr] gap-2">
+                <div className="space-y-1">
+                  <Label className="text-[11px] uppercase tracking-wide text-muted-foreground">Adresse</Label>
+                  <Input value={customer.address.street} onChange={(e) => patch({ address: { ...customer.address, street: e.target.value } })} />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-[11px] uppercase tracking-wide text-muted-foreground">Postnr.</Label>
+                  <Input className="w-20" value={customer.address.zip} onChange={(e) => patch({ address: { ...customer.address, zip: e.target.value } })} />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-[11px] uppercase tracking-wide text-muted-foreground">By</Label>
+                  <Input value={customer.address.city} onChange={(e) => patch({ address: { ...customer.address, city: e.target.value } })} />
+                </div>
               </div>
             </div>
           </Card>
