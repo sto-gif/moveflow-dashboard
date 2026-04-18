@@ -181,6 +181,7 @@ function LeadsPage() {
       />
 
       <div className="p-6">
+        <FilterChips filters={filterGroups} value={filterValues} onChange={setFilters} />
         <Tabs defaultValue="kanban">
           <TabsList>
             <TabsTrigger value="kanban"><LayoutGrid className="mr-1.5 h-3.5 w-3.5" strokeWidth={1.5} /> Kanban</TabsTrigger>
