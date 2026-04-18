@@ -175,10 +175,17 @@ function LeadDetailPage() {
                 <div className="text-caption text-muted-foreground">Oprettet</div>
                 <div className="text-label py-2">{lead.createdAt.toLocaleDateString("da-DK")}</div>
               </div>
-              <div>
-                <div className="text-caption text-muted-foreground">Kilde</div>
-                <div className="text-label py-2">{lead.source}</div>
-              </div>
+              <label className="space-y-1">
+                <span className="text-caption text-muted-foreground">Kilde</span>
+                <Select value={lead.source} onValueChange={(v) => updateLead(lead.id, { source: v as typeof lead.source })}>
+                  <SelectTrigger className="h-9 text-sm"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {LEAD_SOURCES.map((s) => (
+                      <SelectItem key={s} value={s}>{s}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </label>
             </div>
           </Card>
         </div>
