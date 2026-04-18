@@ -1,8 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
 import {
   TrendingUp, TrendingDown, Briefcase, Users, Wallet, Activity,
   AlertTriangle, Clock, CheckCircle2,
 } from "lucide-react";
+import { CreateDialog } from "@/components/create-dialog";
+import { useMockStore } from "@/store/mock-store";
 import {
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   BarChart, Bar,
@@ -38,6 +41,8 @@ export const Route = createFileRoute("/_app/")({
 });
 
 function DashboardPage() {
+  const navigate = useNavigate();
+  const { createJob } = useMockStore();
   const today = todaysJobs();
   const completedThisMonth = jobs.filter(
     (j) => j.status === "afsluttet" && j.date.getMonth() === MOCK_TODAY.getMonth(),
@@ -69,24 +74,43 @@ function DashboardPage() {
         description={`God morgen, Anders — ${today.length} jobs i dag, ${activeJobs} aktive jobs.`}
         actions={
           <>
-            <Button variant="outline" size="sm">Eksportér</Button>
-            <Button size="sm">Nyt job</Button>
+            <Button variant="outline" size="sm" onClick={() => toast.success("Eksport startet")}>Eksportér</Button>
+            <CreateDialog
+              trigger={<Button size="sm">Nyt job</Button>}
+              title="Opret nyt job"
+              fields={[
+                { name: "customerName", label: "Kunde", defaultValue: "Ny kunde" },
+                { name: "volumeM3", label: "Volumen (m³)", type: "number", defaultValue: 30 },
+                { name: "revenue", label: "Omsætning (DKK)", type: "number", defaultValue: 18000 },
+                { name: "startTime", label: "Starttid", defaultValue: "08:00" },
+              ]}
+              onSubmit={(v) => {
+                const job = createJob({
+                  customerName: v.customerName,
+                  volumeM3: Number(v.volumeM3) || 30,
+                  revenue: Number(v.revenue) || 18000,
+                  startTime: v.startTime || "08:00",
+                });
+                toast.success(`Job #${job.number} oprettet`);
+                navigate({ to: "/jobs" });
+              }}
+            />
           </>
         }
       />
       <div className="space-y-8 p-6">
         {/* Hero KPIs */}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-          <KpiHero label="Omsætning MTD" value={dkk(revenueMTD)} delta="+12,4 % vs. sidste måned" up icon={Wallet} />
-          <KpiHero label="Aktive jobs" value={number(activeJobs)} delta={`${today.length} starter i dag`} icon={Briefcase} />
-          <KpiHero label="Jobs udført" value={number(completedThisMonth.length)} delta="+8 vs. sidste måned" up icon={CheckCircle2} />
+          <Link to="/reports"><KpiHero label="Omsætning MTD" value={dkk(revenueMTD)} delta="+12,4 % vs. sidste måned" up icon={Wallet} /></Link>
+          <Link to="/jobs"><KpiHero label="Aktive jobs" value={number(activeJobs)} delta={`${today.length} starter i dag`} icon={Briefcase} /></Link>
+          <Link to="/jobs"><KpiHero label="Jobs udført" value={number(completedThisMonth.length)} delta="+8 vs. sidste måned" up icon={CheckCircle2} /></Link>
         </div>
 
         {/* Secondary KPIs */}
         <div className="grid grid-cols-2 gap-6 md:grid-cols-3">
-          <KpiSmall label="Konvertering" value={pct(conversion)} delta="+1,8 %" up icon={Users} />
-          <KpiSmall label="Snit pr. job" value={dkk(avgValue)} delta="-2,1 %" icon={TrendingUp} />
-          <KpiSmall label="Crew-udnyttelse" value={pct(utilization)} delta="+3,1 %" up icon={Activity} />
+          <Link to="/leads"><KpiSmall label="Konvertering" value={pct(conversion)} delta="+1,8 %" up icon={Users} /></Link>
+          <Link to="/reports"><KpiSmall label="Snit pr. job" value={dkk(avgValue)} delta="-2,1 %" icon={TrendingUp} /></Link>
+          <Link to="/crew"><KpiSmall label="Crew-udnyttelse" value={pct(utilization)} delta="+3,1 %" up icon={Activity} /></Link>
         </div>
 
         {/* Charts row */}
