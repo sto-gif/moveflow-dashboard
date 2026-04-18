@@ -1,6 +1,10 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { zodValidator, fallback } from "@tanstack/zod-adapter";
+import { z } from "zod";
 import { RowCount } from "@/components/row-count";
-import { useEffect, useState } from "react";
+import { FilterBar, FilterChips, type FilterGroup } from "@/components/filter-bar";
+import { applyFilters, type FilterValues } from "@/hooks/use-filters";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Plus, Search, Image as ImageIcon, Upload, Camera, Building2, User, Mail, Phone, Pencil, LayoutGrid, Table as TableIcon, Calendar as CalendarIcon, Truck, MapPin, CheckCircle2, Circle, Clock, ExternalLink } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -26,10 +30,16 @@ import { CreateDialog } from "@/components/create-dialog";
 import { KanbanBoard } from "@/components/kanban-board";
 import { StageSelect } from "@/components/stage-select";
 
+const jobsSearchSchema = z.object({
+  job: fallback(z.string().optional(), undefined),
+  status: fallback(z.string().array(), []).default([]),
+  crew: fallback(z.string().array(), []).default([]),
+  vehicle: fallback(z.string().array(), []).default([]),
+  month: fallback(z.string().array(), []).default([]),
+});
+
 export const Route = createFileRoute("/_app/jobs")({
-  validateSearch: (s: Record<string, unknown>): { job?: string } => ({
-    job: typeof s.job === "string" ? s.job : undefined,
-  }),
+  validateSearch: zodValidator(jobsSearchSchema),
   head: () => ({
     meta: [
       { title: "Jobs — Movena" },
@@ -40,10 +50,12 @@ export const Route = createFileRoute("/_app/jobs")({
 });
 
 const STATUSES: JobStatus[] = ["planlagt", "bekraeftet", "i_gang", "afsluttet", "annulleret"];
+const MONTHS = ["jan", "feb", "mar", "apr", "maj", "jun", "jul", "aug", "sep", "okt", "nov", "dec"];
 
 function JobsPage() {
   const { jobs, createJob, updateJobStatus } = useMockStore();
-  const { job: jobParam } = Route.useSearch();
+  const searchParams = Route.useSearch();
+  const jobParam = searchParams.job;
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<string | null>(null);
@@ -52,11 +64,69 @@ function JobsPage() {
     if (jobParam) setSelected(jobParam);
   }, [jobParam]);
 
-  const filtered = jobs.filter(
-    (j) =>
-      j.customerName.toLowerCase().includes(search.toLowerCase()) ||
-      j.number.includes(search),
+  const filterValues: FilterValues = useMemo(
+    () => ({
+      status: searchParams.status,
+      crew: searchParams.crew,
+      vehicle: searchParams.vehicle,
+      month: searchParams.month,
+    }),
+    [searchParams.status, searchParams.crew, searchParams.vehicle, searchParams.month],
   );
+
+  const setFilters = (next: FilterValues) => {
+    navigate({
+      to: "/jobs",
+      search: {
+        job: jobParam,
+        status: next.status ?? [],
+        crew: next.crew ?? [],
+        vehicle: next.vehicle ?? [],
+        month: next.month ?? [],
+      },
+      replace: true,
+    });
+  };
+
+  const filterGroups: FilterGroup[] = useMemo(() => {
+    const statusC = new Map<string, number>();
+    const crewC = new Map<string, number>();
+    const monthC = new Map<string, number>();
+    const vehicleC = new Map<string, number>();
+    jobs.forEach((j) => {
+      statusC.set(j.status, (statusC.get(j.status) ?? 0) + 1);
+      j.crewIds.forEach((id) => crewC.set(id, (crewC.get(id) ?? 0) + 1));
+      const m = String(j.date.getMonth());
+      monthC.set(m, (monthC.get(m) ?? 0) + 1);
+      const v = j.vehicleId ? "yes" : "no";
+      vehicleC.set(v, (vehicleC.get(v) ?? 0) + 1);
+    });
+    return [
+      { key: "status", label: "Status", options: STATUSES.map((s) => ({ value: s, label: JOB_STATUS_LABELS[s], count: statusC.get(s) })) },
+      { key: "crew", label: "Crew-medlem", options: crew.map((c) => ({ value: c.id, label: c.name, count: crewC.get(c.id) })) },
+      { key: "vehicle", label: "Køretøj tildelt", options: [
+        { value: "yes", label: "Ja", count: vehicleC.get("yes") },
+        { value: "no", label: "Nej", count: vehicleC.get("no") },
+      ] },
+      { key: "month", label: "Måned", options: MONTHS.map((label, idx) => ({ value: String(idx), label, count: monthC.get(String(idx)) })).filter((o) => (o.count ?? 0) > 0) },
+    ];
+  }, [jobs]);
+
+  const filtered = useMemo(() => {
+    let list = jobs.filter(
+      (j) =>
+        j.customerName.toLowerCase().includes(search.toLowerCase()) ||
+        j.number.includes(search),
+    );
+    list = applyFilters(list, filterValues, {
+      status: (j) => j.status,
+      crew: (j) => j.crewIds,
+      vehicle: (j) => (j.vehicleId ? "yes" : "no"),
+      month: (j) => String(j.date.getMonth()),
+    });
+    return list;
+  }, [jobs, search, filterValues]);
+
   const job = jobs.find((j) => j.id === selected);
 
   const itemsByColumn = STATUSES.reduce((acc, s) => {
@@ -66,7 +136,7 @@ function JobsPage() {
 
   const closeSheet = () => {
     setSelected(null);
-    if (jobParam) navigate({ to: "/jobs", search: {} });
+    if (jobParam) navigate({ to: "/jobs", search: { ...searchParams, job: undefined } });
   };
 
   return (
@@ -80,6 +150,7 @@ function JobsPage() {
               <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" strokeWidth={1.5} />
               <Input placeholder="Søg jobs…" value={search} onChange={(e) => setSearch(e.target.value)} className="h-9 w-56 pl-8" />
             </div>
+            <FilterBar filters={filterGroups} value={filterValues} onChange={setFilters} />
             <CreateDialog
               trigger={<Button size="sm"><Plus className="h-4 w-4" strokeWidth={1.5} /> Nyt job</Button>}
               title="Opret nyt job"
@@ -103,6 +174,7 @@ function JobsPage() {
         }
       />
       <div className="p-6">
+        <FilterChips filters={filterGroups} value={filterValues} onChange={setFilters} />
         <Tabs defaultValue="kanban">
           <TabsList>
             <TabsTrigger value="kanban"><LayoutGrid className="mr-1.5 h-3.5 w-3.5" strokeWidth={1.5} /> Kanban</TabsTrigger>
