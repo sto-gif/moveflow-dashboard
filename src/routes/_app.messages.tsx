@@ -22,6 +22,15 @@ export const Route = createFileRoute("/_app/messages")({
   component: FlowsPage,
 });
 
+function inferTiming(trigger: string): string {
+  const t = trigger.toLowerCase();
+  if (t.includes("24")) return "24h";
+  if (t.includes("30 min") || t.includes("30min")) return "30min";
+  if (t.includes("3 dage")) return "3d_after";
+  if (t.includes("dagen efter") || t.includes("1 dag")) return "1d_after";
+  return "now";
+}
+
 function FlowsPage() {
   const [seqs, setSeqs] = useState(sequences);
 
