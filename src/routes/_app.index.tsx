@@ -40,7 +40,7 @@ export const Route = createFileRoute("/_app/")({
 function DashboardPage() {
   const today = todaysJobs();
   const completedThisMonth = jobs.filter(
-    (j) => j.status === "afsluttet" && j.date.getMonth() === new Date().getMonth(),
+    (j) => j.status === "afsluttet" && j.date.getMonth() === MOCK_TODAY.getMonth(),
   );
   const revenueMTD = completedThisMonth.reduce((s, j) => s + j.revenue, 0);
   const avgValue = completedThisMonth.length ? revenueMTD / completedThisMonth.length : 0;
@@ -50,7 +50,7 @@ function DashboardPage() {
   const utilization = 78.4;
 
   const revenueData = Array.from({ length: 12 }, (_, i) => {
-    const m = new Date();
+    const m = new Date(MOCK_TODAY);
     m.setMonth(m.getMonth() - (11 - i));
     return {
       m: m.toLocaleDateString("da-DK", { month: "short" }),
@@ -74,59 +74,69 @@ function DashboardPage() {
           </>
         }
       />
-      <div className="space-y-4 p-6">
-        {/* KPI strip */}
-        <div className="grid grid-cols-2 gap-3 lg:grid-cols-6">
-          <Kpi label="Omsætning MTD" value={dkk(revenueMTD)} delta="+12,4 %" up icon={Wallet} />
-          <Kpi label="Jobs udført" value={number(completedThisMonth.length)} delta="+8" up icon={Briefcase} />
-          <Kpi label="Crew-udnyttelse" value={pct(utilization)} delta="+3,1 %" up icon={Activity} />
-          <Kpi label="Gns. jobværdi" value={dkk(avgValue)} delta="-2,1 %" icon={TrendingUp} />
-          <Kpi label="Aktive jobs" value={number(activeJobs)} delta={`${today.length} i dag`} icon={Briefcase} />
-          <Kpi label="Konvertering" value={pct(conversion)} delta="+1,8 %" up icon={Users} />
+      <div className="space-y-8 p-6">
+        {/* Hero KPIs */}
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          <KpiHero label="Omsætning MTD" value={dkk(revenueMTD)} delta="+12,4 % vs. sidste måned" up icon={Wallet} />
+          <KpiHero label="Aktive jobs" value={number(activeJobs)} delta={`${today.length} starter i dag`} icon={Briefcase} />
+          <KpiHero label="Jobs udført" value={number(completedThisMonth.length)} delta="+8 vs. sidste måned" up icon={CheckCircle2} />
+        </div>
+
+        {/* Secondary KPIs */}
+        <div className="grid grid-cols-2 gap-6 md:grid-cols-3">
+          <KpiSmall label="Konvertering" value={pct(conversion)} delta="+1,8 %" up icon={Users} />
+          <KpiSmall label="Snit pr. job" value={dkk(avgValue)} delta="-2,1 %" icon={TrendingUp} />
+          <KpiSmall label="Crew-udnyttelse" value={pct(utilization)} delta="+3,1 %" up icon={Activity} />
         </div>
 
         {/* Charts row */}
-        <div className="grid gap-4 lg:grid-cols-3">
-          <Card className="lg:col-span-2 p-5">
+        <div className="grid gap-6 lg:grid-cols-3">
+          <Card className="lg:col-span-2">
             <div className="mb-4 flex items-center justify-between">
               <div>
-                <h3 className="text-sm font-semibold">Omsætning, sidste 12 mdr.</h3>
-                <p className="text-xs text-muted-foreground">DKK pr. måned</p>
+                <h3 className="text-section">Omsætning, sidste 12 mdr.</h3>
+                <p className="text-caption text-muted-foreground">DKK pr. måned</p>
               </div>
-              <Badge variant="secondary">+18,2 % YoY</Badge>
+              <Badge variant="success">+18,2 % YoY</Badge>
             </div>
             <ResponsiveContainer width="100%" height={240}>
               <LineChart data={revenueData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="oklch(0.92 0.01 255)" />
-                <XAxis dataKey="m" tick={{ fontSize: 11 }} stroke="oklch(0.5 0.02 257)" />
-                <YAxis tick={{ fontSize: 11 }} stroke="oklch(0.5 0.02 257)"
+                <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
+                <XAxis dataKey="m" tick={{ fontSize: 11 }} stroke="#94A3B8" />
+                <YAxis tick={{ fontSize: 11 }} stroke="#94A3B8"
                   tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
                 <Tooltip
                   formatter={(v: any) => dkk(Number(v))}
-                  contentStyle={{ borderRadius: 8, fontSize: 12, border: "1px solid oklch(0.92 0.01 255)" }}
+                  contentStyle={{ borderRadius: 8, fontSize: 12, border: "1px solid #E2E8F0" }}
                 />
                 <Line
                   type="monotone" dataKey="omsætning"
-                  stroke="oklch(0.487 0.214 264)" strokeWidth={2.5}
+                  stroke="#1D4ED8" strokeWidth={2}
                   dot={{ r: 3 }} activeDot={{ r: 5 }}
                 />
               </LineChart>
             </ResponsiveContainer>
+            <p className="mt-3 text-caption text-muted-foreground">
+              Omsætning er steget 18 % i forhold til sidste måned.
+            </p>
           </Card>
-          <Card className="p-5">
+          <Card>
             <div className="mb-4">
-              <h3 className="text-sm font-semibold">Lead funnel</h3>
-              <p className="text-xs text-muted-foreground">Antal leads pr. fase</p>
+              <h3 className="text-section">Lead funnel</h3>
+              <p className="text-caption text-muted-foreground">Antal leads pr. fase</p>
             </div>
             <ResponsiveContainer width="100%" height={240}>
               <BarChart data={funnel} layout="vertical" margin={{ left: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="oklch(0.92 0.01 255)" horizontal={false} />
-                <XAxis type="number" tick={{ fontSize: 11 }} stroke="oklch(0.5 0.02 257)" />
-                <YAxis type="category" dataKey="name" tick={{ fontSize: 11 }} width={90} stroke="oklch(0.5 0.02 257)" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" horizontal={false} />
+                <XAxis type="number" tick={{ fontSize: 11 }} stroke="#94A3B8" />
+                <YAxis type="category" dataKey="name" tick={{ fontSize: 11 }} width={90} stroke="#94A3B8" />
                 <Tooltip contentStyle={{ borderRadius: 8, fontSize: 12 }} />
-                <Bar dataKey="v" fill="oklch(0.487 0.214 264)" radius={[0, 4, 4, 0]} />
+                <Bar dataKey="v" fill="#1D4ED8" radius={[0, 4, 4, 0]} />
               </BarChart>
             </ResponsiveContainer>
+            <p className="mt-3 text-caption text-muted-foreground">
+              3 jobs mangler crew-tildeling denne uge.
+            </p>
           </Card>
         </div>
 
