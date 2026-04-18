@@ -1,76 +1,67 @@
 
-# Movena — Comprehensive MVP Update
+# Movena MVP — Round 2 Refinements
 
-Rebranding the app to **Movena** and implementing 14 major feature updates. This is a large refactor touching branding, navigation structure, and adding/restructuring 8+ modules.
+11 focused changes touching sidebar density, layout patterns, data filtering, and module restructuring.
 
-## Branding (global)
-- Add Movena logo (`Fitted_Horizontal_transparent.png`) and icon (`Icon_only_L.svg`) to `src/assets/`.
-- Update `src/styles.css` with the full Movena palette (Navy `#0B1F3B`, Blue `#1D4ED8`, Teal `#29ABE2`, Orange `#EA580C`, BG `#F8FAFC`, surface white, borders `#E2E8F0`, text `#0F172A`, muted `#475569`, status colors, radii 8/12/4px).
-- Manrope font already set; verify weights 400–800.
-- Type scale utilities in `styles.css`: `.text-page-title` (24/700), `.text-section` (18/600), `.text-label` (14/600), `.text-body` (14/400), `.text-body-sm` (13/400), `.text-caption` (12/500).
-- Sidebar stays light/white with logo at top, active items use teal indicator + blue text.
-- Replace "FlytOperations" → "Movena" everywhere (root title, sidebar header, page metadata, mock company).
-- Update favicon in `__root.tsx`.
+## 1. Sidebar & logo — 25% more compact
+`src/components/ui/sidebar.tsx`: change `SIDEBAR_WIDTH` from `16rem` → `12rem`, `SIDEBAR_WIDTH_ICON` from `3rem` → `2.5rem`.
+`src/components/app-sidebar.tsx`: shrink logo from `h-8` → `h-6`, icon from `h-8 w-8` → `h-6 w-6`, tighten group/item padding (`py-2`→`py-1`, gap-2→gap-1.5), smaller group label (`text-[10px]`).
 
-## Sidebar restructure
-New grouping with new items:
-- **Overview**: Dashboard, **Daglig Brief** (new)
-- **Salg**: **Leads** (new), Kunder, Tilbud, Fakturaer
-- **Drift**: Jobs, Kalender, Vagtplan (Crew), Opgaver, **Lager** (new), Materialer (renamed Inventar), Køretøjer (split from Materialer)
-- **Engagement**: Beskeder
-- **Insights**: Rapporter
-- **Settings**: Indstillinger
+## 2. Daglig Brief — full-page editor (new route)
+- Convert `_app.brief.tsx` list page: remove `<Sheet>`, replace with `Link to="/brief/$briefId"` rows + new "Opret ny brief" button that navigates to `/brief/new`.
+- Create `_app.brief.$briefId.tsx` — full-page editor (extracts existing `BriefEditor` as the page body), with back link, header bar, and save/share actions in a sticky toolbar. Handles `briefId === "new"` for blank create flow.
+- Old briefs persist in the list (already do, since each has unique id).
 
-Topbar: add trial badge "Prøveperiode: 12 dage tilbage" + language switcher (DA/EN dropdown, visual only).
+## 3. Leads — Kanban/Tabel tabs (Jobs-style)
+Replace the existing icon view-toggle in `_app.leads.tsx` with `<Tabs>` `Kanban | Tabel` matching `_app.jobs.tsx` styling.
 
-## New / restructured pages
+## 4. Kunder — only converted customers
+- `src/mocks/customers.ts`: change the customer generator so `STAGES` are only `["booket","i_gang","afsluttet"]` with new `CustomerStage` type. Reduce count to ~22. Drop "ny_henvendelse"/"tilbud_sendt"/"tabt".
+- Update `STAGE_LABELS` to `{ booket: "Booket", i_gang: "I gang", afsluttet: "Afsluttet" }`.
+- `_app.customers.tsx`: kanban now uses 3 stages; keep Alle/Privat/Erhverv tabs and the existing kanban/table icon toggle.
+- `_app.index.tsx` (Dashboard): conversion KPI now uses `customers.length / (customers.length + leads.length)`. Funnel chart switches to lead stages from `leads.ts` (already 6 stages there).
 
-**1. Kunder** — Parent tabs: Alle / Privat / Erhverv. Each customer has `type: 'privat' | 'erhverv'`, optional `cvr` and `companyName`. View toggle: Pipeline kanban / Table (name, type, contact, last job, total value, status). Drawer shows previous jobs list, communication log, notes.
+## 5. Remove Fakturaer
+- Delete `src/routes/_app.invoices.tsx` and `src/mocks/invoices.ts`.
+- Remove "Fakturaer" item from `app-sidebar.tsx`.
+- Dashboard: remove `outstanding`, `overdue`, the Udestående KPI, the "forfaldne fakturaer" alert, and the invoice-related activity feed entry. Replace Udestående KPI with something neutral like "Aktive jobs" count.
+- Topbar notifications: remove "Faktura #089 forfalden" entry from `mocks/notifications.ts`.
+- Settings team menu: remove "Bogholder" if needed (keep, unrelated to invoicing).
 
-**2. Leads** (new route `_app.leads.tsx`) — Pipeline kanban + table toggle. Stages: Ny → Kontaktet → Tilbud sendt → Forhandling → Vundet/Tabt. Lead source field (Hjemmeside, Telefon, Anbefaling, Facebook, Google). Mock 25+ leads.
+## 6. Jobs detail — customer + quote panels
+In `_app.jobs.tsx` `JobSheet`:
+- Add **Kunde** card at top of "Detaljer" tab: name, type badge, phone, email, full address, notes (lookup via `customers.find(c => c.id === job.customerId)` — extend `jobs.ts` to ensure `customerId` resolves).
+- Add **Oprindeligt tilbud** card on "Økonomi" tab: lookup quote by `job.customerId` matching latest `quotes` entry, show quote number, pricing model, line items table, manual-adjustment badge if any.
 
-**3. Tilbud (Quotes)** — Rebuilt with stepper (Kunde → Volumen → Layout → Services → Parkering → Transport → Tillæg). Pricing model selector (m²/Timepris/Manuel). Live price breakdown panel with line items, custom items, manual adjustment with "Justeret" badge. Flyttepakker selectable cards (Basis/Komplet/Premium). Convert-to-Job CTA on Accepted. Business toggle adds CVR/company fields.
+## 7. Vagtplan — Tabel/Kalender tabs
+Restructure `_app.crew.tsx`:
+- Keep "Syge i dag" banner.
+- Replace cards-grid + weekly table + friønsker stack with `<Tabs>` `Tabel | Kalender`.
+- **Tabel**: clean table with columns Navn, Rolle, Status, Tildelte jobs (from `recentJobIds`), Timer (period), Skills/Certificeringer.
+- **Kalender**: day/week/month sub-toggle. Reuse a calendar grid (similar to Jobs CalendarGrid) showing crew assignments per day color-coded by member.
+- Keep Friønsker as a smaller card below tabs (or move to drawer).
 
-**4. Lager** (new route `_app.lager.tsx`) — Customer storage units. Table with unit#, customer, description, start/end, status, monthly price. Detail drawer. Mock 20+ entries (active + ended).
+## 8. Køretøjer — add calendar view
+Wrap current table + weekly grid in `<Tabs>` `Tabel | Ugentlig | Kalender`. Add new month-calendar showing vehicle assignments per day (similar pattern to Jobs calendar).
 
-**5. Materialer** (renamed) — Keep tabs Flyttekasser/Udstyr. Add lent-out tracking with linked customer + return deadline + overdue highlight. Sync indicator pill ("Synkroniseret med mobilapp"). Add custom material type dialog.
+## 9. Beskeder → Automatiske Flows
+- Rename file `_app.messages.tsx` → keep filename (route `/messages`) but change title and content. Or simpler: keep route, update content/sidebar label.
+- Remove inbox tab and conversation pane entirely.
+- Page becomes the existing "Automatiske flows" content (sequences list with toggles and templates) at full width, expanded with: trigger condition select, timing input (e.g., "1 dag før"), SMS/Email channel toggle per sequence.
+- Update sidebar: rename "Beskeder" → "Automatiske Flows", update `head().title` to "Automatiske Flows — Movena", group label `Engagement` → `Automatisering`.
 
-**6. Køretøjer** (split into own route `_app.koretojer.tsx`) — Table with capacity (m³), current/upcoming jobs, simple weekly assignment grid.
+## 10. Settings — vertical side nav
+Refactor `_app.settings.tsx`: replace top `<TabsList>` with a 2-column layout: left vertical nav (`<button>` list, ~200px wide, sticky) + right content area. Each nav item swaps the active section via local state. All 9 sections preserved with their existing content.
 
-**7. Vagtplan (Crew)** — Updated weekly grid showing assignments + sick indicator. Hours-per-period running counter. "Syge i dag" pill at top.
+## 11. Sidebar groups — final structure
+Update `app-sidebar.tsx` groups to: Overblik (Dashboard, Daglig Brief), Salg (Leads, Kunder, Tilbud), Drift (Jobs, Kalender, Vagtplan, Opgaver, Lager, Materialer, Køretøjer), Automatisering (Automatiske Flows), Indsigt (Rapporter), Konto (Indstillinger).
 
-**8. Medarbejdere** — Profile drawer adds: strengths/weaknesses (tag inputs), certifications list, driver's license toggle. Skill-match hint badge.
+## Files affected
+**Modify**: `app-sidebar.tsx`, `ui/sidebar.tsx`, `_app.brief.tsx`, `_app.leads.tsx`, `_app.customers.tsx`, `_app.jobs.tsx`, `_app.crew.tsx`, `_app.koretojer.tsx`, `_app.messages.tsx`, `_app.settings.tsx`, `_app.index.tsx`, `mocks/customers.ts`, `mocks/notifications.ts`.
+**Create**: `_app.brief.$briefId.tsx`.
+**Delete**: `_app.invoices.tsx`, `mocks/invoices.ts`.
 
-**9. Daglig Brief** (new route `_app.brief.tsx`) — Two layers:
-- List/calendar of briefs (date, title, status, author).
-- Editor: auto-filled today's jobs/crew/vehicles + editable sections (notes, special instructions, breaks, announcements). Share action. Weekly/monthly toggle.
-
-**10. Job detail Fotos tab** — In Jobs sheet, add "Fotos" tab with Før/Efter gallery (mock photos with thumbnails, upload UI placeholder).
-
-**11. Settings** — Tabs:
-- Virksomhed: name, currency selector (DKK default), timezone (Europe/Copenhagen default), language (DA/EN).
-- Team & roller, Notifikationer, Integrationer, Tilbudsformular (new — pricing model, field toggles, step order list, appearance, business toggle, live preview), Abonnement (new — current plan + Starter/Professional/Enterprise tier cards), Kom i gang, Feedback, Support.
-
-**12. Remove mobile app** — Audit for any mobile-app preview sections (none expected from current routes; verify Settings/Integrationer doesn't have a mobile mockup).
-
-## Mock data updates
-- `customers.ts`: add `type`, `cvr`, `companyName`, `previousJobIds`, `notes`, `communications[]`.
-- New: `leads.ts`, `storage.ts`, `briefs.ts`, `packages.ts`, `vehicles.ts` (split from inventory).
-- `crew.ts`: add `strengths`, `weaknesses`, `certifications`, `driverLicense`, `sickToday`, `hoursThisPeriod`.
-- `jobs.ts`: add `photos: { url, label: 'før'|'efter' }[]`.
-- `quotes.ts`: add `pricingModel`, `lineItems[]`, `manualAdjustment`, `packageId`.
-
-## Files to create
-Routes: `_app.leads.tsx`, `_app.lager.tsx`, `_app.koretojer.tsx`, `_app.brief.tsx`.
-Mocks: `leads.ts`, `storage.ts`, `briefs.ts`, `packages.ts`, `vehicles.ts`.
-Components: `trial-badge.tsx`, `language-switcher.tsx`, `quote-stepper.tsx`, `price-breakdown.tsx`, `brief-editor.tsx`, `photo-gallery.tsx`.
-Assets: copy logo + icon to `src/assets/`.
-
-## Files to update
-`styles.css`, `__root.tsx` (favicon, title), `app-sidebar.tsx` (Movena logo + new groups/items), `topbar.tsx` (trial badge, language), all existing route files for rebrand + restructure (Kunder tabs, Quotes rebuild, Materialer rename, Crew updates, Settings tabs, Jobs photos tab).
-
-## Out of scope (explicitly)
-- Real auth/payments (paywall is UI-only).
-- Real i18n (toggle visual only, copy stays Danish).
-- Real photo upload (UI + mock thumbnails only).
-- Drag-and-drop step reordering in form settings (use up/down arrows for MVP).
+## Out of scope
+- True drag-and-drop on kanban (deferred).
+- Real timezone/i18n behavior.
+- Persistent brief storage (still in-memory mock).
