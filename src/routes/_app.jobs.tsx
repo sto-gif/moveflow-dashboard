@@ -270,8 +270,35 @@ function JobSheet({ job }: { job: Job }) {
             </div>
           </Card>
           <div>
-            <div className="text-xs font-semibold uppercase text-muted-foreground mb-2">Crew</div>
+            <div className="mb-2 flex items-center justify-between">
+              <div className="text-xs font-semibold uppercase text-muted-foreground">Crew</div>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button size="sm" variant="ghost" className="h-7 px-2 text-xs">
+                    <Pencil className="mr-1 h-3 w-3" strokeWidth={1.5} /> Rediger
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent align="end" className="w-64 p-2">
+                  <div className="px-2 py-1 text-[11px] font-semibold uppercase text-muted-foreground">Vælg crew</div>
+                  <div className="max-h-72 space-y-1 overflow-y-auto">
+                    {crew.map((m) => {
+                      const checked = job.crewIds.includes(m.id);
+                      return (
+                        <label key={m.id} className="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 hover:bg-muted">
+                          <Checkbox checked={checked} onCheckedChange={() => toggleCrew(m.id)} />
+                          <span className={cn("flex h-6 w-6 items-center justify-center rounded-full text-[9px] font-bold", m.avatarColor)}>{m.initials}</span>
+                          <span className="text-sm">{m.name}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </PopoverContent>
+              </Popover>
+            </div>
             <div className="flex flex-wrap gap-2">
+              {job.crewIds.length === 0 && (
+                <div className="text-xs text-muted-foreground">Intet crew tildelt endnu.</div>
+              )}
               {job.crewIds.map((id) => {
                 const m = crew.find((c) => c.id === id);
                 return (
