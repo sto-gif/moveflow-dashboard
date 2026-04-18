@@ -29,6 +29,7 @@ interface Ctx {
   // leads
   createLead: (input: { name: string; email: string; phone: string; city: string; estimatedValue: number }) => Lead;
   updateLeadStage: (id: string, stage: LeadStage) => void;
+  updateLead: (id: string, patch: Partial<Lead>) => void;
   convertLeadToCustomer: (id: string) => Customer | null;
   // customers
   createCustomer: (input: { name: string; email: string; phone: string; type: CustomerType }) => Customer;
@@ -92,6 +93,10 @@ export function MockStoreProvider({ children }: { children: ReactNode }) {
 
   const updateLeadStage: Ctx["updateLeadStage"] = useCallback((id, stage) => {
     setLeads((ls) => ls.map((l) => (l.id === id ? { ...l, stage } : l)));
+  }, []);
+
+  const updateLead: Ctx["updateLead"] = useCallback((id, patch) => {
+    setLeads((ls) => ls.map((l) => (l.id === id ? { ...l, ...patch } : l)));
   }, []);
 
   const convertLeadToCustomer: Ctx["convertLeadToCustomer"] = useCallback((id) => {
@@ -290,7 +295,7 @@ export function MockStoreProvider({ children }: { children: ReactNode }) {
 
   const value: Ctx = {
     leads, customers, jobs, quotes, briefs, notifications, settings, unreadCount,
-    createLead, updateLeadStage, convertLeadToCustomer,
+    createLead, updateLeadStage, updateLead, convertLeadToCustomer,
     createCustomer, updateCustomerStage, updateCustomer,
     createJob, updateJobStatus, updateJob,
     createQuote, updateQuoteStatus, convertQuoteToJob,
