@@ -276,12 +276,12 @@ function LeadDetailPage() {
           </TabsContent>
 
           <TabsContent value="quotes" className="mt-4">
-            <Card className="overflow-auto max-h-[calc(100vh-280px)]">
+            <Card className="overflow-x-auto">
               {leadQuotes.length === 0 ? (
                 <div className="p-8 text-center text-body-sm text-muted-foreground">Ingen tilbud sendt endnu.</div>
               ) : (
                 <table className="w-full text-sm">
-                  <thead className="bg-muted/40 sticky top-0 z-10">
+                  <thead className="bg-muted/40">
                     <tr className="text-left text-caption uppercase text-muted-foreground">
                       <th className="px-4 py-2.5">Nr.</th>
                       <th className="px-4 py-2.5">Oprettet</th>

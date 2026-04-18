@@ -155,7 +155,7 @@ function SettingsPage() {
                 <Button size="sm" onClick={() => toast.success("Invitation sendt")}><Plus className="h-4 w-4" strokeWidth={1.5} /> Inviter</Button>
               </div>
               <table className="w-full text-sm">
-                <thead className="bg-muted/40 sticky top-0 z-10">
+                <thead className="bg-muted/40">
                   <tr className="text-left text-xs uppercase tracking-wide text-muted-foreground">
                     <th className="px-4 py-2.5">Navn</th><th className="px-4 py-2.5">Email</th><th className="px-4 py-2.5">Rolle</th>
                   </tr>

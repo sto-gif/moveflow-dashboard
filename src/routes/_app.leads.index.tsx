@@ -157,9 +157,9 @@ function LeadsPage() {
           </TabsContent>
 
           <TabsContent value="table" className="mt-4">
-            <Card className="overflow-auto max-h-[calc(100vh-280px)]">
+            <Card className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-muted/40 sticky top-0 z-10">
+                <thead className="bg-muted/40">
                   <tr className="text-left text-caption uppercase text-muted-foreground">
                     <th className="px-4 py-2.5 font-medium">
                       <button onClick={() => toggleSort("name")} className="hover:text-foreground">
