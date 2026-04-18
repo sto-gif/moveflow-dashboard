@@ -265,35 +265,46 @@ function DashboardPage() {
             <h3 className="text-sm font-semibold">Seneste aktivitet</h3>
             <Badge variant="secondary" className="text-[10px]">Live</Badge>
           </div>
-          <div className="max-h-[360px] space-y-3 overflow-y-auto pr-2 text-sm">
+          <div className="max-h-[360px] overflow-y-auto pr-2 text-sm">
             {[
-              { t: "Anne Pedersen accepterede tilbud Q-3015 (24.500 DKK)", time: "5 min" },
-              { t: "Mette Sørensen anmodede om fri 24. apr", time: "32 min" },
-              { t: "Job #145 oprettet — København → Aarhus, 65 m³", time: "1 t" },
-              { t: "Ny anmeldelse på Trustpilot fra Emilie Jensen (5★)", time: "2 t" },
-              { t: "Crew-tildeling ændret på job #142 (Anders → Mikkel)", time: "3 t" },
-              { t: "Nyt lead modtaget fra hjemmesiden — Søren Christensen", time: "4 t" },
-              { t: "Tilbud Q-3014 sendt til Lars Holm (18.200 DKK)", time: "5 t" },
-              { t: "Job #141 markeret som afsluttet — Frederiksberg", time: "6 t" },
-              { t: "Faktura F-2204 betalt af Nordisk Logistik ApS", time: "7 t" },
-              { t: "Køretøj BIL-04 sendt til service", time: "8 t" },
-              { t: "Lager-enhed L-12 udlejet til Camilla Berg", time: "9 t" },
-              { t: "Daglig brief sendt til 7 crew-medlemmer", time: "10 t" },
-              { t: "Lead L-5018 flyttet til Forhandling", time: "12 t" },
-              { t: "Ny besked fra Peter Madsen om flytning 2. maj", time: "14 t" },
-              { t: "Tilbud Q-3013 udløb — påmindelse sendt", time: "16 t" },
-              { t: "Crew-medlem Kasper J. tilføjet til job #144", time: "18 t" },
-              { t: "Pakkeordre på 30 flyttekasser leveret", time: "1 d" },
-              { t: "Job #140 fik 5★ anmeldelse fra kunde", time: "1 d" },
-              { t: "Ny kunde oprettet: Bredgade Erhverv ApS", time: "1 d" },
-              { t: "Lead L-5012 markeret som tabt — for dyrt", time: "2 d" },
-            ].map((a, i) => (
-              <div key={i} className="flex items-start gap-3 border-b pb-3 last:border-0 last:pb-0">
-                <div className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                <div className="flex-1">{a.t}</div>
-                <div className="shrink-0 text-xs text-muted-foreground">{a.time}</div>
-              </div>
-            ))}
+              { icon: CheckCircle2, tone: "ok", t: "Anne Pedersen accepterede tilbud Q-3015 (24.500 DKK)", time: "5 min" },
+              { icon: UserCheck, tone: "info", t: "Mette Sørensen anmodede om fri 24. apr", time: "32 min" },
+              { icon: Briefcase, tone: "info", t: "Job #145 oprettet — København → Aarhus, 65 m³", time: "1 t" },
+              { icon: Star, tone: "ok", t: "Ny anmeldelse på Trustpilot fra Emilie Jensen (5★)", time: "2 t" },
+              { icon: Users, tone: "info", t: "Crew-tildeling ændret på job #142 (Anders → Mikkel)", time: "3 t" },
+              { icon: UserPlus, tone: "info", t: "Nyt lead modtaget fra hjemmesiden — Søren Christensen", time: "4 t" },
+              { icon: Send, tone: "info", t: "Tilbud Q-3014 sendt til Lars Holm (18.200 DKK)", time: "5 t" },
+              { icon: CheckCircle2, tone: "ok", t: "Job #141 markeret som afsluttet — Frederiksberg", time: "6 t" },
+              { icon: Receipt, tone: "ok", t: "Faktura F-2204 betalt af Nordisk Logistik ApS", time: "7 t" },
+              { icon: Wrench, tone: "warn", t: "Køretøj BIL-04 sendt til service", time: "8 t" },
+              { icon: Warehouse, tone: "info", t: "Lager-enhed L-12 udlejet til Camilla Berg", time: "9 t" },
+              { icon: Mail, tone: "info", t: "Daglig brief sendt til 7 crew-medlemmer", time: "10 t" },
+              { icon: ArrowRight, tone: "info", t: "Lead L-5018 flyttet til Forhandling", time: "12 t" },
+              { icon: MessageSquare, tone: "info", t: "Ny besked fra Peter Madsen om flytning 2. maj", time: "14 t" },
+              { icon: Clock, tone: "warn", t: "Tilbud Q-3013 udløb — påmindelse sendt", time: "16 t" },
+              { icon: Users, tone: "info", t: "Crew-medlem Kasper J. tilføjet til job #144", time: "18 t" },
+              { icon: Package, tone: "info", t: "Pakkeordre på 30 flyttekasser leveret", time: "1 d" },
+              { icon: Star, tone: "ok", t: "Job #140 fik 5★ anmeldelse fra kunde", time: "1 d" },
+              { icon: Building2, tone: "info", t: "Ny kunde oprettet: Bredgade Erhverv ApS", time: "1 d" },
+              { icon: XCircle, tone: "danger", t: "Lead L-5012 markeret som tabt — for dyrt", time: "2 d" },
+            ].map((a, i) => {
+              const Icon = a.icon;
+              const toneCls = {
+                ok: "bg-[#DCFCE7] text-[#16A34A]",
+                warn: "bg-[#FEF3C7] text-[#D97706]",
+                danger: "bg-[#FEE2E2] text-[#DC2626]",
+                info: "bg-muted text-muted-foreground",
+              }[a.tone as "ok" | "warn" | "danger" | "info"];
+              return (
+                <div key={i} className="flex items-start gap-3 border-b py-3 first:pt-0 last:border-0 last:pb-0">
+                  <div className={cn("flex h-7 w-7 shrink-0 items-center justify-center rounded-full", toneCls)}>
+                    <Icon className="h-3.5 w-3.5" />
+                  </div>
+                  <div className="flex-1 leading-snug">{a.t}</div>
+                  <div className="shrink-0 text-xs text-muted-foreground tabular-nums">{a.time}</div>
+                </div>
+              );
+            })}
           </div>
         </Card>
       </div>
