@@ -128,6 +128,7 @@ function CrewPage() {
                 </tbody>
               </table>
             </Card>
+            <RowCount shown={crew.length} total={crew.length} noun="medarbejdere" />
           </TabsContent>
 
           <TabsContent value="kalender" className="mt-4">

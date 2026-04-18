@@ -306,6 +306,7 @@ function LeadDetailPage() {
                 </table>
               )}
             </Card>
+            {leadQuotes.length > 0 && <RowCount shown={leadQuotes.length} total={leadQuotes.length} noun="tilbud" />}
           </TabsContent>
 
           <TabsContent value="notes" className="mt-4">

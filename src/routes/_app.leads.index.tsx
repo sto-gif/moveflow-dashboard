@@ -209,6 +209,7 @@ function LeadsPage() {
                 </tbody>
               </table>
             </Card>
+            <RowCount shown={filtered.length} total={leads.length} noun="leads" />
           </TabsContent>
         </Tabs>
       </div>

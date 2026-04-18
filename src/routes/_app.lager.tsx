@@ -136,6 +136,7 @@ function LagerPage() {
             </tbody>
           </table>
         </Card>
+        <RowCount shown={filtered.length} total={storageUnits.length} noun="enheder" />
       </div>
 
       <Sheet open={!!selected} onOpenChange={(o) => !o && setSelected(null)}>

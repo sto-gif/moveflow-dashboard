@@ -199,6 +199,7 @@ function JobsPage() {
                 </tbody>
               </table>
             </Card>
+            <RowCount shown={filtered.length} total={jobs.length} noun="jobs" />
           </TabsContent>
         </Tabs>
       </div>

@@ -229,6 +229,7 @@ function CustomerDetailPage() {
                 </table>
               )}
             </Card>
+            {customerJobs.length > 0 && <RowCount shown={customerJobs.length} total={customerJobs.length} noun="flytninger" />}
           </TabsContent>
 
           <TabsContent value="quotes" className="mt-4">
@@ -262,6 +263,7 @@ function CustomerDetailPage() {
                 </table>
               )}
             </Card>
+            {customerQuotes.length > 0 && <RowCount shown={customerQuotes.length} total={customerQuotes.length} noun="tilbud" />}
           </TabsContent>
 
           <TabsContent value="comm" className="mt-4">
@@ -313,6 +315,7 @@ function CustomerDetailPage() {
                 </table>
               )}
             </Card>
+            {customerStorage.length > 0 && <RowCount shown={customerStorage.length} total={customerStorage.length} noun="enheder" />}
           </TabsContent>
 
           <TabsContent value="notes" className="mt-4">

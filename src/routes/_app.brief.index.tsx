@@ -96,6 +96,7 @@ function BriefPage() {
                 </tbody>
               </table>
             </Card>
+            <RowCount shown={briefs.length} total={briefs.length} noun="briefs" />
           </TabsContent>
 
           <TabsContent value="kalender" className="mt-4">

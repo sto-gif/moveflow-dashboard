@@ -196,6 +196,7 @@ function CustomersPage() {
                 </tbody>
               </table>
             </Card>
+            <RowCount shown={filtered.length} total={customers.length} noun="kunder" />
           </TabsContent>
         </Tabs>
       </div>

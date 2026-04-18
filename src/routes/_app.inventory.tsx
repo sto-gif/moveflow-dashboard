@@ -105,6 +105,7 @@ function MaterialsPage() {
                     </tbody>
                   </table>
                 </Card>
+                <RowCount shown={inventory.filter((i) => i.category === cat).length} total={inventory.filter((i) => i.category === cat).length} noun="varer" />
               </div>
               <Card className="p-5 h-fit">
                 <h3 className="mb-3 text-section">Bevægelser</h3>
@@ -166,6 +167,7 @@ function MaterialsPage() {
                 </tbody>
               </table>
             </Card>
+            <RowCount shown={lentItems.length} total={lentItems.length} noun="udlån" />
           </TabsContent>
         </Tabs>
       </div>

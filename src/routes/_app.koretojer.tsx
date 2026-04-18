@@ -95,6 +95,7 @@ function VehiclesPage() {
                 </tbody>
               </table>
             </Card>
+            <RowCount shown={vehicles.length} total={vehicles.length} noun="køretøjer" />
           </TabsContent>
 
           <TabsContent value="ugentlig" className="mt-4">

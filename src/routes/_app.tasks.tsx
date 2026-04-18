@@ -158,6 +158,7 @@ function TasksPage() {
                 </tbody>
               </table>
             </Card>
+            <RowCount shown={filtered.length} total={tasks.length} noun="opgaver" />
           </TabsContent>
           <TabsContent value="calendar" className="mt-4">
             <TasksCalendar items={filtered} />

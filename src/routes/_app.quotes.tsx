@@ -126,6 +126,7 @@ function QuotesPage() {
                 </tbody>
               </table>
             </Card>
+            <RowCount shown={quotes.length} total={quotes.length} noun="tilbud" />
           </TabsContent>
 
           <TabsContent value="builder" className="mt-4">
