@@ -1,16 +1,15 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
-import { Plus, Search, Phone, Mail, Calendar } from "lucide-react";
-import { Card } from "@/components/ui/card";
+import { Plus, Search } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { PageHeader } from "@/components/page-header";
 import { leads, LEAD_STAGE_LABELS, LEAD_STAGE_COLORS, type LeadStage } from "@/mocks/leads";
 import { dkk } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 
 export const Route = createFileRoute("/_app/leads")({
   head: () => ({
@@ -26,7 +25,6 @@ const STAGES: LeadStage[] = ["ny", "kontaktet", "tilbud_sendt", "forhandling", "
 
 function LeadsPage() {
   const [search, setSearch] = useState("");
-  const [selected, setSelected] = useState<string | null>(null);
 
   const filtered = useMemo(
     () =>
@@ -37,16 +35,20 @@ function LeadsPage() {
       ),
     [search],
   );
-  const lead = leads.find((l) => l.id === selected);
-  const totalPipeline = leads
-    .filter((l) => l.stage !== "tabt" && l.stage !== "vundet")
-    .reduce((s, l) => s + l.estimatedValue, 0);
+  const totalPipeline = useMemo(
+    () =>
+      leads
+        .filter((l) => l.stage !== "tabt" && l.stage !== "vundet")
+        .reduce((s, l) => s + l.estimatedValue, 0),
+    [],
+  );
+  const newCount = useMemo(() => leads.filter((l) => l.stage === "ny").length, []);
 
   return (
     <div>
       <PageHeader
         title="Leads"
-        description={`${leads.length} leads · ${dkk(totalPipeline)} i pipeline · ${leads.filter((l) => l.stage === "ny").length} nye`}
+        description={`${leads.length} leads · ${dkk(totalPipeline)} i pipeline · ${newCount} nye`}
         actions={
           <>
             <div className="relative">
@@ -75,35 +77,37 @@ function LeadsPage() {
                 const items = filtered.filter((l) => l.stage === stage);
                 const total = items.reduce((s, l) => s + l.estimatedValue, 0);
                 return (
-                  <div key={stage} className="rounded-lg bg-muted/40 p-2.5">
-                    <div className="mb-1 flex items-center justify-between px-1">
-                      <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                        {LEAD_STAGE_LABELS[stage]}
-                      </span>
-                      <Badge variant="secondary" className="h-5 px-1.5 text-[10px]">
-                        {items.length}
-                      </Badge>
+                  <div key={stage} className="kanban-column">
+                    <div className="kanban-column-header">
+                      <div>
+                        <div className="text-[11px] font-semibold uppercase tracking-wide text-[#94A3B8]">
+                          {LEAD_STAGE_LABELS[stage]}
+                        </div>
+                        <div className="mt-0.5 text-caption text-muted-foreground tabular-nums">{dkk(total)}</div>
+                      </div>
+                      <Badge variant="secondary" className="h-5 px-1.5 text-[10px]">{items.length}</Badge>
                     </div>
-                    <div className="mb-2 px-1 text-[11px] text-muted-foreground">{dkk(total)}</div>
-                    <div className="space-y-2">
+                    <div className="kanban-cards">
                       {items.map((l) => (
-                        <Card key={l.id} onClick={() => setSelected(l.id)}
-                          className="cursor-pointer p-3 hover:shadow-md transition-shadow border-border">
+                        <Link
+                          key={l.id}
+                          to="/leads/$leadId"
+                          params={{ leadId: l.id }}
+                          className="kanban-card block"
+                        >
                           <div className="flex items-start justify-between gap-2">
-                            <div className="font-medium text-sm leading-snug">{l.name}</div>
-                            <Badge variant="outline" className={cn("text-[9px] capitalize", l.type === "erhverv" && "bg-blue-50 text-blue-700")}>
-                              {l.type}
-                            </Badge>
+                            <div className="text-label leading-snug">{l.name}</div>
+                            <Badge variant="outline" className="text-[9px] capitalize">{l.type}</Badge>
                           </div>
-                          <div className="mt-1 text-xs text-muted-foreground">{l.city}</div>
+                          <div className="mt-1 text-caption text-muted-foreground">{l.city}</div>
                           <div className="mt-2 flex items-center justify-between">
-                            <span className="text-xs font-semibold">{dkk(l.estimatedValue)}</span>
-                            <Badge variant="outline" className="text-[10px] border-border">{l.source}</Badge>
+                            <span className="text-caption font-semibold tabular-nums">{dkk(l.estimatedValue)}</span>
+                            <Badge variant="outline" className="text-[10px]">{l.source}</Badge>
                           </div>
-                        </Card>
+                        </Link>
                       ))}
                       {items.length === 0 && (
-                        <div className="rounded border border-dashed border-border px-2 py-6 text-center text-xs text-muted-foreground">
+                        <div className="rounded border border-dashed border-border px-2 py-6 text-center text-caption text-muted-foreground">
                           Ingen leads
                         </div>
                       )}
@@ -118,7 +122,7 @@ function LeadsPage() {
             <Card className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead className="bg-muted/40">
-                  <tr className="text-left text-xs uppercase tracking-wide text-muted-foreground">
+                  <tr className="text-left text-caption uppercase text-muted-foreground">
                     <th className="px-4 py-2.5 font-medium">Navn</th>
                     <th className="px-4 py-2.5 font-medium">Type</th>
                     <th className="px-4 py-2.5 font-medium">By</th>
@@ -131,9 +135,12 @@ function LeadsPage() {
                 </thead>
                 <tbody>
                   {filtered.map((l) => (
-                    <tr key={l.id} className="cursor-pointer border-t hover:bg-muted/40"
-                      onClick={() => setSelected(l.id)}>
-                      <td className="px-4 py-2.5 font-medium">{l.name}</td>
+                    <tr key={l.id} className="cursor-pointer border-t hover:bg-[#F8FAFC] transition-colors">
+                      <td className="px-4 py-2.5 cell-primary">
+                        <Link to="/leads/$leadId" params={{ leadId: l.id }} className="hover:underline">
+                          {l.name}
+                        </Link>
+                      </td>
                       <td className="px-4 py-2.5 capitalize text-muted-foreground">{l.type}</td>
                       <td className="px-4 py-2.5">{l.city}</td>
                       <td className="px-4 py-2.5 text-muted-foreground">{l.source}</td>
@@ -143,8 +150,8 @@ function LeadsPage() {
                         </Badge>
                       </td>
                       <td className="px-4 py-2.5 text-muted-foreground">{l.owner}</td>
-                      <td className="px-4 py-2.5 text-muted-foreground">{l.moveDate.toLocaleDateString("da-DK")}</td>
-                      <td className="px-4 py-2.5 text-right font-medium">{dkk(l.estimatedValue)}</td>
+                      <td className="px-4 py-2.5 text-muted-foreground tabular-nums">{l.moveDate.toLocaleDateString("da-DK")}</td>
+                      <td className="px-4 py-2.5 text-right font-medium tabular-nums">{dkk(l.estimatedValue)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -153,51 +160,6 @@ function LeadsPage() {
           </TabsContent>
         </Tabs>
       </div>
-
-      <Sheet open={!!selected} onOpenChange={(o) => !o && setSelected(null)}>
-        <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
-          {lead && (
-            <>
-              <SheetHeader>
-                <SheetTitle>{lead.name}</SheetTitle>
-              </SheetHeader>
-              <div className="mt-6 space-y-5">
-                <div className="flex items-center gap-2">
-                  <Badge variant="outline" className={cn("text-[11px]", LEAD_STAGE_COLORS[lead.stage])}>
-                    {LEAD_STAGE_LABELS[lead.stage]}
-                  </Badge>
-                  <Badge variant="outline" className="text-[11px] capitalize">{lead.type}</Badge>
-                  <Badge variant="outline" className="text-[11px]">{lead.source}</Badge>
-                </div>
-                <Card className="p-4">
-                  <div className="text-xs font-semibold uppercase text-muted-foreground">Kontakt</div>
-                  <div className="mt-2 space-y-1.5 text-sm">
-                    <div className="flex items-center gap-2"><Mail className="h-3.5 w-3.5 text-muted-foreground" strokeWidth={1.5} /> {lead.email}</div>
-                    <div className="flex items-center gap-2"><Phone className="h-3.5 w-3.5 text-muted-foreground" strokeWidth={1.5} /> {lead.phone}</div>
-                    <div className="flex items-center gap-2"><Calendar className="h-3.5 w-3.5 text-muted-foreground" strokeWidth={1.5} /> Flyttedato {lead.moveDate.toLocaleDateString("da-DK")}</div>
-                  </div>
-                </Card>
-                <Card className="p-4">
-                  <div className="grid grid-cols-3 gap-3 text-center">
-                    <div><div className="text-xs text-muted-foreground">Estimeret værdi</div><div className="text-base font-bold">{dkk(lead.estimatedValue)}</div></div>
-                    <div><div className="text-xs text-muted-foreground">Ejer</div><div className="text-sm font-semibold">{lead.owner}</div></div>
-                    <div><div className="text-xs text-muted-foreground">Oprettet</div><div className="text-sm font-semibold">{lead.createdAt.toLocaleDateString("da-DK")}</div></div>
-                  </div>
-                </Card>
-                <div>
-                  <div className="text-xs font-semibold uppercase text-muted-foreground mb-2">Note</div>
-                  <p className="text-sm">{lead.note}</p>
-                </div>
-                <div className="flex gap-2 pt-2">
-                  <Button size="sm" className="flex-1">Send tilbud</Button>
-                  <Button size="sm" variant="outline" className="flex-1">Konvertér til kunde</Button>
-                </div>
-              </div>
-            </>
-          )}
-        </SheetContent>
-      </Sheet>
     </div>
   );
 }
-
