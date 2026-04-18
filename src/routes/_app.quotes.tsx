@@ -1,5 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
+import { toast } from "sonner";
 import { Plus, Send, Sparkles, Calculator, Trash2, Check } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -10,8 +11,10 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PageHeader } from "@/components/page-header";
-import { quotes, QUOTE_STATUS_LABELS, QUOTE_STATUS_COLORS, PRICING_LABELS, type PricingModel, type QuoteLineItem, buildQuoteLineItems } from "@/mocks/quotes";
+import { CreateDialog } from "@/components/create-dialog";
+import { QUOTE_STATUS_LABELS, QUOTE_STATUS_COLORS, PRICING_LABELS, type PricingModel, type QuoteLineItem, buildQuoteLineItems } from "@/mocks/quotes";
 import { movingPackages } from "@/mocks/packages";
+import { useMockStore } from "@/store/mock-store";
 import { dkk } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
