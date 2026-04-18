@@ -1,15 +1,19 @@
-import { fullName, phone, email, randomAddress, pick, randInt, daysFromNow, DANISH_LAST_NAMES } from "./_helpers";
+import { fullName, phone, email, randomAddress, pick, randInt, daysFromNow, DANISH_LAST_NAMES, randFloat } from "./_helpers";
 
 export type LeadSource = "Hjemmeside" | "Anbefaling" | "Google" | "Facebook" | "Trustpilot" | "Telefonopkald";
-export type CustomerStage = "ny_henvendelse" | "tilbud_sendt" | "booket" | "afsluttet" | "tabt";
+export type CustomerStage = "booket" | "i_gang" | "afsluttet";
 export type CustomerType = "privat" | "erhverv";
 
 export const STAGE_LABELS: Record<CustomerStage, string> = {
-  ny_henvendelse: "Ny henvendelse",
-  tilbud_sendt: "Tilbud sendt",
   booket: "Booket",
+  i_gang: "I gang",
   afsluttet: "Afsluttet",
-  tabt: "Tabt",
+};
+
+export const STAGE_COLORS: Record<CustomerStage, string> = {
+  booket: "bg-blue-100 text-blue-700 border-blue-200",
+  i_gang: "bg-amber-100 text-amber-700 border-amber-200",
+  afsluttet: "bg-emerald-100 text-emerald-700 border-emerald-200",
 };
 
 export interface Communication {
@@ -51,8 +55,8 @@ export interface Customer {
 }
 
 const SOURCES: LeadSource[] = ["Hjemmeside", "Anbefaling", "Google", "Facebook", "Trustpilot", "Telefonopkald"];
-const STAGES: CustomerStage[] = ["ny_henvendelse", "tilbud_sendt", "booket", "afsluttet", "tabt"];
-const STAGE_WEIGHTS = [10, 8, 12, 15, 5];
+const STAGES: CustomerStage[] = ["booket", "i_gang", "afsluttet"];
+const STAGE_WEIGHTS = [8, 4, 14];
 const TAG_OPTIONS = ["Klaver", "Pakning", "Opbevaring", "Stor flytning", "Stamkunde", "VIP"];
 
 const COMPANY_SUFFIXES = ["ApS", "A/S", "I/S", "K/S"];
@@ -91,7 +95,7 @@ function weightedStage(): CustomerStage {
     r -= STAGE_WEIGHTS[i]!;
     if (r < 0) return STAGES[i]!;
   }
-  return "ny_henvendelse";
+  return "afsluttet";
 }
 
 const PROJECT_DESCRIPTIONS = [
@@ -126,7 +130,7 @@ function makeCommunications(count: number): Communication[] {
   });
 }
 
-export const customers: Customer[] = Array.from({ length: 48 }, (_, i) => {
+export const customers: Customer[] = Array.from({ length: 22 }, (_, i) => {
   const type: CustomerType = i % 4 === 0 ? "erhverv" : "privat";
   const personName = fullName();
   const stage = weightedStage();
@@ -175,5 +179,6 @@ export const customers: Customer[] = Array.from({ length: 48 }, (_, i) => {
 });
 
 void DANISH_LAST_NAMES;
+void randFloat;
 
 export const customerById = (id: string) => customers.find((c) => c.id === id);

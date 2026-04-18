@@ -17,13 +17,6 @@ export const notifications: Notification[] = [
     unread: true,
   },
   {
-    id: "N-2",
-    type: "alert",
-    title: "Faktura #089 er 7 dage forfalden (12.500 DKK)",
-    meta: "Økonomi · for 1 time siden",
-    unread: true,
-  },
-  {
     id: "N-3",
     type: "info",
     title: "Nyt tilbud anmodet af Lars Hansen",
@@ -49,13 +42,6 @@ export const notifications: Notification[] = [
     type: "success",
     title: "Job #138 markeret som færdig af crew leader Anders",
     meta: "Operations · i går 16:42",
-    unread: false,
-  },
-  {
-    id: "N-7",
-    type: "alert",
-    title: "Faktura #076 er 14 dage forfalden (8.900 DKK)",
-    meta: "Økonomi · i går 12:10",
     unread: false,
   },
   {

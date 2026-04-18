@@ -1,7 +1,7 @@
 import { Link, useLocation } from "@tanstack/react-router";
 import {
   LayoutDashboard, Users, Briefcase, FileText, Calendar, HardHat,
-  CheckSquare, Package, MessageSquare, Receipt, BarChart3, Settings,
+  CheckSquare, Package, Zap, BarChart3, Settings,
   Truck, Warehouse, Sparkles, UserPlus,
 } from "lucide-react";
 import {
@@ -29,7 +29,6 @@ const groups: { label: string; items: Item[] }[] = [
       { title: "Leads", url: "/leads", icon: UserPlus },
       { title: "Kunder", url: "/customers", icon: Users },
       { title: "Tilbud", url: "/quotes", icon: FileText },
-      { title: "Fakturaer", url: "/invoices", icon: Receipt },
     ],
   },
   {
@@ -45,8 +44,8 @@ const groups: { label: string; items: Item[] }[] = [
     ],
   },
   {
-    label: "Engagement",
-    items: [{ title: "Beskeder", url: "/messages", icon: MessageSquare }],
+    label: "Automatisering",
+    items: [{ title: "Automatiske Flows", url: "/messages", icon: Zap }],
   },
   {
     label: "Indsigt",
@@ -68,36 +67,40 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="border-b border-sidebar-border">
-        <div className="flex items-center gap-2 px-2 py-2">
+        <div className="flex items-center gap-2 px-2 py-1.5">
           {collapsed ? (
-            <img src={iconUrl} alt="Movena" className="h-8 w-8" />
+            <img src={iconUrl} alt="Movena" className="h-6 w-6" />
           ) : (
-            <img src={logoUrl} alt="Movena" className="h-8 w-auto" />
+            <img src={logoUrl} alt="Movena" className="h-6 w-auto" />
           )}
         </div>
       </SidebarHeader>
       <SidebarContent>
         {groups.map((group) => (
-          <SidebarGroup key={group.label}>
-            {!collapsed && <SidebarGroupLabel>{group.label}</SidebarGroupLabel>}
+          <SidebarGroup key={group.label} className="py-1">
+            {!collapsed && (
+              <SidebarGroupLabel className="text-[10px] uppercase tracking-wide h-6">
+                {group.label}
+              </SidebarGroupLabel>
+            )}
             <SidebarGroupContent>
               <SidebarMenu>
                 {group.items.map((item) => {
                   const active = isActive(item.url);
                   return (
                     <SidebarMenuItem key={item.url}>
-                      <SidebarMenuButton asChild tooltip={item.title}>
+                      <SidebarMenuButton asChild tooltip={item.title} className="h-7 text-[13px]">
                         <Link
                           to={item.url}
                           className={cn(
-                            "relative flex items-center gap-2 rounded-md text-sm",
+                            "relative flex items-center gap-1.5 rounded-md",
                             active && "bg-sidebar-accent text-primary font-semibold",
                           )}
                         >
                           {active && (
-                            <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-0.5 rounded-r bg-teal" />
+                            <span className="absolute left-0 top-1/2 -translate-y-1/2 h-4 w-0.5 rounded-r bg-teal" />
                           )}
-                          <item.icon className={cn("h-4 w-4 shrink-0", active && "text-primary")} strokeWidth={1.5} />
+                          <item.icon className={cn("h-3.5 w-3.5 shrink-0", active && "text-primary")} strokeWidth={1.5} />
                           {!collapsed && <span>{item.title}</span>}
                         </Link>
                       </SidebarMenuButton>
@@ -111,8 +114,8 @@ export function AppSidebar() {
       </SidebarContent>
       <SidebarFooter className="border-t border-sidebar-border">
         {!collapsed && (
-          <div className="px-2 py-2 text-[11px] text-muted-foreground">
-            Movena · v1.0 · Demo
+          <div className="px-2 py-1.5 text-[10px] text-muted-foreground">
+            Movena · v1.0
           </div>
         )}
       </SidebarFooter>
