@@ -78,5 +78,9 @@ function RootShell({ children }: { children: React.ReactNode }) {
 }
 
 function RootComponent() {
-  return <Outlet />;
+  return (
+    <div className="animate-fade-in">
+      <Outlet />
+    </div>
+  );
 }

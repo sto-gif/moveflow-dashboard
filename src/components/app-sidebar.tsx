@@ -79,7 +79,7 @@ export function AppSidebar() {
         {groups.map((group) => (
           <SidebarGroup key={group.label} className="py-1">
             {!collapsed && (
-              <SidebarGroupLabel className="text-[10px] uppercase tracking-wide h-6">
+              <SidebarGroupLabel className="mb-2 h-5 text-[11px] font-semibold uppercase tracking-wide text-[#94A3B8]">
                 {group.label}
               </SidebarGroupLabel>
             )}
@@ -89,18 +89,18 @@ export function AppSidebar() {
                   const active = isActive(item.url);
                   return (
                     <SidebarMenuItem key={item.url}>
-                      <SidebarMenuButton asChild tooltip={item.title} className="h-7 text-[13px]">
+                      <SidebarMenuButton asChild tooltip={item.title} className="h-7 text-[13px] transition-colors duration-100 hover:bg-[#F1F5F9]">
                         <Link
                           to={item.url}
                           className={cn(
                             "relative flex items-center gap-1.5 rounded-md",
-                            active && "bg-sidebar-accent text-primary font-semibold",
+                            active && "bg-[#EFF6FF] font-medium text-[#1D4ED8]",
                           )}
                         >
                           {active && (
-                            <span className="absolute left-0 top-1/2 -translate-y-1/2 h-4 w-0.5 rounded-r bg-teal" />
+                            <span className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r bg-[#1D4ED8]" />
                           )}
-                          <item.icon className={cn("h-3.5 w-3.5 shrink-0", active && "text-primary")} strokeWidth={1.5} />
+                          <item.icon className={cn("h-3.5 w-3.5 shrink-0", active && "text-[#1D4ED8]")} strokeWidth={1.5} />
                           {!collapsed && <span>{item.title}</span>}
                         </Link>
                       </SidebarMenuButton>
