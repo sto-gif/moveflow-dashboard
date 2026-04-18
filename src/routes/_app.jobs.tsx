@@ -9,6 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { PageHeader } from "@/components/page-header";
 import { JOB_STATUS_LABELS, JOB_STATUS_COLORS, type JobStatus, type Job } from "@/mocks/jobs";
 import { crew } from "@/mocks/crew";
@@ -203,14 +205,20 @@ function JobsPage() {
 }
 
 function JobSheet({ job }: { job: Job }) {
-  const { updateJob } = useMockStore();
-  const customer = customerById(job.customerId);
+  const { updateJob, updateCustomer, customers: storeCustomers } = useMockStore();
+  const customer = storeCustomers.find((c) => c.id === job.customerId) ?? customerById(job.customerId);
   const quote = quotes.find((q) => q.customerId === job.customerId);
   const toggleCrew = (id: string) => {
     const next = job.crewIds.includes(id)
       ? job.crewIds.filter((c) => c !== id)
       : [...job.crewIds, id];
     updateJob(job.id, { crewIds: next });
+  };
+  const patchCustomer = (patch: Parameters<typeof updateCustomer>[1]) => {
+    if (customer) updateCustomer(customer.id, patch);
+  };
+  const patchAddress = (field: "street" | "zip" | "city", value: string) => {
+    if (customer) updateCustomer(customer.id, { address: { ...customer.address, [field]: value } });
   };
   return (
     <>
@@ -228,23 +236,65 @@ function JobSheet({ job }: { job: Job }) {
 
         <TabsContent value="detaljer" className="mt-4 space-y-4">
           {customer && (
-            <Card className="border-primary/20 bg-primary/5 p-4">
-              <div className="mb-2 flex items-center justify-between">
-                <div className="flex items-center gap-2">
+            <Card className="border-primary/20 bg-primary/5 p-4 space-y-3">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex flex-1 items-center gap-2">
                   {customer.type === "erhverv"
                     ? <Building2 className="h-4 w-4 text-primary" strokeWidth={1.5} />
                     : <User className="h-4 w-4 text-primary" strokeWidth={1.5} />}
-                  <span className="text-sm font-semibold">{customer.name}</span>
+                  <Input
+                    value={customer.name}
+                    onChange={(e) => patchCustomer({ name: e.target.value })}
+                    className="h-8 text-sm font-semibold"
+                  />
                 </div>
-                <Badge variant="outline" className="text-[10px] capitalize">{customer.type}</Badge>
+                <Select value={customer.type} onValueChange={(v) => patchCustomer({ type: v as typeof customer.type })}>
+                  <SelectTrigger className="h-8 w-28 text-xs capitalize"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="privat">Privat</SelectItem>
+                    <SelectItem value="erhverv">Erhverv</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-              <div className="space-y-1 text-xs text-muted-foreground">
-                <div className="flex items-center gap-1.5"><Phone className="h-3 w-3" strokeWidth={1.5} /> {customer.phone}</div>
-                <div className="flex items-center gap-1.5"><Mail className="h-3 w-3" strokeWidth={1.5} /> {customer.email}</div>
-                <div>{customer.address.street}, {customer.address.zip} {customer.address.city}</div>
-                {customer.cvr && <div>CVR {customer.cvr}</div>}
-                {customer.notes && <div className="mt-2 rounded bg-background/60 p-2 text-foreground">{customer.notes}</div>}
+              <div className="grid grid-cols-2 gap-2">
+                <label className="space-y-1">
+                  <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground"><Phone className="h-3 w-3" strokeWidth={1.5} /> Telefon</span>
+                  <Input value={customer.phone} onChange={(e) => patchCustomer({ phone: e.target.value })} className="h-8 text-xs" />
+                </label>
+                <label className="space-y-1">
+                  <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground"><Mail className="h-3 w-3" strokeWidth={1.5} /> E-mail</span>
+                  <Input value={customer.email} onChange={(e) => patchCustomer({ email: e.target.value })} className="h-8 text-xs" />
+                </label>
               </div>
+              <div className="grid grid-cols-[1fr_90px_1fr] gap-2">
+                <label className="space-y-1">
+                  <span className="text-[11px] text-muted-foreground">Adresse</span>
+                  <Input value={customer.address.street} onChange={(e) => patchAddress("street", e.target.value)} className="h-8 text-xs" />
+                </label>
+                <label className="space-y-1">
+                  <span className="text-[11px] text-muted-foreground">Postnr.</span>
+                  <Input value={customer.address.zip} onChange={(e) => patchAddress("zip", e.target.value)} className="h-8 text-xs" />
+                </label>
+                <label className="space-y-1">
+                  <span className="text-[11px] text-muted-foreground">By</span>
+                  <Input value={customer.address.city} onChange={(e) => patchAddress("city", e.target.value)} className="h-8 text-xs" />
+                </label>
+              </div>
+              {customer.type === "erhverv" && (
+                <label className="block space-y-1">
+                  <span className="text-[11px] text-muted-foreground">CVR</span>
+                  <Input value={customer.cvr ?? ""} onChange={(e) => patchCustomer({ cvr: e.target.value })} className="h-8 text-xs" />
+                </label>
+              )}
+              <label className="block space-y-1">
+                <span className="text-[11px] text-muted-foreground">Noter</span>
+                <Textarea
+                  value={customer.notes ?? ""}
+                  onChange={(e) => patchCustomer({ notes: e.target.value })}
+                  className="min-h-[60px] text-xs"
+                  placeholder="Tilføj noter om kunden..."
+                />
+              </label>
             </Card>
           )}
 

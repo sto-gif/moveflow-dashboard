@@ -33,6 +33,7 @@ interface Ctx {
   // customers
   createCustomer: (input: { name: string; email: string; phone: string; type: CustomerType }) => Customer;
   updateCustomerStage: (id: string, stage: CustomerStage) => void;
+  updateCustomer: (id: string, patch: Partial<Customer>) => void;
   // jobs
   createJob: (input: { customerName: string; volumeM3: number; revenue: number; startTime: string }) => Job;
   updateJobStatus: (id: string, status: JobStatus) => void;
@@ -146,6 +147,10 @@ export function MockStoreProvider({ children }: { children: ReactNode }) {
 
   const updateCustomerStage: Ctx["updateCustomerStage"] = useCallback((id, stage) => {
     setCustomers((cs) => cs.map((c) => (c.id === id ? { ...c, stage } : c)));
+  }, []);
+
+  const updateCustomer: Ctx["updateCustomer"] = useCallback((id, patch) => {
+    setCustomers((cs) => cs.map((c) => (c.id === id ? { ...c, ...patch } : c)));
   }, []);
 
   const createJob: Ctx["createJob"] = useCallback((input) => {
@@ -286,7 +291,7 @@ export function MockStoreProvider({ children }: { children: ReactNode }) {
   const value: Ctx = {
     leads, customers, jobs, quotes, briefs, notifications, settings, unreadCount,
     createLead, updateLeadStage, convertLeadToCustomer,
-    createCustomer, updateCustomerStage,
+    createCustomer, updateCustomerStage, updateCustomer,
     createJob, updateJobStatus, updateJob,
     createQuote, updateQuoteStatus, convertQuoteToJob,
     createBrief,
