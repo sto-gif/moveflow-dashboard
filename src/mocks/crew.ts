@@ -3,7 +3,7 @@ import { fullName, phone, pick, randInt, daysFromNow, resetSeed } from "./_helpe
 
 resetSeed(1097);
 export type CrewRole = "Chauffør" | "Flyttemand" | "Holdleder" | "Pakker" | "Lærling";
-export type CrewStatus = "aktiv" | "ferie" | "syg";
+export type CrewStatus = "aktiv" | "ferie" | "syg" | "inaktiv";
 
 export interface CrewMember {
   id: string;
@@ -51,7 +51,7 @@ const COLORS = [
 export const crew: CrewMember[] = Array.from({ length: 15 }, (_, i) => {
   const name = fullName();
   const parts = name.split(" ");
-  const status: CrewStatus = i === 3 ? "ferie" : i === 7 || i === 11 ? "syg" : "aktiv";
+  const status: CrewStatus = i === 3 ? "ferie" : i === 7 || i === 11 ? "syg" : i === 13 ? "inaktiv" : "aktiv";
   const certCount = randInt(1, 3);
   const skillCount = randInt(2, 4);
   const strengthCount = randInt(2, 3);

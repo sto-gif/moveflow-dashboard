@@ -30,11 +30,18 @@ function CrewPage() {
   const member = crew.find((c) => c.id === selected);
   const sick = sickCrewToday();
 
+  const STATUS_LABELS: Record<string, string> = {
+    aktiv: "Aktiv",
+    ferie: "Ferie",
+    syg: "Syg",
+    inaktiv: "Inaktiv",
+  };
   const statusBadge = (status: string) => {
     const map = {
       aktiv: "bg-success/10 text-success border-success/30",
       ferie: "bg-warning/10 text-warning border-warning/30",
       syg: "bg-destructive/10 text-destructive border-destructive/30",
+      inaktiv: "bg-muted text-muted-foreground border-border",
     } as Record<string, string>;
     return map[status] ?? "";
   };
