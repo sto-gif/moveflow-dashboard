@@ -1,10 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PageHeader } from "@/components/page-header";
-import { jobs, JOB_STATUS_COLORS, JOB_STATUS_LABELS } from "@/mocks/jobs";
+import { JOB_STATUS_COLORS, JOB_STATUS_LABELS } from "@/mocks/jobs";
+import { useMockStore } from "@/store/mock-store";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_app/calendar")({
@@ -18,6 +19,8 @@ export const Route = createFileRoute("/_app/calendar")({
 });
 
 function CalendarPage() {
+  const { jobs } = useMockStore();
+  const navigate = useNavigate();
   const today = new Date();
   const year = today.getFullYear();
   const month = today.getMonth();
@@ -73,9 +76,13 @@ function CalendarPage() {
                     <div className={cn("text-xs font-semibold", d === today.getDate() && "inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground")}>{d}</div>
                     <div className="mt-1.5 space-y-1">
                       {dayJobs(d).slice(0, 3).map((j) => (
-                        <div key={j.id} className={cn("truncate rounded px-1.5 py-0.5 text-[10px] font-medium", JOB_STATUS_COLORS[j.status])}>
+                        <button
+                          key={j.id}
+                          onClick={() => navigate({ to: "/jobs", search: { job: j.id } })}
+                          className={cn("block w-full truncate rounded px-1.5 py-0.5 text-left text-[10px] font-medium hover:opacity-80", JOB_STATUS_COLORS[j.status])}
+                        >
                           {j.startTime} #{j.number}
-                        </div>
+                        </button>
                       ))}
                       {dayJobs(d).length > 3 && (
                         <div className="px-1 text-[10px] text-muted-foreground">+{dayJobs(d).length - 3} mere</div>

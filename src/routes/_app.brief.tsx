@@ -1,11 +1,13 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
 import { Plus, Send, FileText, CheckCircle2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { PageHeader } from "@/components/page-header";
-import { briefs, type BriefStatus } from "@/mocks/briefs";
+import { type BriefStatus } from "@/mocks/briefs";
+import { useMockStore } from "@/store/mock-store";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_app/brief")({
@@ -25,16 +27,23 @@ const STATUS: Record<BriefStatus, { label: string; cls: string; icon: any }> = {
 };
 
 function BriefPage() {
+  const { briefs, createBrief } = useMockStore();
+  const navigate = useNavigate();
   return (
     <div>
       <PageHeader
         title="Daglig Brief"
         description="Den digitale morgentavle — jobs, crew og biler i ét overblik."
         actions={
-          <Button asChild size="sm">
-            <Link to="/brief/$briefId" params={{ briefId: "new" }}>
-              <Plus className="h-4 w-4" strokeWidth={1.5} /> Opret ny brief
-            </Link>
+          <Button
+            size="sm"
+            onClick={() => {
+              const b = createBrief();
+              toast.success("Brief oprettet");
+              navigate({ to: "/brief/$briefId", params: { briefId: b.id } });
+            }}
+          >
+            <Plus className="h-4 w-4" strokeWidth={1.5} /> Opret ny brief
           </Button>
         }
       />
