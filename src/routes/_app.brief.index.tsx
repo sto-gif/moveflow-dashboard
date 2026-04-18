@@ -10,7 +10,7 @@ import { type BriefStatus } from "@/mocks/briefs";
 import { useMockStore } from "@/store/mock-store";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/_app/brief")({
+export const Route = createFileRoute("/_app/brief/")({
   head: () => ({
     meta: [
       { title: "Daglig Brief — Movena" },

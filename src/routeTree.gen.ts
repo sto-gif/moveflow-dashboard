@@ -24,9 +24,9 @@ import { Route as AppInventoryRouteImport } from './routes/_app.inventory'
 import { Route as AppCustomersRouteImport } from './routes/_app.customers'
 import { Route as AppCrewRouteImport } from './routes/_app.crew'
 import { Route as AppCalendarRouteImport } from './routes/_app.calendar'
-import { Route as AppBriefRouteImport } from './routes/_app.brief'
 import { Route as AppLeadsIndexRouteImport } from './routes/_app.leads.index'
 import { Route as AppCustomersIndexRouteImport } from './routes/_app.customers.index'
+import { Route as AppBriefIndexRouteImport } from './routes/_app.brief.index'
 import { Route as AppLeadsLeadIdRouteImport } from './routes/_app.leads.$leadId'
 import { Route as AppCustomersCustomerIdRouteImport } from './routes/_app.customers.$customerId'
 import { Route as AppBriefBriefIdRouteImport } from './routes/_app.brief.$briefId'
@@ -105,11 +105,6 @@ const AppCalendarRoute = AppCalendarRouteImport.update({
   path: '/calendar',
   getParentRoute: () => AppRoute,
 } as any)
-const AppBriefRoute = AppBriefRouteImport.update({
-  id: '/brief',
-  path: '/brief',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppLeadsIndexRoute = AppLeadsIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -119,6 +114,11 @@ const AppCustomersIndexRoute = AppCustomersIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AppCustomersRoute,
+} as any)
+const AppBriefIndexRoute = AppBriefIndexRouteImport.update({
+  id: '/brief/',
+  path: '/brief/',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppLeadsLeadIdRoute = AppLeadsLeadIdRouteImport.update({
   id: '/$leadId',
@@ -131,14 +131,13 @@ const AppCustomersCustomerIdRoute = AppCustomersCustomerIdRouteImport.update({
   getParentRoute: () => AppCustomersRoute,
 } as any)
 const AppBriefBriefIdRoute = AppBriefBriefIdRouteImport.update({
-  id: '/$briefId',
-  path: '/$briefId',
-  getParentRoute: () => AppBriefRoute,
+  id: '/brief/$briefId',
+  path: '/brief/$briefId',
+  getParentRoute: () => AppRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
-  '/brief': typeof AppBriefRouteWithChildren
   '/calendar': typeof AppCalendarRoute
   '/crew': typeof AppCrewRoute
   '/customers': typeof AppCustomersRouteWithChildren
@@ -155,11 +154,11 @@ export interface FileRoutesByFullPath {
   '/brief/$briefId': typeof AppBriefBriefIdRoute
   '/customers/$customerId': typeof AppCustomersCustomerIdRoute
   '/leads/$leadId': typeof AppLeadsLeadIdRoute
+  '/brief/': typeof AppBriefIndexRoute
   '/customers/': typeof AppCustomersIndexRoute
   '/leads/': typeof AppLeadsIndexRoute
 }
 export interface FileRoutesByTo {
-  '/brief': typeof AppBriefRouteWithChildren
   '/calendar': typeof AppCalendarRoute
   '/crew': typeof AppCrewRoute
   '/inventory': typeof AppInventoryRoute
@@ -175,13 +174,13 @@ export interface FileRoutesByTo {
   '/brief/$briefId': typeof AppBriefBriefIdRoute
   '/customers/$customerId': typeof AppCustomersCustomerIdRoute
   '/leads/$leadId': typeof AppLeadsLeadIdRoute
+  '/brief': typeof AppBriefIndexRoute
   '/customers': typeof AppCustomersIndexRoute
   '/leads': typeof AppLeadsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteWithChildren
-  '/_app/brief': typeof AppBriefRouteWithChildren
   '/_app/calendar': typeof AppCalendarRoute
   '/_app/crew': typeof AppCrewRoute
   '/_app/customers': typeof AppCustomersRouteWithChildren
@@ -199,6 +198,7 @@ export interface FileRoutesById {
   '/_app/brief/$briefId': typeof AppBriefBriefIdRoute
   '/_app/customers/$customerId': typeof AppCustomersCustomerIdRoute
   '/_app/leads/$leadId': typeof AppLeadsLeadIdRoute
+  '/_app/brief/': typeof AppBriefIndexRoute
   '/_app/customers/': typeof AppCustomersIndexRoute
   '/_app/leads/': typeof AppLeadsIndexRoute
 }
@@ -206,7 +206,6 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/brief'
     | '/calendar'
     | '/crew'
     | '/customers'
@@ -223,11 +222,11 @@ export interface FileRouteTypes {
     | '/brief/$briefId'
     | '/customers/$customerId'
     | '/leads/$leadId'
+    | '/brief/'
     | '/customers/'
     | '/leads/'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/brief'
     | '/calendar'
     | '/crew'
     | '/inventory'
@@ -243,12 +242,12 @@ export interface FileRouteTypes {
     | '/brief/$briefId'
     | '/customers/$customerId'
     | '/leads/$leadId'
+    | '/brief'
     | '/customers'
     | '/leads'
   id:
     | '__root__'
     | '/_app'
-    | '/_app/brief'
     | '/_app/calendar'
     | '/_app/crew'
     | '/_app/customers'
@@ -266,6 +265,7 @@ export interface FileRouteTypes {
     | '/_app/brief/$briefId'
     | '/_app/customers/$customerId'
     | '/_app/leads/$leadId'
+    | '/_app/brief/'
     | '/_app/customers/'
     | '/_app/leads/'
   fileRoutesById: FileRoutesById
@@ -381,13 +381,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppCalendarRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/brief': {
-      id: '/_app/brief'
-      path: '/brief'
-      fullPath: '/brief'
-      preLoaderRoute: typeof AppBriefRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/_app/leads/': {
       id: '/_app/leads/'
       path: '/'
@@ -401,6 +394,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/customers/'
       preLoaderRoute: typeof AppCustomersIndexRouteImport
       parentRoute: typeof AppCustomersRoute
+    }
+    '/_app/brief/': {
+      id: '/_app/brief/'
+      path: '/brief'
+      fullPath: '/brief/'
+      preLoaderRoute: typeof AppBriefIndexRouteImport
+      parentRoute: typeof AppRoute
     }
     '/_app/leads/$leadId': {
       id: '/_app/leads/$leadId'
@@ -418,25 +418,13 @@ declare module '@tanstack/react-router' {
     }
     '/_app/brief/$briefId': {
       id: '/_app/brief/$briefId'
-      path: '/$briefId'
+      path: '/brief/$briefId'
       fullPath: '/brief/$briefId'
       preLoaderRoute: typeof AppBriefBriefIdRouteImport
-      parentRoute: typeof AppBriefRoute
+      parentRoute: typeof AppRoute
     }
   }
 }
-
-interface AppBriefRouteChildren {
-  AppBriefBriefIdRoute: typeof AppBriefBriefIdRoute
-}
-
-const AppBriefRouteChildren: AppBriefRouteChildren = {
-  AppBriefBriefIdRoute: AppBriefBriefIdRoute,
-}
-
-const AppBriefRouteWithChildren = AppBriefRoute._addFileChildren(
-  AppBriefRouteChildren,
-)
 
 interface AppCustomersRouteChildren {
   AppCustomersCustomerIdRoute: typeof AppCustomersCustomerIdRoute
@@ -467,7 +455,6 @@ const AppLeadsRouteWithChildren = AppLeadsRoute._addFileChildren(
 )
 
 interface AppRouteChildren {
-  AppBriefRoute: typeof AppBriefRouteWithChildren
   AppCalendarRoute: typeof AppCalendarRoute
   AppCrewRoute: typeof AppCrewRoute
   AppCustomersRoute: typeof AppCustomersRouteWithChildren
@@ -482,10 +469,11 @@ interface AppRouteChildren {
   AppSettingsRoute: typeof AppSettingsRoute
   AppTasksRoute: typeof AppTasksRoute
   AppIndexRoute: typeof AppIndexRoute
+  AppBriefBriefIdRoute: typeof AppBriefBriefIdRoute
+  AppBriefIndexRoute: typeof AppBriefIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
-  AppBriefRoute: AppBriefRouteWithChildren,
   AppCalendarRoute: AppCalendarRoute,
   AppCrewRoute: AppCrewRoute,
   AppCustomersRoute: AppCustomersRouteWithChildren,
@@ -500,6 +488,8 @@ const AppRouteChildren: AppRouteChildren = {
   AppSettingsRoute: AppSettingsRoute,
   AppTasksRoute: AppTasksRoute,
   AppIndexRoute: AppIndexRoute,
+  AppBriefBriefIdRoute: AppBriefBriefIdRoute,
+  AppBriefIndexRoute: AppBriefIndexRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
