@@ -443,6 +443,10 @@ function JobSheet({ job }: { job: Job }) {
           )}
         </TabsContent>
 
+        <TabsContent value="tidslinje" className="mt-4">
+          <JobTimeline job={job} />
+        </TabsContent>
+
         <TabsContent value="fotos" className="mt-4 space-y-4">
           <Card className="border-dashed border-2 p-6 text-center">
             <Upload className="mx-auto h-8 w-8 text-muted-foreground" strokeWidth={1.5} />
