@@ -1,5 +1,9 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { zodValidator, fallback } from "@tanstack/zod-adapter";
+import { z } from "zod";
 import { RowCount } from "@/components/row-count";
+import { FilterBar, FilterChips, type FilterGroup } from "@/components/filter-bar";
+import { applyFilters, type FilterValues } from "@/hooks/use-filters";
 import { useState, useMemo } from "react";
 import { Plus, Search, LayoutGrid, Table as TableIcon } from "lucide-react";
 import { toast } from "sonner";
@@ -12,12 +16,20 @@ import { PageHeader } from "@/components/page-header";
 import { CreateDialog } from "@/components/create-dialog";
 import { StageSelect } from "@/components/stage-select";
 import { KanbanBoard } from "@/components/kanban-board";
-import { LEAD_STAGE_LABELS, LEAD_STAGE_COLORS, type LeadStage } from "@/mocks/leads";
+import { LEAD_STAGE_LABELS, LEAD_STAGE_COLORS, LEAD_SOURCES, type LeadStage } from "@/mocks/leads";
 import { useMockStore } from "@/store/mock-store";
 import { dkk } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
+const leadsSearchSchema = z.object({
+  stage: fallback(z.string().array(), []).default([]),
+  source: fallback(z.string().array(), []).default([]),
+  owner: fallback(z.string().array(), []).default([]),
+  type: fallback(z.string().array(), []).default([]),
+});
+
 export const Route = createFileRoute("/_app/leads/")({
+  validateSearch: zodValidator(leadsSearchSchema),
   head: () => ({
     meta: [
       { title: "Leads — Movena" },
