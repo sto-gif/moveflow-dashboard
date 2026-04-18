@@ -249,25 +249,50 @@ function DashboardPage() {
   );
 }
 
-function Kpi({
-  label, value, delta, up, warn, icon: Icon,
+function KpiHero({
+  label, value, delta, up, icon: Icon,
 }: {
-  label: string; value: string; delta?: string; up?: boolean; warn?: boolean;
+  label: string; value: string; delta?: string; up?: boolean;
   icon: React.ComponentType<{ className?: string }>;
 }) {
   return (
-    <Card className="p-4">
+    <Card className="card-interactive p-6">
       <div className="flex items-center justify-between">
-        <span className="text-xs font-medium text-muted-foreground">{label}</span>
-        <Icon className={cn("h-4 w-4", warn ? "text-destructive" : "text-muted-foreground")} />
+        <span className="text-label text-muted-foreground">{label}</span>
+        <Icon className="h-5 w-5 text-muted-foreground" />
       </div>
-      <div className="mt-2 text-xl font-bold tracking-tight">{value}</div>
+      <div className="mt-3 text-3xl font-semibold tracking-tight tabular-nums text-foreground">{value}</div>
       {delta && (
         <div className={cn(
-          "mt-1 flex items-center gap-1 text-[11px] font-medium",
-          warn ? "text-destructive" : up ? "text-emerald-600" : "text-muted-foreground",
+          "mt-2 flex items-center gap-1 text-caption",
+          up ? "text-[#16A34A]" : "text-muted-foreground",
         )}>
-          {up ? <TrendingUp className="h-3 w-3" /> : warn ? <AlertTriangle className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+          {up ? <TrendingUp className="h-3.5 w-3.5" /> : <TrendingDown className="h-3.5 w-3.5" />}
+          {delta}
+        </div>
+      )}
+    </Card>
+  );
+}
+
+function KpiSmall({
+  label, value, delta, up, icon: Icon,
+}: {
+  label: string; value: string; delta?: string; up?: boolean;
+  icon: React.ComponentType<{ className?: string }>;
+}) {
+  return (
+    <Card className="card-interactive">
+      <div className="flex items-center justify-between">
+        <span className="text-caption text-muted-foreground">{label}</span>
+        <Icon className="h-4 w-4 text-muted-foreground" />
+      </div>
+      <div className="mt-2 text-xl font-semibold tracking-tight tabular-nums text-foreground">{value}</div>
+      {delta && (
+        <div className={cn(
+          "mt-1 text-caption",
+          up ? "text-[#16A34A]" : "text-muted-foreground",
+        )}>
           {delta}
         </div>
       )}
@@ -283,17 +308,17 @@ function Alert({
   title: string; meta: string;
 }) {
   const colors = {
-    warn: "bg-amber-50 text-amber-700 border-amber-200",
-    danger: "bg-rose-50 text-rose-700 border-rose-200",
-    info: "bg-blue-50 text-blue-700 border-blue-200",
-    ok: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    warn: "bg-[#FEF3C7] text-[#D97706] border-[#FDE68A]",
+    danger: "bg-[#FEE2E2] text-[#DC2626] border-[#FECACA]",
+    info: "bg-[#F1F5F9] text-[#475569] border-[#E2E8F0]",
+    ok: "bg-[#DCFCE7] text-[#16A34A] border-[#BBF7D0]",
   }[tone];
   return (
     <div className={cn("flex items-start gap-3 rounded-md border px-3 py-2.5", colors)}>
       <Icon className="mt-0.5 h-4 w-4 shrink-0" />
       <div className="flex-1 leading-snug">
-        <div className="text-sm font-medium">{title}</div>
-        <div className="text-xs opacity-80">{meta}</div>
+        <div className="text-body font-medium">{title}</div>
+        <div className="text-caption opacity-80">{meta}</div>
       </div>
     </div>
   );
