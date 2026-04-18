@@ -3,13 +3,15 @@ import { useState } from "react";
 import { toast } from "sonner";
 import {
   ArrowLeft, Mail, Phone, Calendar, MapPin, FileText,
-  MessageSquare, UserPlus, Send, Clock, CheckCircle2, FileSignature,
+  MessageSquare, UserPlus, Send, Clock, CheckCircle2, FileSignature, Plus, Activity,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { leads as seedLeads, LEAD_STAGE_LABELS, LEAD_STAGE_COLORS } from "@/mocks/leads";
 import { quotes, QUOTE_STATUS_LABELS, QUOTE_STATUS_COLORS } from "@/mocks/quotes";
 import { useMockStore } from "@/store/mock-store";
