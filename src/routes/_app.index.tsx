@@ -127,10 +127,16 @@ function DashboardPage() {
                 <h3 className="text-section">Omsætning, sidste 12 mdr.</h3>
                 <p className="text-caption text-muted-foreground">DKK pr. måned</p>
               </div>
-              <Badge variant="success">+18,2 % YoY</Badge>
+              <Badge variant="success">+21 % YoY</Badge>
             </div>
             <ResponsiveContainer width="100%" height={240}>
-              <LineChart data={revenueData}>
+              <ComposedChart data={revenueData}>
+                <defs>
+                  <linearGradient id="revFill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#3B82F6" stopOpacity={0.18} />
+                    <stop offset="100%" stopColor="#3B82F6" stopOpacity={0.01} />
+                  </linearGradient>
+                </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
                 <XAxis dataKey="m" tick={{ fontSize: 11 }} stroke="#94A3B8" />
                 <YAxis tick={{ fontSize: 11 }} stroke="#94A3B8"
@@ -139,15 +145,16 @@ function DashboardPage() {
                   formatter={(v: any) => dkk(Number(v))}
                   contentStyle={{ borderRadius: 8, fontSize: 12, border: "1px solid #E2E8F0" }}
                 />
+                <Area type="monotone" dataKey="omsætning" stroke="none" fill="url(#revFill)" />
                 <Line
                   type="monotone" dataKey="omsætning"
                   stroke="#1D4ED8" strokeWidth={2}
-                  dot={{ r: 3 }} activeDot={{ r: 5 }}
+                  dot={{ r: 3, fill: "#1D4ED8" }} activeDot={{ r: 5 }}
                 />
-              </LineChart>
+              </ComposedChart>
             </ResponsiveContainer>
             <p className="mt-3 text-caption text-muted-foreground">
-              Omsætning er steget 18 % i forhold til sidste måned.
+              Omsætning er steget 21 % sammenlignet med sidste år. Sommer er jeres største sæson.
             </p>
           </Card>
           <Card>
