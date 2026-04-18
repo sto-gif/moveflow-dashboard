@@ -1,5 +1,6 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
+import { CustomerDrawer } from "@/components/customer-drawer";
 import { Plus, Search, Building2, User, LayoutGrid, Table as TableIcon } from "lucide-react";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
@@ -32,6 +33,7 @@ function CustomersPage() {
   const navigate = useNavigate();
   const [typeFilter, setTypeFilter] = useState<"alle" | CustomerType>("alle");
   const [search, setSearch] = useState("");
+  const [drawerId, setDrawerId] = useState<string | null>(null);
 
   const filtered = useMemo(
     () =>
@@ -86,7 +88,7 @@ function CustomersPage() {
                   type: v.type === "erhverv" ? "erhverv" : "privat",
                 });
                 toast.success(`Kunde ${c.name} oprettet`);
-                navigate({ to: "/customers/$customerId", params: { customerId: c.id } });
+                setDrawerId(c.id);
               }}
               trigger={<Button size="sm"><Plus className="h-4 w-4" strokeWidth={1.5} /> Ny kunde</Button>}
             />
@@ -125,7 +127,7 @@ function CustomersPage() {
               itemsByColumn={itemsByColumn}
               onMove={handleMove}
               renderCard={(c) => (
-                <Link to="/customers/$customerId" params={{ customerId: c.id }} className="kanban-card block">
+                <button type="button" onClick={() => setDrawerId(c.id)} className="kanban-card block w-full text-left">
                   <div className="flex items-start justify-between gap-2">
                     <div className="text-label leading-snug">{c.name}</div>
                     {c.type === "erhverv" && <Building2 className="h-3.5 w-3.5 text-muted-foreground shrink-0" strokeWidth={1.5} />}
@@ -135,7 +137,7 @@ function CustomersPage() {
                     <span className="text-caption font-semibold tabular-nums">{dkk(c.value)}</span>
                     <Badge variant="outline" className="text-[10px]">{c.source}</Badge>
                   </div>
-                </Link>
+                </button>
               )}
             />
           </TabsContent>
@@ -156,12 +158,14 @@ function CustomersPage() {
                 </thead>
                 <tbody>
                   {filtered.map((c) => (
-                    <tr key={c.id} className="cursor-pointer border-t hover:bg-[#F8FAFC] transition-colors">
+                    <tr
+                      key={c.id}
+                      className="cursor-pointer border-t hover:bg-[#F8FAFC] transition-colors"
+                      onClick={() => setDrawerId(c.id)}
+                    >
                       <td className="px-4 py-2.5">
-                        <Link to="/customers/$customerId" params={{ customerId: c.id }} className="hover:underline">
-                          <div className="cell-primary">{c.name}</div>
-                          {c.cvr && <div className="text-[11px] text-muted-foreground tabular-nums">CVR {c.cvr}</div>}
-                        </Link>
+                        <div className="cell-primary hover:underline">{c.name}</div>
+                        {c.cvr && <div className="text-[11px] text-muted-foreground tabular-nums">CVR {c.cvr}</div>}
                       </td>
                       <td className="px-4 py-2.5">
                         <Badge variant="outline" className="text-[10px] capitalize">
