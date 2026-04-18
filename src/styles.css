@@ -207,3 +207,11 @@
   .bg-orange { background-color: var(--orange); }
   .text-orange { color: var(--orange); }
 }
+
+/* Hide Lovable preview badge in deployed/demo contexts */
+#lovable-badge,
+#lovable-badge-container,
+[data-lovable-badge],
+a[href*="lovable.dev"][class*="badge"] {
+  display: none !important;
+}
