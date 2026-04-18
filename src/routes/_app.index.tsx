@@ -380,8 +380,8 @@ function Alert({
     <div className={cn("flex items-start gap-3 rounded-md border px-3 py-2.5", colors)}>
       <Icon className="mt-0.5 h-4 w-4 shrink-0" />
       <div className="flex-1 leading-snug">
-        <div className="text-body font-medium">{title}</div>
-        <div className="text-caption opacity-80">{meta}</div>
+        <div className="text-body font-semibold">{title}</div>
+        <div className="text-caption opacity-75">{meta}</div>
       </div>
     </div>
   );
