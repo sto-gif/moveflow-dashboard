@@ -203,8 +203,15 @@ function JobsPage() {
 }
 
 function JobSheet({ job }: { job: Job }) {
+  const { updateJob } = useMockStore();
   const customer = customerById(job.customerId);
   const quote = quotes.find((q) => q.customerId === job.customerId);
+  const toggleCrew = (id: string) => {
+    const next = job.crewIds.includes(id)
+      ? job.crewIds.filter((c) => c !== id)
+      : [...job.crewIds, id];
+    updateJob(job.id, { crewIds: next });
+  };
   return (
     <>
       <SheetHeader>
