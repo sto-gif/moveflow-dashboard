@@ -35,7 +35,7 @@ function BriefDetailPage() {
   const existing = !isNew ? (briefs.find((b) => b.id === briefId) ?? seedBriefs.find((b) => b.id === briefId)) : undefined;
 
   const blank: Brief = {
-    id: "new",
+    id: isNew ? "new" : briefId,
     date: new Date(),
     title: `Brief ${new Date().toLocaleDateString("da-DK", { day: "numeric", month: "long" })}`,
     scope: "dag",
@@ -50,8 +50,10 @@ function BriefDetailPage() {
     announcements: "",
   };
 
+  // Fallback: if a brief id isn't found (e.g. after refresh on a freshly-created
+  // brief whose state was lost), render the blank template instead of a 404.
   const brief = existing ?? blank;
-  const notFound = !isNew && !existing;
+  const notFound = false;
 
   const [title, setTitle] = useState(brief.title);
   const [notes, setNotes] = useState(brief.generalNotes);
