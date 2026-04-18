@@ -611,7 +611,7 @@ function JobTimeline({ job }: { job: Job }) {
   );
 }
 
-
+function CalendarGrid({ jobs, onJobClick }: { jobs: Job[]; onJobClick: (id: string) => void }) {
   const today = new Date();
   const year = today.getFullYear();
   const month = today.getMonth();
