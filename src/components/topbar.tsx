@@ -9,7 +9,8 @@ import {
   DropdownMenuSeparator, DropdownMenuTrigger, DropdownMenuRadioGroup, DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { notifications, type NotificationType } from "@/mocks/notifications";
+import { useMockStore } from "@/store/mock-store";
+import type { NotificationType } from "@/mocks/notifications";
 import { cn } from "@/lib/utils";
 
 const iconFor = (type: NotificationType) => {
@@ -22,9 +23,8 @@ const iconFor = (type: NotificationType) => {
 };
 
 export function Topbar() {
-  const [items] = useState(notifications);
+  const { notifications, unreadCount, markNotificationRead, markAllNotificationsRead } = useMockStore();
   const [lang, setLang] = useState("da");
-  const unread = items.filter((n) => n.unread).length;
 
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border bg-background/95 px-3 backdrop-blur">
@@ -65,9 +65,9 @@ export function Topbar() {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="relative h-9 w-9">
               <Bell className="h-[18px] w-[18px]" strokeWidth={1.5} />
-              {unread > 0 && (
+              {unreadCount > 0 && (
                 <span className="absolute right-1.5 top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground">
-                  {unread}
+                  {unreadCount}
                 </span>
               )}
             </Button>
@@ -77,14 +77,18 @@ export function Topbar() {
               <DropdownMenuLabel className="p-0 text-sm font-semibold">
                 Notifikationer
               </DropdownMenuLabel>
-              <button className="text-xs font-medium text-primary hover:underline">
+              <button
+                className="text-xs font-medium text-primary hover:underline"
+                onClick={() => markAllNotificationsRead()}
+              >
                 Markér alle som læst
               </button>
             </div>
             <div className="max-h-[480px] overflow-y-auto">
-              {items.map((n) => (
+              {notifications.map((n) => (
                 <DropdownMenuItem
                   key={n.id}
+                  onClick={() => markNotificationRead(n.id)}
                   className={cn(
                     "flex cursor-pointer items-start gap-3 rounded-none border-b px-3 py-3 last:border-b-0",
                     n.unread && "bg-accent/30",
@@ -102,9 +106,9 @@ export function Topbar() {
               ))}
             </div>
             <div className="border-t px-3 py-2 text-center">
-              <button className="text-xs font-medium text-primary hover:underline">
+              <Link to="/" className="text-xs font-medium text-primary hover:underline">
                 Vis alle notifikationer
-              </button>
+              </Link>
             </div>
           </DropdownMenuContent>
         </DropdownMenu>

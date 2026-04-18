@@ -76,7 +76,7 @@ export const email = (name: string) =>
   `${name.toLowerCase().replace(/\s+/g, ".").replace(/ø/g, "o").replace(/æ/g, "ae").replace(/å/g, "aa")}@${pick(["gmail.com", "outlook.dk", "hotmail.dk", "live.dk"])}`;
 
 export const daysFromNow = (days: number) => {
-  const d = new Date();
+  const d = new Date(MOCK_TODAY);
   d.setDate(d.getDate() + days);
   return d;
 };

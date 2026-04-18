@@ -1,4 +1,6 @@
 import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
+import { Toaster } from "@/components/ui/sonner";
+import { MockStoreProvider } from "@/store/mock-store";
 
 import appCss from "../styles.css?url";
 import faviconUrl from "../assets/movena-icon.svg?url";
@@ -79,8 +81,11 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   return (
-    <div className="animate-fade-in">
-      <Outlet />
-    </div>
+    <MockStoreProvider>
+      <div className="animate-fade-in">
+        <Outlet />
+      </div>
+      <Toaster richColors position="top-right" />
+    </MockStoreProvider>
   );
 }

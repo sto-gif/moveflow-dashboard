@@ -1,5 +1,6 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { toast } from "sonner";
 import {
   ArrowLeft, Mail, Phone, Calendar, MapPin, FileText,
   MessageSquare, UserPlus, Send, Clock, CheckCircle2, FileSignature,
@@ -9,14 +10,15 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { leads, LEAD_STAGE_LABELS, LEAD_STAGE_COLORS, type Lead } from "@/mocks/leads";
+import { leads as seedLeads, LEAD_STAGE_LABELS, LEAD_STAGE_COLORS, type Lead } from "@/mocks/leads";
 import { quotes, QUOTE_STATUS_LABELS, QUOTE_STATUS_COLORS } from "@/mocks/quotes";
+import { useMockStore } from "@/store/mock-store";
 import { dkk } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_app/leads/$leadId")({
   loader: ({ params }) => {
-    const lead = leads.find((l) => l.id === params.leadId);
+    const lead = seedLeads.find((l) => l.id === params.leadId);
     if (!lead) throw notFound();
     return { lead };
   },
@@ -35,11 +37,29 @@ export const Route = createFileRoute("/_app/leads/$leadId")({
 });
 
 function LeadDetailPage() {
-  const { lead } = Route.useLoaderData() as { lead: Lead };
+  const { lead: loaderLead } = Route.useLoaderData() as { lead: Lead };
+  const { leads, updateLeadStage, convertLeadToCustomer, createQuote } = useMockStore();
+  const navigate = useNavigate();
+  const lead = leads.find((l) => l.id === loaderLead.id) ?? loaderLead;
   const [notes, setNotes] = useState<{ id: string; text: string; at: Date }[]>([
     { id: "n1", text: lead.note, at: lead.createdAt },
   ]);
   const [draft, setDraft] = useState("");
+
+  const handleSendQuote = () => {
+    createQuote({ customerName: lead.name, total: lead.estimatedValue });
+    updateLeadStage(lead.id, "tilbud_sendt");
+    toast.success(`Tilbud sendt til ${lead.name}`);
+    navigate({ to: "/quotes" });
+  };
+
+  const handleConvert = () => {
+    const c = convertLeadToCustomer(lead.id);
+    if (c) {
+      toast.success(`${lead.name} konverteret til kunde`);
+      navigate({ to: "/customers/$customerId", params: { customerId: c.id } });
+    }
+  };
 
   const leadQuotes = quotes.filter((q) => q.customerName === lead.name).slice(0, 5);
 
@@ -78,8 +98,8 @@ function LeadDetailPage() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Button size="sm" variant="outline"><Send className="h-4 w-4" strokeWidth={1.5} /> Send tilbud</Button>
-            <Button size="sm"><CheckCircle2 className="h-4 w-4" strokeWidth={1.5} /> Konverter til kunde</Button>
+            <Button size="sm" variant="outline" onClick={handleSendQuote}><Send className="h-4 w-4" strokeWidth={1.5} /> Send tilbud</Button>
+            <Button size="sm" onClick={handleConvert}><CheckCircle2 className="h-4 w-4" strokeWidth={1.5} /> Konverter til kunde</Button>
           </div>
         </div>
       </div>

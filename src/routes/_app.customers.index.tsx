@@ -1,15 +1,19 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
 import { Plus, Search, Building2, User } from "lucide-react";
+import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { PageHeader } from "@/components/page-header";
-import { customers, STAGE_LABELS, type CustomerStage, type CustomerType } from "@/mocks/customers";
+import { CreateDialog } from "@/components/create-dialog";
+import { StageSelect } from "@/components/stage-select";
+import { KanbanBoard } from "@/components/kanban-board";
+import { STAGE_LABELS, STAGE_COLORS, type CustomerStage, type CustomerType } from "@/mocks/customers";
+import { useMockStore } from "@/store/mock-store";
 import { dkk } from "@/lib/format";
-import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_app/customers/")({
   head: () => ({
@@ -24,6 +28,8 @@ export const Route = createFileRoute("/_app/customers/")({
 const STAGES: CustomerStage[] = ["booket", "i_gang", "afsluttet"];
 
 function CustomersPage() {
+  const { customers, createCustomer, updateCustomerStage } = useMockStore();
+  const navigate = useNavigate();
   const [typeFilter, setTypeFilter] = useState<"alle" | CustomerType>("alle");
   const [search, setSearch] = useState("");
 
@@ -38,11 +44,22 @@ function CustomersPage() {
           (c.cvr ?? "").includes(q);
         return typeMatch && sMatch;
       }),
-    [typeFilter, search],
+    [customers, typeFilter, search],
   );
 
-  const privateCount = useMemo(() => customers.filter((c) => c.type === "privat").length, []);
-  const erhvervCount = useMemo(() => customers.filter((c) => c.type === "erhverv").length, []);
+  const privateCount = customers.filter((c) => c.type === "privat").length;
+  const erhvervCount = customers.filter((c) => c.type === "erhverv").length;
+
+  const itemsByColumn = useMemo(() => {
+    const map = {} as Record<CustomerStage, typeof filtered>;
+    STAGES.forEach((s) => { map[s] = filtered.filter((c) => c.stage === s); });
+    return map;
+  }, [filtered]);
+
+  const handleMove = (id: string, stage: CustomerStage) => {
+    updateCustomerStage(id, stage);
+    toast.success(`Kunde flyttet til ${STAGE_LABELS[stage]}`);
+  };
 
   return (
     <div>
@@ -55,7 +72,24 @@ function CustomersPage() {
               <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" strokeWidth={1.5} />
               <Input placeholder="Søg navn, email, CVR…" value={search} onChange={(e) => setSearch(e.target.value)} className="h-9 w-64 pl-8" />
             </div>
-            <Button size="sm"><Plus className="h-4 w-4" strokeWidth={1.5} /> Ny kunde</Button>
+            <CreateDialog
+              title="Ny kunde"
+              fields={[
+                { name: "name", label: "Navn", defaultValue: "Ny kunde" },
+                { name: "email", label: "Email", type: "email", defaultValue: "ny.kunde@example.dk" },
+                { name: "phone", label: "Telefon", type: "tel", defaultValue: "+45 33 44 55 66" },
+                { name: "type", label: "Type (privat/erhverv)", defaultValue: "privat" },
+              ]}
+              onSubmit={(v) => {
+                const c = createCustomer({
+                  name: v.name!, email: v.email!, phone: v.phone!,
+                  type: v.type === "erhverv" ? "erhverv" : "privat",
+                });
+                toast.success(`Kunde ${c.name} oprettet`);
+                navigate({ to: "/customers/$customerId", params: { customerId: c.id } });
+              }}
+              trigger={<Button size="sm"><Plus className="h-4 w-4" strokeWidth={1.5} /> Ny kunde</Button>}
+            />
           </>
         }
       />
@@ -80,50 +114,30 @@ function CustomersPage() {
           </TabsList>
 
           <TabsContent value="pipeline" className="mt-4">
-            <div className="grid gap-3 lg:grid-cols-3">
-              {STAGES.map((stage) => {
-                const items = filtered.filter((c) => c.stage === stage);
-                const total = items.reduce((s, c) => s + c.value, 0);
-                return (
-                  <div key={stage} className="kanban-column">
-                    <div className="kanban-column-header">
-                      <div>
-                        <div className="text-[11px] font-semibold uppercase tracking-wide text-[#94A3B8]">
-                          {STAGE_LABELS[stage]}
-                        </div>
-                        <div className="mt-0.5 text-caption text-muted-foreground tabular-nums">{dkk(total)}</div>
-                      </div>
-                      <Badge variant="secondary" className="h-5 px-1.5 text-[10px]">{items.length}</Badge>
-                    </div>
-                    <div className="kanban-cards">
-                      {items.map((c) => (
-                        <Link
-                          key={c.id}
-                          to="/customers/$customerId"
-                          params={{ customerId: c.id }}
-                          className="kanban-card block"
-                        >
-                          <div className="flex items-start justify-between gap-2">
-                            <div className="text-label leading-snug">{c.name}</div>
-                            {c.type === "erhverv" && <Building2 className="h-3.5 w-3.5 text-muted-foreground shrink-0" strokeWidth={1.5} />}
-                          </div>
-                          <div className="mt-1 text-caption text-muted-foreground">{c.address.city}</div>
-                          <div className="mt-2 flex items-center justify-between">
-                            <span className="text-caption font-semibold tabular-nums">{dkk(c.value)}</span>
-                            <Badge variant="outline" className="text-[10px]">{c.source}</Badge>
-                          </div>
-                        </Link>
-                      ))}
-                      {items.length === 0 && (
-                        <div className="rounded border border-dashed border-border px-2 py-6 text-center text-caption text-muted-foreground">
-                          Ingen kunder
-                        </div>
-                      )}
-                    </div>
+            <KanbanBoard
+              className="grid gap-3 lg:grid-cols-3"
+              columns={STAGES.map((s) => ({
+                id: s,
+                label: STAGE_LABELS[s],
+                items: itemsByColumn[s],
+                footer: dkk(itemsByColumn[s].reduce((sum, c) => sum + c.value, 0)),
+              }))}
+              itemsByColumn={itemsByColumn}
+              onMove={handleMove}
+              renderCard={(c) => (
+                <Link to="/customers/$customerId" params={{ customerId: c.id }} className="kanban-card block">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="text-label leading-snug">{c.name}</div>
+                    {c.type === "erhverv" && <Building2 className="h-3.5 w-3.5 text-muted-foreground shrink-0" strokeWidth={1.5} />}
                   </div>
-                );
-              })}
-            </div>
+                  <div className="mt-1 text-caption text-muted-foreground">{c.address.city}</div>
+                  <div className="mt-2 flex items-center justify-between">
+                    <span className="text-caption font-semibold tabular-nums">{dkk(c.value)}</span>
+                    <Badge variant="outline" className="text-[10px]">{c.source}</Badge>
+                  </div>
+                </Link>
+              )}
+            />
           </TabsContent>
 
           <TabsContent value="table" className="mt-4">
@@ -150,7 +164,7 @@ function CustomersPage() {
                         </Link>
                       </td>
                       <td className="px-4 py-2.5">
-                        <Badge variant="outline" className={cn("text-[10px] capitalize")}>
+                        <Badge variant="outline" className="text-[10px] capitalize">
                           {c.type === "erhverv" ? <Building2 className="mr-1 h-3 w-3" strokeWidth={1.5} /> : <User className="mr-1 h-3 w-3" strokeWidth={1.5} />}
                           {c.type}
                         </Badge>
@@ -164,7 +178,13 @@ function CustomersPage() {
                         {c.lastJobDate ? c.lastJobDate.toLocaleDateString("da-DK") : "—"}
                       </td>
                       <td className="px-4 py-2.5">
-                        <Badge variant="outline" className="text-[10px]">{STAGE_LABELS[c.stage]}</Badge>
+                        <StageSelect
+                          value={c.stage}
+                          options={STAGES}
+                          labels={STAGE_LABELS}
+                          colors={STAGE_COLORS}
+                          onChange={(s) => handleMove(c.id, s)}
+                        />
                       </td>
                       <td className="px-4 py-2.5 text-right font-semibold tabular-nums">{dkk(c.totalValue)}</td>
                     </tr>
