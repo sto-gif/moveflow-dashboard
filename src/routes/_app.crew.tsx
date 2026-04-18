@@ -30,11 +30,18 @@ function CrewPage() {
   const member = crew.find((c) => c.id === selected);
   const sick = sickCrewToday();
 
+  const STATUS_LABELS: Record<string, string> = {
+    aktiv: "Aktiv",
+    ferie: "Ferie",
+    syg: "Syg",
+    inaktiv: "Inaktiv",
+  };
   const statusBadge = (status: string) => {
     const map = {
       aktiv: "bg-success/10 text-success border-success/30",
       ferie: "bg-warning/10 text-warning border-warning/30",
       syg: "bg-destructive/10 text-destructive border-destructive/30",
+      inaktiv: "bg-muted text-muted-foreground border-border",
     } as Record<string, string>;
     return map[status] ?? "";
   };
@@ -101,7 +108,7 @@ function CrewPage() {
                       </td>
                       <td className="px-4 py-2.5 text-muted-foreground">{c.role}</td>
                       <td className="px-4 py-2.5">
-                        <Badge variant="outline" className={cn("text-[10px] capitalize", statusBadge(c.status))}>{c.status}</Badge>
+                        <Badge variant="outline" className={cn("text-[10px]", statusBadge(c.status))}>{STATUS_LABELS[c.status] ?? c.status}</Badge>
                       </td>
                       <td className="px-4 py-2.5">
                         <div className="flex flex-wrap gap-1">
@@ -162,7 +169,7 @@ function CrewPage() {
                     <div className="font-semibold">{member.role}</div>
                     <div className="text-xs text-muted-foreground flex items-center gap-1"><Phone className="h-3 w-3" strokeWidth={1.5} />{member.phone}</div>
                   </div>
-                  <Badge variant="outline" className={cn("text-[10px] capitalize", statusBadge(member.status))}>{member.status}</Badge>
+                  <Badge variant="outline" className={cn("text-[10px]", statusBadge(member.status))}>{STATUS_LABELS[member.status] ?? member.status}</Badge>
                 </div>
 
                 <Card className="p-3">

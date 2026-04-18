@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Input } from "@/components/ui/input";
+
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -21,6 +21,15 @@ export const Route = createFileRoute("/_app/messages")({
   }),
   component: FlowsPage,
 });
+
+function inferTiming(trigger: string): string {
+  const t = trigger.toLowerCase();
+  if (t.includes("24")) return "24h";
+  if (t.includes("30 min") || t.includes("30min")) return "30min";
+  if (t.includes("3 dage")) return "3d_after";
+  if (t.includes("dagen efter") || t.includes("1 dag")) return "1d_after";
+  return "now";
+}
 
 function FlowsPage() {
   const [seqs, setSeqs] = useState(sequences);
@@ -61,7 +70,18 @@ function FlowsPage() {
                   </div>
                   <div>
                     <Label className="text-xs">Timing</Label>
-                    <Input defaultValue="0 dage" className="mt-1 h-9" />
+                    <Select defaultValue={inferTiming(s.trigger)}>
+                      <SelectTrigger className="mt-1 h-9"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="now">Med det samme</SelectItem>
+                        <SelectItem value="30min">30 min. før</SelectItem>
+                        <SelectItem value="1h">1 time før</SelectItem>
+                        <SelectItem value="24h">24 timer før job</SelectItem>
+                        <SelectItem value="1d_after">1 dag efter job</SelectItem>
+                        <SelectItem value="3d_after">3 dage efter job</SelectItem>
+                        <SelectItem value="7d_after">7 dage efter job</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div>
                     <Label className="text-xs">Kanal</Label>

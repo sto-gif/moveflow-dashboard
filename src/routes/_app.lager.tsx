@@ -172,6 +172,10 @@ function LagerPage() {
                   </div>
                 </Card>
                 <div>
+                  <div className="text-xs font-semibold uppercase text-muted-foreground mb-2">Bemærkninger</div>
+                  <p className="text-sm text-muted-foreground">{unit.notes}</p>
+                </div>
+                <div>
                   <div className="text-xs font-semibold uppercase text-muted-foreground mb-2">Kontrakt</div>
                   <a className="text-sm text-primary hover:underline" href="#">{unit.contract}</a>
                 </div>

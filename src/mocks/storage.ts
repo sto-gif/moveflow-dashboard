@@ -21,6 +21,7 @@ export interface StorageUnit {
   contract: string;
   sizeM3: number;
   location: string;
+  notes: string;
 }
 
 const DESCRIPTIONS = [
@@ -37,6 +38,18 @@ const DESCRIPTIONS = [
 ];
 
 const LOCATIONS = ["Lager A — Herlev", "Lager B — Glostrup", "Lager C — Brøndby"];
+
+const NOTES = [
+  "Kunde har egen nøgle — kontakt før besøg",
+  "Sart gods — håndteres med forsigtighed",
+  "Tung last på paller, kræver gaffeltruck",
+  "Forsikret op til 250.000 kr.",
+  "Sæsonopbevaring — afhentes inden 1. juni",
+  "Genoptages efter renovering",
+  "Faktureres kvartalsvis",
+  "Kontaktperson: ægtefælle, +45 30 20 10 00",
+  "Ingen bemærkninger",
+];
 
 export const storageUnits: StorageUnit[] = Array.from({ length: 22 }, (_, i) => {
   const customer = pick(customers);
@@ -60,5 +73,6 @@ export const storageUnits: StorageUnit[] = Array.from({ length: 22 }, (_, i) => 
     contract: `Kontrakt-${randInt(1000, 9999)}.pdf`,
     sizeM3,
     location: pick(LOCATIONS),
+    notes: pick(NOTES),
   };
 });
