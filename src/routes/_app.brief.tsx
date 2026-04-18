@@ -104,7 +104,7 @@ function BriefPage() {
 
           <TabsContent value="kalender" className="mt-4">
             <Card className="p-5">
-              <BriefMonth />
+              <BriefMonth briefs={briefs} />
             </Card>
           </TabsContent>
         </Tabs>
@@ -113,7 +113,7 @@ function BriefPage() {
   );
 }
 
-function BriefMonth() {
+function BriefMonth({ briefs }: { briefs: { id: string; title: string; date: Date }[] }) {
   const today = new Date();
   const year = today.getFullYear();
   const month = today.getMonth();
