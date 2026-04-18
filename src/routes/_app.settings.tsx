@@ -144,7 +144,7 @@ function SettingsPage() {
                   </Select>
                 </Field>
               </div>
-              <Button className="mt-5">Gem ændringer</Button>
+              <Button className="mt-5" onClick={() => toast.success("Indstillinger gemt")}>Gem ændringer</Button>
             </Card>
           </TabsContent>
 
@@ -152,7 +152,7 @@ function SettingsPage() {
             <Card className="overflow-hidden">
               <div className="flex items-center justify-between border-b px-4 py-3">
                 <h3 className="text-section">Brugere</h3>
-                <Button size="sm"><Plus className="h-4 w-4" strokeWidth={1.5} /> Inviter</Button>
+                <Button size="sm" onClick={() => toast.success("Invitation sendt")}><Plus className="h-4 w-4" strokeWidth={1.5} /> Inviter</Button>
               </div>
               <table className="w-full text-sm">
                 <thead className="bg-muted/40">
@@ -187,7 +187,7 @@ function SettingsPage() {
                   </div>
                   <div className="mt-1 text-sm text-muted-foreground">12 dage tilbage på Professional-planen.</div>
                 </div>
-                <Button>Opgradér nu</Button>
+                <Button onClick={() => toast.success("Opgradering startet")}>Opgradér nu</Button>
               </div>
             </Card>
             <div className="grid gap-4 md:grid-cols-3">
@@ -274,7 +274,7 @@ function SettingsPage() {
               <h3 className="text-section">Send feedback</h3>
               <Field label="Emne"><Input placeholder="Kort beskrivelse" /></Field>
               <Field label="Besked"><Textarea rows={6} placeholder="Fortæl os, hvad du tænker…" /></Field>
-              <Button>Send feedback</Button>
+              <Button onClick={() => toast.success("Tak for din feedback!")}>Send feedback</Button>
             </Card>
           </TabsContent>
 
@@ -382,7 +382,7 @@ function QuoteFormSettings() {
           <Switch defaultChecked />
         </div>
 
-        <Button>Gem indstillinger</Button>
+        <Button onClick={() => toast.success("Tilbudsformular gemt")}>Gem indstillinger</Button>
       </Card>
 
       <Card className="p-5 h-fit sticky top-20 bg-muted/30">
