@@ -8,15 +8,21 @@ import {
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { customers as seedCustomers, STAGE_LABELS, type Communication } from "@/mocks/customers";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { customers as seedCustomers, STAGE_LABELS, type Communication, type CustomerStage, type CustomerType } from "@/mocks/customers";
 import { JOB_STATUS_LABELS, JOB_STATUS_COLORS } from "@/mocks/jobs";
 import { QUOTE_STATUS_LABELS, QUOTE_STATUS_COLORS } from "@/mocks/quotes";
 import { storageUnits } from "@/mocks/storage";
 import { useMockStore } from "@/store/mock-store";
 import { dkk } from "@/lib/format";
 import { cn } from "@/lib/utils";
+
+const STAGES: CustomerStage[] = ["booket", "i_gang", "afsluttet"];
+const TYPES: CustomerType[] = ["privat", "erhverv"];
 
 export const Route = createFileRoute("/_app/customers/$customerId")({
   head: () => ({ meta: [{ title: "Kunde — Movena" }] }),
@@ -25,7 +31,7 @@ export const Route = createFileRoute("/_app/customers/$customerId")({
 
 function CustomerDetailPage() {
   const { customerId } = Route.useParams();
-  const { customers, jobs, quotes, createJob, createQuote } = useMockStore();
+  const { customers, jobs, quotes, createJob, createQuote, updateCustomer } = useMockStore();
   const navigate = useNavigate();
   const customer = customers.find((c) => c.id === customerId) ?? seedCustomers.find((c) => c.id === customerId);
   const [notes, setNotes] = useState<{ id: string; text: string; at: Date }[]>(
