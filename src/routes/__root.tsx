@@ -29,20 +29,26 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Flyt — Operations platform for flyttefirmaer" },
+      { title: "Testing SSS" },
       {
         name: "description",
         content:
           "Alt-i-én SaaS til flyttefirmaer: jobs, tilbud, crew, fakturaer, lager og kundekommunikation.",
       },
       { name: "author", content: "Flyt" },
-      { property: "og:title", content: "Flyt — Operations platform for flyttefirmaer" },
+      { property: "og:title", content: "Testing SSS" },
       {
         property: "og:description",
         content: "Driv hele dit flyttefirma fra én moderne platform.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
+      { name: "twitter:title", content: "Testing SSS" },
+      { name: "description", content: "MoveFlow Dashboard is a comprehensive SaaS platform for moving companies, managing operations from lead to invoice." },
+      { property: "og:description", content: "MoveFlow Dashboard is a comprehensive SaaS platform for moving companies, managing operations from lead to invoice." },
+      { name: "twitter:description", content: "MoveFlow Dashboard is a comprehensive SaaS platform for moving companies, managing operations from lead to invoice." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/bd87703d-0e54-46bc-a02f-02c89b1da04c/id-preview-ea2c0c1d--cc9ef946-3789-4582-a577-e6378c7c50f5.lovable.app-1776439148607.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/bd87703d-0e54-46bc-a02f-02c89b1da04c/id-preview-ea2c0c1d--cc9ef946-3789-4582-a577-e6378c7c50f5.lovable.app-1776439148607.png" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
