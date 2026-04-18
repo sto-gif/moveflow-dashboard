@@ -555,7 +555,63 @@ function JobSheet({ job }: { job: Job }) {
   );
 }
 
-function CalendarGrid({ jobs, onJobClick }: { jobs: Job[]; onJobClick: (id: string) => void }) {
+function JobTimeline({ job }: { job: Job }) {
+  const created = new Date(job.date.getTime() - 14 * 24 * 60 * 60 * 1000);
+  const confirmed = new Date(job.date.getTime() - 5 * 24 * 60 * 60 * 1000);
+  const [startH, startM] = job.startTime.split(":").map(Number);
+  const started = new Date(job.date);
+  started.setHours(startH ?? 8, startM ?? 0, 0, 0);
+  const completed = new Date(started.getTime() + job.estimatedHours * 60 * 60 * 1000);
+  const now = new Date();
+
+  const events: { label: string; at: Date; done: boolean; status: JobStatus }[] = [
+    { label: "Job oprettet", at: created, done: true, status: "planlagt" },
+    { label: "Bekræftet af kunde", at: confirmed, done: ["bekraeftet", "i_gang", "afsluttet"].includes(job.status), status: "bekraeftet" },
+    { label: "Job startet", at: started, done: ["i_gang", "afsluttet"].includes(job.status), status: "i_gang" },
+    { label: "Job afsluttet", at: completed, done: job.status === "afsluttet", status: "afsluttet" },
+  ];
+  if (job.status === "annulleret") {
+    events.push({ label: "Job annulleret", at: now, done: true, status: "annulleret" });
+  }
+
+  const fmt = (d: Date) =>
+    d.toLocaleDateString("da-DK", { day: "numeric", month: "short" }) +
+    " · " +
+    d.toLocaleTimeString("da-DK", { hour: "2-digit", minute: "2-digit" });
+
+  return (
+    <Card className="p-5">
+      <div className="relative space-y-5 pl-7">
+        <div className="absolute left-[10px] top-2 bottom-2 w-px bg-border" />
+        {events.map((ev, i) => (
+          <div key={i} className="relative">
+            <div className="absolute -left-7 top-0 flex h-5 w-5 items-center justify-center">
+              {ev.done
+                ? <CheckCircle2 className="h-5 w-5 text-success" strokeWidth={2} />
+                : <Circle className="h-5 w-5 text-muted-foreground/40" strokeWidth={1.5} />}
+            </div>
+            <div className="flex items-center justify-between gap-2">
+              <div>
+                <div className={cn("text-sm font-medium", !ev.done && "text-muted-foreground")}>{ev.label}</div>
+                <div className="text-[11px] text-muted-foreground tabular-nums">{fmt(ev.at)}</div>
+              </div>
+              <Badge variant="outline" className={cn("text-[10px]", JOB_STATUS_COLORS[ev.status])}>
+                {JOB_STATUS_LABELS[ev.status]}
+              </Badge>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="mt-5 grid grid-cols-3 gap-3 border-t pt-4 text-center text-xs">
+        <div><MapPin className="mx-auto h-3.5 w-3.5 text-muted-foreground" strokeWidth={1.5} /><div className="mt-1 text-muted-foreground">Estimeret tid</div><div className="font-semibold">{job.estimatedHours} timer</div></div>
+        <div><Clock className="mx-auto h-3.5 w-3.5 text-muted-foreground" strokeWidth={1.5} /><div className="mt-1 text-muted-foreground">Starttid</div><div className="font-semibold">{job.startTime}</div></div>
+        <div><Truck className="mx-auto h-3.5 w-3.5 text-muted-foreground" strokeWidth={1.5} /><div className="mt-1 text-muted-foreground">Volumen</div><div className="font-semibold">{job.volumeM3} m³</div></div>
+      </div>
+    </Card>
+  );
+}
+
+
   const today = new Date();
   const year = today.getFullYear();
   const month = today.getMonth();
