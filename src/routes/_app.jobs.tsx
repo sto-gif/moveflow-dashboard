@@ -1,12 +1,14 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Plus, Search, Image as ImageIcon, Upload, Camera, Building2, User, Mail, Phone } from "lucide-react";
+import { Plus, Search, Image as ImageIcon, Upload, Camera, Building2, User, Mail, Phone, Pencil } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
 import { PageHeader } from "@/components/page-header";
 import { JOB_STATUS_LABELS, JOB_STATUS_COLORS, type JobStatus, type Job } from "@/mocks/jobs";
 import { crew } from "@/mocks/crew";
@@ -201,8 +203,15 @@ function JobsPage() {
 }
 
 function JobSheet({ job }: { job: Job }) {
+  const { updateJob } = useMockStore();
   const customer = customerById(job.customerId);
   const quote = quotes.find((q) => q.customerId === job.customerId);
+  const toggleCrew = (id: string) => {
+    const next = job.crewIds.includes(id)
+      ? job.crewIds.filter((c) => c !== id)
+      : [...job.crewIds, id];
+    updateJob(job.id, { crewIds: next });
+  };
   return (
     <>
       <SheetHeader>
@@ -261,8 +270,35 @@ function JobSheet({ job }: { job: Job }) {
             </div>
           </Card>
           <div>
-            <div className="text-xs font-semibold uppercase text-muted-foreground mb-2">Crew</div>
+            <div className="mb-2 flex items-center justify-between">
+              <div className="text-xs font-semibold uppercase text-muted-foreground">Crew</div>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button size="sm" variant="ghost" className="h-7 px-2 text-xs">
+                    <Pencil className="mr-1 h-3 w-3" strokeWidth={1.5} /> Rediger
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent align="end" className="w-64 p-2">
+                  <div className="px-2 py-1 text-[11px] font-semibold uppercase text-muted-foreground">Vælg crew</div>
+                  <div className="max-h-72 space-y-1 overflow-y-auto">
+                    {crew.map((m) => {
+                      const checked = job.crewIds.includes(m.id);
+                      return (
+                        <label key={m.id} className="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 hover:bg-muted">
+                          <Checkbox checked={checked} onCheckedChange={() => toggleCrew(m.id)} />
+                          <span className={cn("flex h-6 w-6 items-center justify-center rounded-full text-[9px] font-bold", m.avatarColor)}>{m.initials}</span>
+                          <span className="text-sm">{m.name}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </PopoverContent>
+              </Popover>
+            </div>
             <div className="flex flex-wrap gap-2">
+              {job.crewIds.length === 0 && (
+                <div className="text-xs text-muted-foreground">Intet crew tildelt endnu.</div>
+              )}
               {job.crewIds.map((id) => {
                 const m = crew.find((c) => c.id === id);
                 return (

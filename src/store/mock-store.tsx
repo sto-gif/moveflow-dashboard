@@ -36,6 +36,7 @@ interface Ctx {
   // jobs
   createJob: (input: { customerName: string; volumeM3: number; revenue: number; startTime: string }) => Job;
   updateJobStatus: (id: string, status: JobStatus) => void;
+  updateJob: (id: string, patch: Partial<Job>) => void;
   // quotes
   createQuote: (input: { customerName: string; total: number; pricingModel?: Quote["pricingModel"] }) => Quote;
   updateQuoteStatus: (id: string, status: QuoteStatus) => void;
@@ -181,6 +182,10 @@ export function MockStoreProvider({ children }: { children: ReactNode }) {
     setJobs((js) => js.map((j) => (j.id === id ? { ...j, status } : j)));
   }, []);
 
+  const updateJob: Ctx["updateJob"] = useCallback((id, patch) => {
+    setJobs((js) => js.map((j) => (j.id === id ? { ...j, ...patch } : j)));
+  }, []);
+
   const createQuote: Ctx["createQuote"] = useCallback((input) => {
     const lineItems = [
       { id: "li-1", label: "Grundpris", amount: Math.round(input.total * 0.7), category: "base" as const },
@@ -282,7 +287,7 @@ export function MockStoreProvider({ children }: { children: ReactNode }) {
     leads, customers, jobs, quotes, briefs, notifications, settings, unreadCount,
     createLead, updateLeadStage, convertLeadToCustomer,
     createCustomer, updateCustomerStage,
-    createJob, updateJobStatus,
+    createJob, updateJobStatus, updateJob,
     createQuote, updateQuoteStatus, convertQuoteToJob,
     createBrief,
     markNotificationRead, markAllNotificationsRead,
