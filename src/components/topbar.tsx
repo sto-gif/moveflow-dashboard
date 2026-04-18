@@ -119,7 +119,11 @@ export function Topbar() {
                     </p>
                     <p className="text-[11px] text-muted-foreground">{n.meta}</p>
                   </div>
-                  {n.unread && <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary" />}
+                  {n.urgent ? (
+                    <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-destructive ring-2 ring-destructive/30" title="Hastende" />
+                  ) : n.unread ? (
+                    <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary" />
+                  ) : null}
                 </DropdownMenuItem>
               ))}
             </div>
