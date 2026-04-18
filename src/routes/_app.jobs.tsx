@@ -264,9 +264,37 @@ function JobSheet({ job }: { job: Job }) {
           </div>
           <Card className="p-3">
             <div className="grid grid-cols-3 gap-3 text-center">
-              <div><div className="text-xs text-muted-foreground">Dato</div><div className="text-sm font-semibold">{job.date.toLocaleDateString("da-DK")}</div></div>
-              <div><div className="text-xs text-muted-foreground">Tid</div><div className="text-sm font-semibold">{job.startTime}</div></div>
-              <div><div className="text-xs text-muted-foreground">Volumen</div><div className="text-sm font-semibold">{job.volumeM3} m³</div></div>
+              <div>
+                <div className="text-xs text-muted-foreground">Dato</div>
+                <Input
+                  type="date"
+                  value={job.date.toISOString().slice(0, 10)}
+                  onChange={(e) => {
+                    const d = new Date(e.target.value);
+                    if (!isNaN(d.getTime())) updateJob(job.id, { date: d });
+                  }}
+                  className="mt-1 h-8 text-center text-sm font-semibold"
+                />
+              </div>
+              <div>
+                <div className="text-xs text-muted-foreground">Tid</div>
+                <Input
+                  type="time"
+                  value={job.startTime}
+                  onChange={(e) => updateJob(job.id, { startTime: e.target.value })}
+                  className="mt-1 h-8 text-center text-sm font-semibold"
+                />
+              </div>
+              <div>
+                <div className="text-xs text-muted-foreground">Volumen (m³)</div>
+                <Input
+                  type="number"
+                  min={0}
+                  value={job.volumeM3}
+                  onChange={(e) => updateJob(job.id, { volumeM3: Number(e.target.value) || 0 })}
+                  className="mt-1 h-8 text-center text-sm font-semibold"
+                />
+              </div>
             </div>
           </Card>
           <div>
