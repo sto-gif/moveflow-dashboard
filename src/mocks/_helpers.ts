@@ -37,6 +37,9 @@ export const STREETS = [
   "Havnevej", "Parkvej", "Skolegade",
 ];
 
+/** Stable "today" used across mocks to avoid SSR/client hydration mismatches. */
+export const MOCK_TODAY = new Date("2025-04-15T08:00:00.000Z");
+
 let seed = 42;
 const rand = () => {
   seed = (seed * 9301 + 49297) % 233280;
