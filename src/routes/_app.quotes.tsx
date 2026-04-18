@@ -31,12 +31,36 @@ export const Route = createFileRoute("/_app/quotes")({
 const STEPS = ["Kunde", "Volumen", "Layout", "Services", "Parkering", "Transport", "Tillæg"] as const;
 
 function QuotesPage() {
+  const { quotes, createQuote, convertQuoteToJob } = useMockStore();
+  const navigate = useNavigate();
+
+  const handleConvert = (id: string) => {
+    const job = convertQuoteToJob(id);
+    if (job) {
+      toast.success(`Job #${job.number} oprettet fra tilbud`);
+      navigate({ to: "/jobs" });
+    }
+  };
+
   return (
     <div>
       <PageHeader
         title="Tilbud"
         description={`${quotes.length} tilbud · ${quotes.filter((q) => q.status === "sendt").length} sendt · ${quotes.filter((q) => q.status === "accepteret").length} accepteret`}
-        actions={<Button size="sm"><Plus className="h-4 w-4" strokeWidth={1.5} /> Nyt tilbud</Button>}
+        actions={
+          <CreateDialog
+            title="Nyt tilbud"
+            fields={[
+              { name: "customerName", label: "Kunde", defaultValue: "Ny kunde" },
+              { name: "total", label: "Total (DKK)", type: "number", defaultValue: 18500 },
+            ]}
+            onSubmit={(v) => {
+              const q = createQuote({ customerName: v.customerName!, total: Number(v.total) || 0 });
+              toast.success(`Tilbud Q-${q.number} oprettet`);
+            }}
+            trigger={<Button size="sm"><Plus className="h-4 w-4" strokeWidth={1.5} /> Nyt tilbud</Button>}
+          />
+        }
       />
       <div className="p-6">
         <Tabs defaultValue="oversigt">
@@ -80,7 +104,9 @@ function QuotesPage() {
                       </td>
                       <td className="px-4 py-2.5">
                         {q.status === "accepteret" && (
-                          <Button size="sm" variant="outline" className="h-7 text-xs">Konvertér til job</Button>
+                          <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => handleConvert(q.id)}>
+                            Konvertér til job
+                          </Button>
                         )}
                       </td>
                     </tr>
@@ -122,6 +148,7 @@ function QuotesPage() {
     </div>
   );
 }
+
 
 function QuoteBuilder() {
   const [step, setStep] = useState(0);
