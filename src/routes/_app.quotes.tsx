@@ -185,7 +185,7 @@ function QuoteBuilder() {
     phone: "+45 22 33 44 55",
     addressFrom: "Vesterbrogade 12, 1620 København",
     addressTo: "Strandvejen 88, 2100 København Ø",
-    moveDate: "2025-05-15",
+    moveDate: "2026-06-15",
     homeSizeM2: 95,
     rooms: 3,
     propertyType: "lejlighed" as "lejlighed" | "rækkehus" | "villa",
