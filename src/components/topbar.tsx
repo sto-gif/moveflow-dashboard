@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { Bell, Search, ChevronDown, AlertTriangle, Info, CheckCircle2, AlertCircle } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { Bell, Search, ChevronDown, AlertTriangle, Info, CheckCircle2, AlertCircle, Sparkles, Globe } from "lucide-react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
-  DropdownMenuSeparator, DropdownMenuTrigger,
+  DropdownMenuSeparator, DropdownMenuTrigger, DropdownMenuRadioGroup, DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { notifications, type NotificationType } from "@/mocks/notifications";
@@ -22,23 +23,48 @@ const iconFor = (type: NotificationType) => {
 
 export function Topbar() {
   const [items] = useState(notifications);
+  const [lang, setLang] = useState("da");
   const unread = items.filter((n) => n.unread).length;
 
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border bg-background/95 px-3 backdrop-blur">
       <SidebarTrigger />
       <div className="relative hidden flex-1 max-w-md md:block">
-        <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" strokeWidth={1.5} />
         <Input
           placeholder="Søg kunder, jobs, fakturaer…"
           className="h-9 pl-8 bg-muted/40 border-transparent focus-visible:bg-background"
         />
       </div>
-      <div className="ml-auto flex items-center gap-1">
+      <div className="ml-auto flex items-center gap-2">
+        <Link
+          to="/settings"
+          className="hidden md:inline-flex items-center gap-1.5 rounded-md border border-orange/30 bg-orange/10 px-2.5 py-1 text-xs font-semibold text-orange hover:bg-orange/15 transition-colors"
+        >
+          <Sparkles className="h-3.5 w-3.5" strokeWidth={1.5} />
+          Prøveperiode: 12 dage tilbage
+        </Link>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="sm" className="h-9 gap-1.5 px-2 text-xs font-medium">
+              <Globe className="h-4 w-4" strokeWidth={1.5} />
+              {lang.toUpperCase()}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-32">
+            <DropdownMenuLabel className="text-xs">Sprog</DropdownMenuLabel>
+            <DropdownMenuRadioGroup value={lang} onValueChange={setLang}>
+              <DropdownMenuRadioItem value="da">Dansk</DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="en">English</DropdownMenuRadioItem>
+            </DropdownMenuRadioGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="relative h-9 w-9">
-              <Bell className="h-[18px] w-[18px]" />
+              <Bell className="h-[18px] w-[18px]" strokeWidth={1.5} />
               {unread > 0 && (
                 <span className="absolute right-1.5 top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground">
                   {unread}
@@ -82,6 +108,7 @@ export function Topbar() {
             </div>
           </DropdownMenuContent>
         </DropdownMenu>
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="h-9 gap-2 px-2">
@@ -100,8 +127,9 @@ export function Topbar() {
           <DropdownMenuContent align="end" className="w-48">
             <DropdownMenuLabel>Min konto</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Profil</DropdownMenuItem>
-            <DropdownMenuItem>Indstillinger</DropdownMenuItem>
+            <DropdownMenuItem asChild><Link to="/settings">Profil</Link></DropdownMenuItem>
+            <DropdownMenuItem asChild><Link to="/settings">Indstillinger</Link></DropdownMenuItem>
+            <DropdownMenuItem asChild><Link to="/settings">Abonnement</Link></DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>Log ud</DropdownMenuItem>
           </DropdownMenuContent>

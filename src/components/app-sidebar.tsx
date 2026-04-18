@@ -2,7 +2,7 @@ import { Link, useLocation } from "@tanstack/react-router";
 import {
   LayoutDashboard, Users, Briefcase, FileText, Calendar, HardHat,
   CheckSquare, Package, MessageSquare, Receipt, BarChart3, Settings,
-  Truck,
+  Truck, Warehouse, Sparkles, UserPlus,
 } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
@@ -10,17 +10,23 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
+import logoUrl from "@/assets/movena-logo.png";
+import iconUrl from "@/assets/movena-icon.svg";
 
 type Item = { title: string; url: string; icon: typeof Users };
 
 const groups: { label: string; items: Item[] }[] = [
   {
     label: "Overblik",
-    items: [{ title: "Dashboard", url: "/", icon: LayoutDashboard }],
+    items: [
+      { title: "Dashboard", url: "/", icon: LayoutDashboard },
+      { title: "Daglig Brief", url: "/brief", icon: Sparkles },
+    ],
   },
   {
     label: "Salg",
     items: [
+      { title: "Leads", url: "/leads", icon: UserPlus },
       { title: "Kunder", url: "/customers", icon: Users },
       { title: "Tilbud", url: "/quotes", icon: FileText },
       { title: "Fakturaer", url: "/invoices", icon: Receipt },
@@ -31,9 +37,11 @@ const groups: { label: string; items: Item[] }[] = [
     items: [
       { title: "Jobs", url: "/jobs", icon: Briefcase },
       { title: "Kalender", url: "/calendar", icon: Calendar },
-      { title: "Crew", url: "/crew", icon: HardHat },
+      { title: "Vagtplan", url: "/crew", icon: HardHat },
       { title: "Opgaver", url: "/tasks", icon: CheckSquare },
-      { title: "Lager", url: "/inventory", icon: Package },
+      { title: "Lager", url: "/lager", icon: Warehouse },
+      { title: "Materialer", url: "/inventory", icon: Package },
+      { title: "Køretøjer", url: "/koretojer", icon: Truck },
     ],
   },
   {
@@ -61,16 +69,10 @@ export function AppSidebar() {
     <Sidebar collapsible="icon">
       <SidebarHeader className="border-b border-sidebar-border">
         <div className="flex items-center gap-2 px-2 py-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
-            <Truck className="h-4 w-4" />
-          </div>
-          {!collapsed && (
-            <div className="flex flex-col leading-tight">
-              <span className="text-sm font-bold">Flyt</span>
-              <span className="text-[10px] uppercase tracking-wide text-muted-foreground">
-                Operations
-              </span>
-            </div>
+          {collapsed ? (
+            <img src={iconUrl} alt="Movena" className="h-8 w-8" />
+          ) : (
+            <img src={logoUrl} alt="Movena" className="h-8 w-auto" />
           )}
         </div>
       </SidebarHeader>
@@ -88,11 +90,14 @@ export function AppSidebar() {
                         <Link
                           to={item.url}
                           className={cn(
-                            "flex items-center gap-2 rounded-md text-sm",
-                            active && "bg-sidebar-accent text-sidebar-accent-foreground font-semibold",
+                            "relative flex items-center gap-2 rounded-md text-sm",
+                            active && "bg-sidebar-accent text-primary font-semibold",
                           )}
                         >
-                          <item.icon className="h-4 w-4 shrink-0" />
+                          {active && (
+                            <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-0.5 rounded-r bg-teal" />
+                          )}
+                          <item.icon className={cn("h-4 w-4 shrink-0", active && "text-primary")} strokeWidth={1.5} />
                           {!collapsed && <span>{item.title}</span>}
                         </Link>
                       </SidebarMenuButton>
@@ -107,7 +112,7 @@ export function AppSidebar() {
       <SidebarFooter className="border-t border-sidebar-border">
         {!collapsed && (
           <div className="px-2 py-2 text-[11px] text-muted-foreground">
-            v1.0 · Demo data
+            Movena · v1.0 · Demo
           </div>
         )}
       </SidebarFooter>

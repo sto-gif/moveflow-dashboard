@@ -16,12 +16,16 @@ import { Route as AppSettingsRouteImport } from './routes/_app.settings'
 import { Route as AppReportsRouteImport } from './routes/_app.reports'
 import { Route as AppQuotesRouteImport } from './routes/_app.quotes'
 import { Route as AppMessagesRouteImport } from './routes/_app.messages'
+import { Route as AppLeadsRouteImport } from './routes/_app.leads'
+import { Route as AppLagerRouteImport } from './routes/_app.lager'
+import { Route as AppKoretojerRouteImport } from './routes/_app.koretojer'
 import { Route as AppJobsRouteImport } from './routes/_app.jobs'
 import { Route as AppInvoicesRouteImport } from './routes/_app.invoices'
 import { Route as AppInventoryRouteImport } from './routes/_app.inventory'
 import { Route as AppCustomersRouteImport } from './routes/_app.customers'
 import { Route as AppCrewRouteImport } from './routes/_app.crew'
 import { Route as AppCalendarRouteImport } from './routes/_app.calendar'
+import { Route as AppBriefRouteImport } from './routes/_app.brief'
 
 const AppRoute = AppRouteImport.update({
   id: '/_app',
@@ -57,6 +61,21 @@ const AppMessagesRoute = AppMessagesRouteImport.update({
   path: '/messages',
   getParentRoute: () => AppRoute,
 } as any)
+const AppLeadsRoute = AppLeadsRouteImport.update({
+  id: '/leads',
+  path: '/leads',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppLagerRoute = AppLagerRouteImport.update({
+  id: '/lager',
+  path: '/lager',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppKoretojerRoute = AppKoretojerRouteImport.update({
+  id: '/koretojer',
+  path: '/koretojer',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppJobsRoute = AppJobsRouteImport.update({
   id: '/jobs',
   path: '/jobs',
@@ -87,15 +106,24 @@ const AppCalendarRoute = AppCalendarRouteImport.update({
   path: '/calendar',
   getParentRoute: () => AppRoute,
 } as any)
+const AppBriefRoute = AppBriefRouteImport.update({
+  id: '/brief',
+  path: '/brief',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
+  '/brief': typeof AppBriefRoute
   '/calendar': typeof AppCalendarRoute
   '/crew': typeof AppCrewRoute
   '/customers': typeof AppCustomersRoute
   '/inventory': typeof AppInventoryRoute
   '/invoices': typeof AppInvoicesRoute
   '/jobs': typeof AppJobsRoute
+  '/koretojer': typeof AppKoretojerRoute
+  '/lager': typeof AppLagerRoute
+  '/leads': typeof AppLeadsRoute
   '/messages': typeof AppMessagesRoute
   '/quotes': typeof AppQuotesRoute
   '/reports': typeof AppReportsRoute
@@ -103,12 +131,16 @@ export interface FileRoutesByFullPath {
   '/tasks': typeof AppTasksRoute
 }
 export interface FileRoutesByTo {
+  '/brief': typeof AppBriefRoute
   '/calendar': typeof AppCalendarRoute
   '/crew': typeof AppCrewRoute
   '/customers': typeof AppCustomersRoute
   '/inventory': typeof AppInventoryRoute
   '/invoices': typeof AppInvoicesRoute
   '/jobs': typeof AppJobsRoute
+  '/koretojer': typeof AppKoretojerRoute
+  '/lager': typeof AppLagerRoute
+  '/leads': typeof AppLeadsRoute
   '/messages': typeof AppMessagesRoute
   '/quotes': typeof AppQuotesRoute
   '/reports': typeof AppReportsRoute
@@ -119,12 +151,16 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteWithChildren
+  '/_app/brief': typeof AppBriefRoute
   '/_app/calendar': typeof AppCalendarRoute
   '/_app/crew': typeof AppCrewRoute
   '/_app/customers': typeof AppCustomersRoute
   '/_app/inventory': typeof AppInventoryRoute
   '/_app/invoices': typeof AppInvoicesRoute
   '/_app/jobs': typeof AppJobsRoute
+  '/_app/koretojer': typeof AppKoretojerRoute
+  '/_app/lager': typeof AppLagerRoute
+  '/_app/leads': typeof AppLeadsRoute
   '/_app/messages': typeof AppMessagesRoute
   '/_app/quotes': typeof AppQuotesRoute
   '/_app/reports': typeof AppReportsRoute
@@ -136,12 +172,16 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/brief'
     | '/calendar'
     | '/crew'
     | '/customers'
     | '/inventory'
     | '/invoices'
     | '/jobs'
+    | '/koretojer'
+    | '/lager'
+    | '/leads'
     | '/messages'
     | '/quotes'
     | '/reports'
@@ -149,12 +189,16 @@ export interface FileRouteTypes {
     | '/tasks'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/brief'
     | '/calendar'
     | '/crew'
     | '/customers'
     | '/inventory'
     | '/invoices'
     | '/jobs'
+    | '/koretojer'
+    | '/lager'
+    | '/leads'
     | '/messages'
     | '/quotes'
     | '/reports'
@@ -164,12 +208,16 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/_app'
+    | '/_app/brief'
     | '/_app/calendar'
     | '/_app/crew'
     | '/_app/customers'
     | '/_app/inventory'
     | '/_app/invoices'
     | '/_app/jobs'
+    | '/_app/koretojer'
+    | '/_app/lager'
+    | '/_app/leads'
     | '/_app/messages'
     | '/_app/quotes'
     | '/_app/reports'
@@ -233,6 +281,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppMessagesRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/leads': {
+      id: '/_app/leads'
+      path: '/leads'
+      fullPath: '/leads'
+      preLoaderRoute: typeof AppLeadsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/lager': {
+      id: '/_app/lager'
+      path: '/lager'
+      fullPath: '/lager'
+      preLoaderRoute: typeof AppLagerRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/koretojer': {
+      id: '/_app/koretojer'
+      path: '/koretojer'
+      fullPath: '/koretojer'
+      preLoaderRoute: typeof AppKoretojerRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/jobs': {
       id: '/_app/jobs'
       path: '/jobs'
@@ -275,16 +344,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppCalendarRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/brief': {
+      id: '/_app/brief'
+      path: '/brief'
+      fullPath: '/brief'
+      preLoaderRoute: typeof AppBriefRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
 interface AppRouteChildren {
+  AppBriefRoute: typeof AppBriefRoute
   AppCalendarRoute: typeof AppCalendarRoute
   AppCrewRoute: typeof AppCrewRoute
   AppCustomersRoute: typeof AppCustomersRoute
   AppInventoryRoute: typeof AppInventoryRoute
   AppInvoicesRoute: typeof AppInvoicesRoute
   AppJobsRoute: typeof AppJobsRoute
+  AppKoretojerRoute: typeof AppKoretojerRoute
+  AppLagerRoute: typeof AppLagerRoute
+  AppLeadsRoute: typeof AppLeadsRoute
   AppMessagesRoute: typeof AppMessagesRoute
   AppQuotesRoute: typeof AppQuotesRoute
   AppReportsRoute: typeof AppReportsRoute
@@ -294,12 +374,16 @@ interface AppRouteChildren {
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppBriefRoute: AppBriefRoute,
   AppCalendarRoute: AppCalendarRoute,
   AppCrewRoute: AppCrewRoute,
   AppCustomersRoute: AppCustomersRoute,
   AppInventoryRoute: AppInventoryRoute,
   AppInvoicesRoute: AppInvoicesRoute,
   AppJobsRoute: AppJobsRoute,
+  AppKoretojerRoute: AppKoretojerRoute,
+  AppLagerRoute: AppLagerRoute,
+  AppLeadsRoute: AppLeadsRoute,
   AppMessagesRoute: AppMessagesRoute,
   AppQuotesRoute: AppQuotesRoute,
   AppReportsRoute: AppReportsRoute,
