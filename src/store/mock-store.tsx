@@ -182,6 +182,10 @@ export function MockStoreProvider({ children }: { children: ReactNode }) {
     setJobs((js) => js.map((j) => (j.id === id ? { ...j, status } : j)));
   }, []);
 
+  const updateJob: Ctx["updateJob"] = useCallback((id, patch) => {
+    setJobs((js) => js.map((j) => (j.id === id ? { ...j, ...patch } : j)));
+  }, []);
+
   const createQuote: Ctx["createQuote"] = useCallback((input) => {
     const lineItems = [
       { id: "li-1", label: "Grundpris", amount: Math.round(input.total * 0.7), category: "base" as const },
