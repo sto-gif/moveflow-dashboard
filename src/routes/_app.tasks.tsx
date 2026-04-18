@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Plus } from "lucide-react";
+import { Plus, LayoutGrid, Table as TableIcon, Calendar as CalendarIcon } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -29,9 +29,9 @@ function TasksPage() {
       <div className="p-6">
         <Tabs defaultValue="kanban">
           <TabsList>
-            <TabsTrigger value="kanban">Kanban</TabsTrigger>
-            <TabsTrigger value="table">Tabel</TabsTrigger>
-            <TabsTrigger value="calendar">Kalender</TabsTrigger>
+            <TabsTrigger value="kanban"><LayoutGrid className="mr-1.5 h-3.5 w-3.5" strokeWidth={1.5} /> Kanban</TabsTrigger>
+            <TabsTrigger value="table"><TableIcon className="mr-1.5 h-3.5 w-3.5" strokeWidth={1.5} /> Tabel</TabsTrigger>
+            <TabsTrigger value="calendar"><CalendarIcon className="mr-1.5 h-3.5 w-3.5" strokeWidth={1.5} /> Kalender</TabsTrigger>
           </TabsList>
           <TabsContent value="kanban" className="mt-4">
             <div className="grid gap-3 lg:grid-cols-4">

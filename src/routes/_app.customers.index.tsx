@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
-import { Plus, Search, Building2, User } from "lucide-react";
+import { Plus, Search, Building2, User, LayoutGrid, Table as TableIcon } from "lucide-react";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -109,8 +109,8 @@ function CustomersPage() {
 
         <Tabs defaultValue="pipeline">
           <TabsList>
-            <TabsTrigger value="pipeline">Pipeline</TabsTrigger>
-            <TabsTrigger value="table">Tabel</TabsTrigger>
+            <TabsTrigger value="pipeline"><LayoutGrid className="mr-1.5 h-3.5 w-3.5" strokeWidth={1.5} /> Pipeline</TabsTrigger>
+            <TabsTrigger value="table"><TableIcon className="mr-1.5 h-3.5 w-3.5" strokeWidth={1.5} /> Tabel</TabsTrigger>
           </TabsList>
 
           <TabsContent value="pipeline" className="mt-4">
