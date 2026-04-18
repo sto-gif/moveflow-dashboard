@@ -1,7 +1,7 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Plus, Search, Image as ImageIcon, Upload, Camera, Building2, User, Mail, Phone, Pencil, LayoutGrid, Table as TableIcon, Calendar as CalendarIcon } from "lucide-react";
+import { Plus, Search, Image as ImageIcon, Upload, Camera, Building2, User, Mail, Phone, Pencil, LayoutGrid, Table as TableIcon, Calendar as CalendarIcon, Truck, MapPin, CheckCircle2, Circle, Clock, ExternalLink } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,7 @@ import { PageHeader } from "@/components/page-header";
 import { JOB_STATUS_LABELS, JOB_STATUS_COLORS, type JobStatus, type Job } from "@/mocks/jobs";
 import { crew } from "@/mocks/crew";
 import { customerById } from "@/mocks/customers";
+import { vehicles } from "@/mocks/vehicles";
 import { quotes, PRICING_LABELS } from "@/mocks/quotes";
 import { dkk } from "@/lib/format";
 import { cn } from "@/lib/utils";
