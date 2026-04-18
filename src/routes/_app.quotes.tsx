@@ -29,6 +29,10 @@ export const Route = createFileRoute("/_app/quotes")({
   component: QuotesPage,
 });
 
+function daysSince(d: Date): number {
+  return Math.max(0, Math.floor((Date.now() - d.getTime()) / (1000 * 60 * 60 * 24)));
+}
+
 const STEPS = ["Kunde", "Volumen", "Layout", "Services", "Parkering", "Transport", "Tillæg"] as const;
 
 function QuotesPage() {
