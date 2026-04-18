@@ -103,7 +103,16 @@ function LeadDetailPage() {
                   ))}
                 </SelectContent>
               </Select>
-              <Badge variant="outline" className="text-[11px]">{lead.source}</Badge>
+              <Select value={lead.source} onValueChange={(v) => updateLead(lead.id, { source: v as typeof lead.source })}>
+                <SelectTrigger className="h-7 w-auto gap-1.5 px-2 text-[11px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {LEAD_SOURCES.map((s) => (
+                    <SelectItem key={s} value={s}>{s}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
           <div className="flex items-center gap-2">
