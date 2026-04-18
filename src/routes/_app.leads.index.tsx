@@ -28,6 +28,16 @@ export const Route = createFileRoute("/_app/leads/")({
 
 const STAGES: LeadStage[] = ["ny", "kontaktet", "tilbud_sendt", "forhandling", "vundet", "tabt"];
 
+const LEAD_SOURCE_COLORS: Record<string, string> = {
+  Hjemmeside: "bg-blue-50 text-blue-700",
+  Telefon: "bg-emerald-50 text-emerald-700",
+  Anbefaling: "bg-amber-50 text-amber-700",
+  Facebook: "bg-indigo-50 text-indigo-700",
+  Google: "bg-rose-50 text-rose-700",
+  Instagram: "bg-pink-50 text-pink-700",
+  Trustpilot: "bg-teal-50 text-teal-700",
+};
+
 function LeadsPage() {
   const { leads, createLead, updateLeadStage } = useMockStore();
   const navigate = useNavigate();
@@ -115,6 +125,7 @@ function LeadsPage() {
           <TabsContent value="kanban" className="mt-4">
             <KanbanBoard
               className="grid gap-3 md:grid-cols-3 xl:grid-cols-6"
+              collapseAfter={10}
               columns={STAGES.map((s) => ({
                 id: s,
                 label: LEAD_STAGE_LABELS[s],
@@ -131,12 +142,14 @@ function LeadsPage() {
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="text-label leading-snug">{l.name}</div>
-                    <Badge variant="outline" className="text-[9px] capitalize">{l.type}</Badge>
+                    <Badge variant="outline" className="text-[10px] capitalize shrink-0">{l.type}</Badge>
                   </div>
                   <div className="mt-1 text-caption text-muted-foreground">{l.city}</div>
                   <div className="mt-2 flex items-center justify-between">
                     <span className="text-caption font-semibold tabular-nums">{dkk(l.estimatedValue)}</span>
-                    <Badge variant="outline" className="text-[10px]">{l.source}</Badge>
+                    <span className={cn("inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-medium", LEAD_SOURCE_COLORS[l.source] ?? "bg-muted text-muted-foreground")}>
+                      {l.source}
+                    </span>
                   </div>
                 </Link>
               )}
