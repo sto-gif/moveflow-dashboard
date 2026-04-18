@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { Bell, Search, ChevronDown, AlertTriangle, Info, CheckCircle2, AlertCircle, Sparkles, Globe } from "lucide-react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Input } from "@/components/ui/input";
@@ -22,8 +22,22 @@ const iconFor = (type: NotificationType) => {
   }
 };
 
+function notificationTarget(n: { title: string }): { to: string; search?: Record<string, string> } {
+  const t = n.title.toLowerCase();
+  if (t.includes("tilbud") || t.startsWith("q-") || /\bq-\d/.test(t)) return { to: "/quotes" };
+  if (t.includes("lager") || t.includes("flyttekasser")) return { to: "/lager" };
+  if (t.includes("trustpilot") || t.includes("anmeldelse")) return { to: "/messages" };
+  if (t.includes("crew") || t.includes("fri") || t.includes("medarbejder")) return { to: "/crew" };
+  if (t.includes("service") || t.includes("volvo") || t.includes("bil")) return { to: "/koretojer" };
+  if (t.includes("brief")) return { to: "/brief" };
+  if (t.includes("job")) return { to: "/jobs" };
+  if (t.includes("lead")) return { to: "/leads" };
+  return { to: "/" };
+}
+
 export function Topbar() {
   const { notifications, unreadCount, markNotificationRead, markAllNotificationsRead } = useMockStore();
+  const navigate = useNavigate();
   const [lang, setLang] = useState("da");
 
   return (
@@ -88,7 +102,11 @@ export function Topbar() {
               {notifications.map((n) => (
                 <DropdownMenuItem
                   key={n.id}
-                  onClick={() => markNotificationRead(n.id)}
+                  onClick={() => {
+                    markNotificationRead(n.id);
+                    const target = notificationTarget(n);
+                    navigate({ to: target.to as any, search: target.search as any });
+                  }}
                   className={cn(
                     "flex cursor-pointer items-start gap-3 rounded-none border-b px-3 py-3 last:border-b-0",
                     n.unread && "bg-accent/30",

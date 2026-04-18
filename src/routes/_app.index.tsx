@@ -169,7 +169,7 @@ function DashboardPage() {
           <Card className="lg:col-span-2 p-5">
             <div className="mb-3 flex items-center justify-between">
               <h3 className="text-sm font-semibold">Dagens jobs</h3>
-              <Button size="sm" variant="ghost">Se alle</Button>
+              <Button asChild size="sm" variant="ghost"><Link to="/jobs">Se alle</Link></Button>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -185,7 +185,11 @@ function DashboardPage() {
                 </thead>
                 <tbody>
                   {(today.length ? today : jobs.slice(0, 6)).map((j) => (
-                    <tr key={j.id} className="border-b last:border-0">
+                    <tr
+                      key={j.id}
+                      className="cursor-pointer border-b last:border-0 hover:bg-muted/40"
+                      onClick={() => navigate({ to: "/jobs", search: { job: j.id } })}
+                    >
                       <td className="py-2.5 font-mono text-xs">{j.startTime}</td>
                       <td className="py-2.5 font-medium">#{j.number}</td>
                       <td className="py-2.5">{j.customerName}</td>
@@ -227,21 +231,21 @@ function DashboardPage() {
           <Card className="p-5">
             <h3 className="mb-3 text-sm font-semibold">Alarmer & deadlines</h3>
             <div className="space-y-3">
-              <Alert icon={AlertTriangle} tone="warn"
+              <Link to="/jobs"><Alert icon={AlertTriangle} tone="warn"
                 title="Job #142 starter om 2 timer"
-                meta="1 medarbejder mangler" />
-              <Alert icon={Clock} tone="info"
+                meta="1 medarbejder mangler" /></Link>
+              <Link to="/quotes"><Alert icon={Clock} tone="info"
                 title="Tilbud Q-3015 udløber i morgen"
-                meta="Lars Hansen — 24.500 DKK" />
-              <Alert icon={CheckCircle2} tone="ok"
+                meta="Lars Hansen — 24.500 DKK" /></Link>
+              <Link to="/jobs"><Alert icon={CheckCircle2} tone="ok"
                 title="Job #138 markeret færdig"
-                meta="af Anders · i går 16:42" />
-              <Alert icon={AlertTriangle} tone="warn"
+                meta="af Anders · i går 16:42" /></Link>
+              <Link to="/lager"><Alert icon={AlertTriangle} tone="warn"
                 title="Lager: flyttekasser under min."
-                meta="18 stk. tilbage" />
-              <Alert icon={Clock} tone="info"
+                meta="18 stk. tilbage" /></Link>
+              <Link to="/brief"><Alert icon={Clock} tone="info"
                 title="Daglig brief mangler at blive sendt"
-                meta="Send inden 06:00" />
+                meta="Send inden 06:00" /></Link>
             </div>
           </Card>
         </div>

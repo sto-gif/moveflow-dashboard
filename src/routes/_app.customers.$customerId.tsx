@@ -1,5 +1,6 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { toast } from "sonner";
 import {
   ArrowLeft, Mail, Phone, Building2, User, MessageSquare,
   Truck, Package, FileText, Send,
@@ -9,48 +10,58 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { customers, STAGE_LABELS, type Customer, type Communication } from "@/mocks/customers";
-import { jobs, JOB_STATUS_LABELS, JOB_STATUS_COLORS } from "@/mocks/jobs";
-import { quotes, QUOTE_STATUS_LABELS, QUOTE_STATUS_COLORS } from "@/mocks/quotes";
+import { customers as seedCustomers, STAGE_LABELS, type Communication } from "@/mocks/customers";
+import { JOB_STATUS_LABELS, JOB_STATUS_COLORS } from "@/mocks/jobs";
+import { QUOTE_STATUS_LABELS, QUOTE_STATUS_COLORS } from "@/mocks/quotes";
 import { storageUnits } from "@/mocks/storage";
+import { useMockStore } from "@/store/mock-store";
 import { dkk } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_app/customers/$customerId")({
-  loader: ({ params }) => {
-    const customer = customers.find((c) => c.id === params.customerId);
-    if (!customer) throw notFound();
-    return { customer };
-  },
-  head: ({ loaderData }) => ({
-    meta: [{ title: `${loaderData?.customer.name ?? "Kunde"} — Movena` }],
-  }),
+  head: () => ({ meta: [{ title: "Kunde — Movena" }] }),
   component: CustomerDetailPage,
-  notFoundComponent: () => (
-    <div className="p-10 text-center">
-      <p className="text-section">Kunde ikke fundet</p>
-      <Link to="/customers" className="mt-3 inline-block text-primary underline">Tilbage til kunder</Link>
-    </div>
-  ),
 });
 
 function CustomerDetailPage() {
-  const { customer } = Route.useLoaderData() as { customer: Customer };
-  const customerJobs = jobs.filter((j) => j.customerId === customer.id);
-  const customerQuotes = quotes.filter((q) => q.customerId === customer.id);
+  const { customerId } = Route.useParams();
+  const { customers, jobs, quotes, createJob, createQuote } = useMockStore();
+  const navigate = useNavigate();
+  const customer = customers.find((c) => c.id === customerId) ?? seedCustomers.find((c) => c.id === customerId);
+  const [notes, setNotes] = useState<{ id: string; text: string; at: Date }[]>(
+    customer ? [{ id: "n1", text: customer.notes, at: customer.createdAt }] : [],
+  );
+  const [draft, setDraft] = useState("");
+  if (!customer) {
+    return (
+      <div className="p-10 text-center">
+        <p className="text-section">Kunde ikke fundet</p>
+        <Link to="/customers" className="mt-3 inline-block text-primary underline">Tilbage til kunder</Link>
+      </div>
+    );
+  }
+  const customerJobs = jobs.filter((j) => j.customerId === customer.id || j.customerName === customer.name);
+  const customerQuotes = quotes.filter((q) => q.customerId === customer.id || q.customerName === customer.name);
   const customerStorage = storageUnits.filter((s) => s.customerId === customer.id);
   const firstMoveDate = customerJobs.length
     ? customerJobs.reduce((min, j) => (j.date < min ? j.date : min), customerJobs[0]!.date)
     : null;
 
-  const [notes, setNotes] = useState<{ id: string; text: string; at: Date }[]>([
-    { id: "n1", text: customer.notes, at: customer.createdAt },
-  ]);
-  const [draft, setDraft] = useState("");
   const addNote = () => {
     if (!draft.trim()) return;
     setNotes((n) => [{ id: `n${n.length + 1}`, text: draft, at: new Date() }, ...n]);
     setDraft("");
+  };
+
+  const handleSendQuote = () => {
+    const q = createQuote({ customerName: customer.name, total: Math.max(customer.value, 15000) });
+    toast.success(`Tilbud Q-${q.number} oprettet`);
+    navigate({ to: "/quotes" });
+  };
+  const handleNewJob = () => {
+    const j = createJob({ customerName: customer.name, volumeM3: 35, revenue: Math.max(customer.value, 18000), startTime: "08:00" });
+    toast.success(`Job #${j.number} oprettet`);
+    navigate({ to: "/jobs", search: { job: j.id } });
   };
 
   const TypeIcon = customer.type === "erhverv" ? Building2 : User;
@@ -77,8 +88,8 @@ function CustomerDetailPage() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Button size="sm" variant="outline"><Send className="h-4 w-4" strokeWidth={1.5} /> Send tilbud</Button>
-            <Button size="sm"><Truck className="h-4 w-4" strokeWidth={1.5} /> Nyt job</Button>
+            <Button size="sm" variant="outline" onClick={handleSendQuote}><Send className="h-4 w-4" strokeWidth={1.5} /> Send tilbud</Button>
+            <Button size="sm" onClick={handleNewJob}><Truck className="h-4 w-4" strokeWidth={1.5} /> Nyt job</Button>
           </div>
         </div>
       </div>
@@ -148,7 +159,11 @@ function CustomerDetailPage() {
                   </thead>
                   <tbody>
                     {customerJobs.map((j) => (
-                      <tr key={j.id} className="border-t hover:bg-muted/40">
+                      <tr
+                        key={j.id}
+                        className="cursor-pointer border-t hover:bg-muted/40"
+                        onClick={() => navigate({ to: "/jobs", search: { job: j.id } })}
+                      >
                         <td className="px-4 py-2.5 font-mono text-caption">#{j.number}</td>
                         <td className="px-4 py-2.5">{j.date.toLocaleDateString("da-DK")}</td>
                         <td className="px-4 py-2.5 text-muted-foreground">{j.origin.city} → {j.destination.city}</td>

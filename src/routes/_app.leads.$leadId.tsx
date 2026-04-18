@@ -1,4 +1,4 @@
-import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import {
@@ -10,41 +10,34 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { leads as seedLeads, LEAD_STAGE_LABELS, LEAD_STAGE_COLORS, type Lead } from "@/mocks/leads";
+import { leads as seedLeads, LEAD_STAGE_LABELS, LEAD_STAGE_COLORS } from "@/mocks/leads";
 import { quotes, QUOTE_STATUS_LABELS, QUOTE_STATUS_COLORS } from "@/mocks/quotes";
 import { useMockStore } from "@/store/mock-store";
 import { dkk } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_app/leads/$leadId")({
-  loader: ({ params }) => {
-    const lead = seedLeads.find((l) => l.id === params.leadId);
-    if (!lead) throw notFound();
-    return { lead };
-  },
-  head: ({ loaderData }) => ({
-    meta: [
-      { title: `${loaderData?.lead.name ?? "Lead"} — Movena` },
-    ],
-  }),
+  head: () => ({ meta: [{ title: "Lead — Movena" }] }),
   component: LeadDetailPage,
-  notFoundComponent: () => (
-    <div className="p-10 text-center">
-      <p className="text-section">Lead ikke fundet</p>
-      <Link to="/leads" className="mt-3 inline-block text-primary underline">Tilbage til leads</Link>
-    </div>
-  ),
 });
 
 function LeadDetailPage() {
-  const { lead: loaderLead } = Route.useLoaderData() as { lead: Lead };
+  const { leadId } = Route.useParams();
   const { leads, updateLeadStage, convertLeadToCustomer, createQuote } = useMockStore();
   const navigate = useNavigate();
-  const lead = leads.find((l) => l.id === loaderLead.id) ?? loaderLead;
-  const [notes, setNotes] = useState<{ id: string; text: string; at: Date }[]>([
-    { id: "n1", text: lead.note, at: lead.createdAt },
-  ]);
+  const lead = leads.find((l) => l.id === leadId) ?? seedLeads.find((l) => l.id === leadId);
+  const [notes, setNotes] = useState<{ id: string; text: string; at: Date }[]>(
+    lead ? [{ id: "n1", text: lead.note, at: lead.createdAt }] : [],
+  );
   const [draft, setDraft] = useState("");
+  if (!lead) {
+    return (
+      <div className="p-10 text-center">
+        <p className="text-section">Lead ikke fundet</p>
+        <Link to="/leads" className="mt-3 inline-block text-primary underline">Tilbage til leads</Link>
+      </div>
+    );
+  }
 
   const handleSendQuote = () => {
     createQuote({ customerName: lead.name, total: lead.estimatedValue });

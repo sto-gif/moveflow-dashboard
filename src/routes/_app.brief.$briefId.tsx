@@ -1,12 +1,14 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { toast } from "sonner";
 import { ArrowLeft, Sparkles, Send, Clock, FileText, CheckCircle2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { briefs, type Brief, type BriefStatus } from "@/mocks/briefs";
+import { briefs as seedBriefs, type Brief, type BriefStatus } from "@/mocks/briefs";
+import { useMockStore } from "@/store/mock-store";
 import { todaysJobs, jobs as allJobs } from "@/mocks/jobs";
 import { crew } from "@/mocks/crew";
 import { vehicles } from "@/mocks/vehicles";
@@ -28,8 +30,9 @@ const STATUS: Record<BriefStatus, { label: string; cls: string; icon: any }> = {
 function BriefDetailPage() {
   const { briefId } = Route.useParams();
   const navigate = useNavigate();
+  const { briefs } = useMockStore();
   const isNew = briefId === "new";
-  const existing = !isNew ? briefs.find((b) => b.id === briefId) : undefined;
+  const existing = !isNew ? (briefs.find((b) => b.id === briefId) ?? seedBriefs.find((b) => b.id === briefId)) : undefined;
 
   const blank: Brief = {
     id: "new",
@@ -96,10 +99,10 @@ function BriefDetailPage() {
           </Badge>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={() => navigate({ to: "/brief" })}>
+          <Button variant="outline" size="sm" onClick={() => { toast.success("Brief gemt som udkast"); navigate({ to: "/brief" }); }}>
             <Clock className="h-4 w-4" strokeWidth={1.5} /> Gem som udkast
           </Button>
-          <Button size="sm" onClick={() => navigate({ to: "/brief" })}>
+          <Button size="sm" onClick={() => { toast.success("Brief delt med crew"); navigate({ to: "/brief" }); }}>
             <Send className="h-4 w-4" strokeWidth={1.5} /> Del med crew
           </Button>
         </div>
