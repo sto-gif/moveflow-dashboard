@@ -9,29 +9,31 @@ export interface Notification {
   title: string;
   meta: string;
   unread: boolean;
+  urgent?: boolean;
 }
 
 export const notifications: Notification[] = [
   {
     id: "N-1",
-    type: "warning",
-    title: "Job #142 starter om 2 timer — 1 medarbejder mangler",
+    type: "alert",
+    title: "Job #2031 starter om 2 timer",
     meta: "Operations · for 5 min. siden",
+    unread: true,
+    urgent: true,
+  },
+  {
+    id: "N-2",
+    type: "warning",
+    title: "Kasper Møller har indsendt en ferieansøgning for 14.–18. juli — godkend inden fredag, ellers ryger den i dynamisk planlægning",
+    meta: "Crew · for 18 min. siden",
     unread: true,
   },
   {
     id: "N-3",
     type: "info",
-    title: "Nyt tilbud anmodet af Lars Hansen",
+    title: "Nyt tilbud anmodet af Lars H.",
     meta: "Salg · for 2 timer siden",
     unread: true,
-  },
-  {
-    id: "N-4",
-    type: "info",
-    title: "Mette Sørensen har anmodet om fri 24. april",
-    meta: "Crew · for 3 timer siden",
-    unread: false,
   },
   {
     id: "N-5",
@@ -43,28 +45,28 @@ export const notifications: Notification[] = [
   {
     id: "N-6",
     type: "success",
-    title: "Job #138 markeret som færdig af crew leader Anders",
+    title: "Job #2027 markeret færdig",
     meta: "Operations · i går 16:42",
     unread: false,
   },
   {
     id: "N-8",
     type: "info",
-    title: "Anne Pedersen har accepteret tilbud Q-3015",
+    title: "Anne Pedersen accepterede tilbud Q-3155 (23.847 kr)",
     meta: "Salg · i går 10:28",
     unread: false,
   },
   {
     id: "N-9",
     type: "warning",
-    title: "Volvo FL 12t skal til service inden for 7 dage",
-    meta: "Lager · i går 09:00",
+    title: "Volvo FL 12t skal til service inden for 7 dage — book hos værksted Hansen",
+    meta: "Vognpark · i går 09:00",
     unread: false,
   },
   {
     id: "N-10",
-    type: "info",
-    title: "Ny anmeldelse på Trustpilot fra Søren Christensen (5★)",
+    type: "success",
+    title: "Ny 5★ anmeldelse fra Søren C.",
     meta: "Marketing · for 2 dage siden",
     unread: false,
   },
