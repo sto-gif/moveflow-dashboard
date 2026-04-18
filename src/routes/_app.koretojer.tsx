@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { PageHeader } from "@/components/page-header";
 import { vehicles, vehicleAssignments, type VehicleStatus } from "@/mocks/vehicles";
+import { MOCK_TODAY } from "@/mocks/_helpers";
 import { number } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -145,27 +146,7 @@ function VehiclesPage() {
           </TabsContent>
 
           <TabsContent value="kalender" className="mt-4">
-            <Card className="p-5">
-              <h3 className="text-section mb-3">April 2026 · vognassignments</h3>
-              <div className="grid grid-cols-7 gap-1 text-xs">
-                {DAYS.map((d) => <div key={d} className="text-center font-semibold text-muted-foreground py-1">{d}</div>)}
-                {Array.from({ length: 30 }).map((_, i) => {
-                  const dayVehicles = vehicles.filter((_v, vi) => (i + vi) % 3 !== 0).slice(0, 3);
-                  return (
-                    <div key={i} className="min-h-20 rounded border p-1.5 hover:bg-muted/40 cursor-pointer">
-                      <div className="text-[10px] font-semibold mb-1">{i + 1}</div>
-                      <div className="space-y-0.5">
-                        {dayVehicles.map((v) => (
-                          <div key={v.id} className="rounded bg-primary/10 px-1 py-0.5 text-[8px] font-medium text-primary truncate">
-                            {v.plate}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </Card>
+            <VehicleMonthCalendar />
           </TabsContent>
         </Tabs>
       </div>
