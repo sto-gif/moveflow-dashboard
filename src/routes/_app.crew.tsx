@@ -1,15 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Plus, Phone, Calendar as CalIcon, Car, Sparkles, X, Check } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PageHeader } from "@/components/page-header";
 import { crew, sickCrewToday } from "@/mocks/crew";
 import { dkk } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { MOCK_TODAY } from "@/mocks/_helpers";
 
 export const Route = createFileRoute("/_app/crew")({
   head: () => ({
@@ -25,7 +27,6 @@ const DAYS = ["Man", "Tir", "Ons", "Tor", "Fre", "Lør", "Søn"];
 
 function CrewPage() {
   const [selected, setSelected] = useState<string | null>(null);
-  const [calRange, setCalRange] = useState<"day" | "week" | "month">("week");
   const member = crew.find((c) => c.id === selected);
   const sick = sickCrewToday();
 
@@ -122,123 +123,8 @@ function CrewPage() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="kalender" className="mt-4 space-y-3">
-            <div className="flex items-center gap-2">
-              <div className="inline-flex rounded-md border p-0.5">
-                {(["day", "week", "month"] as const).map((r) => (
-                  <button
-                    key={r}
-                    onClick={() => setCalRange(r)}
-                    className={cn(
-                      "rounded px-3 py-1 text-xs font-medium",
-                      calRange === r ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted",
-                    )}
-                  >
-                    {r === "day" ? "Dag" : r === "week" ? "Uge" : "Måned"}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {calRange === "day" && (
-              <Card className="p-5">
-                <h3 className="text-section mb-3">I dag</h3>
-                <div className="space-y-2">
-                  {crew.filter((c) => !c.sickToday && c.status === "aktiv").map((c) => (
-                    <div key={c.id} className="flex items-center gap-3 rounded-md border p-2.5">
-                      <div className={cn("flex h-8 w-8 items-center justify-center rounded-full text-[11px] font-bold", c.avatarColor)}>{c.initials}</div>
-                      <div className="flex-1">
-                        <div className="font-medium text-sm">{c.name}</div>
-                        <div className="text-[10px] text-muted-foreground">{c.role}</div>
-                      </div>
-                      <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30 text-[10px]">
-                        Job #{100 + c.id.charCodeAt(2) % 50}
-                      </Badge>
-                      <span className="text-xs text-muted-foreground tabular-nums">08:00–16:00</span>
-                    </div>
-                  ))}
-                  {crew.filter((c) => c.sickToday).map((c) => (
-                    <div key={c.id} className="flex items-center gap-3 rounded-md border border-destructive/30 bg-destructive/5 p-2.5">
-                      <div className={cn("flex h-8 w-8 items-center justify-center rounded-full text-[11px] font-bold", c.avatarColor)}>{c.initials}</div>
-                      <div className="flex-1">
-                        <div className="font-medium text-sm">{c.name}</div>
-                        <div className="text-[10px] text-destructive">Syg</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </Card>
-            )}
-
-            {calRange === "week" && (
-              <Card className="p-5">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-xs">
-                    <thead>
-                      <tr>
-                        <th className="px-2 py-2 text-left font-semibold w-44">Medarbejder</th>
-                        {DAYS.map((d) => <th key={d} className="px-2 py-2 text-center font-semibold">{d}</th>)}
-                        <th className="px-2 py-2 text-right font-semibold w-20">Total</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {crew.map((c) => (
-                        <tr key={c.id} className="border-t">
-                          <td className="px-2 py-2">
-                            <div className="flex items-center gap-2">
-                              <div className={cn("flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold", c.avatarColor)}>{c.initials}</div>
-                              <div>
-                                <div className="font-medium">{c.name.split(" ")[0]}</div>
-                                {c.sickToday && <div className="text-[9px] text-destructive font-semibold">Syg</div>}
-                              </div>
-                            </div>
-                          </td>
-                          {DAYS.map((d, i) => {
-                            if (c.sickToday && i === 0) return <td key={d} className="px-1 py-1 text-center"><div className="rounded bg-destructive/10 py-1 text-[10px] text-destructive font-semibold">Syg</div></td>;
-                            const off = c.status !== "aktiv" && i > 1;
-                            const assigned = !off && (i + c.id.charCodeAt(2)) % 3 !== 0;
-                            return (
-                              <td key={d} className="px-1 py-1 text-center">
-                                {off ? (
-                                  <div className="rounded bg-warning/10 py-1 text-[10px] text-warning">Ferie</div>
-                                ) : assigned ? (
-                                  <div className="rounded bg-primary/10 py-1 text-[10px] font-medium text-primary">#{100 + i + c.id.charCodeAt(3) % 50}</div>
-                                ) : (
-                                  <div className="rounded bg-muted py-1 text-[10px] text-muted-foreground">—</div>
-                                )}
-                              </td>
-                            );
-                          })}
-                          <td className="px-2 py-2 text-right font-semibold tabular-nums">{c.hoursThisPeriod}t</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </Card>
-            )}
-
-            {calRange === "month" && (
-              <Card className="p-5">
-                <h3 className="text-section mb-3">April 2025</h3>
-                <div className="grid grid-cols-7 gap-1 text-xs">
-                  {DAYS.map((d) => <div key={d} className="text-center font-semibold text-muted-foreground py-1">{d}</div>)}
-                  {Array.from({ length: 30 }).map((_, i) => {
-                    const assignedCount = (i * 3) % crew.length;
-                    return (
-                      <div key={i} className="aspect-square rounded border p-1.5 hover:bg-muted/40 cursor-pointer">
-                        <div className="text-[10px] font-semibold">{i + 1}</div>
-                        <div className="mt-1 space-y-0.5">
-                          {crew.slice(0, assignedCount % 3).map((c) => (
-                            <div key={c.id} className={cn("h-1 rounded-full", c.avatarColor.split(" ")[0])} />
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </Card>
-            )}
+          <TabsContent value="kalender" className="mt-4">
+            <CrewCalendar />
           </TabsContent>
         </Tabs>
 
@@ -344,4 +230,222 @@ function CrewPage() {
       </Sheet>
     </div>
   );
+}
+
+function CrewCalendar() {
+  const [view, setView] = useState<"kalender" | "oversigt">("kalender");
+  const [range, setRange] = useState<"day" | "week" | "month">("week");
+  const [employeeId, setEmployeeId] = useState<string>("all");
+
+  const filteredCrew = useMemo(
+    () => (employeeId === "all" ? crew : crew.filter((c) => c.id === employeeId)),
+    [employeeId],
+  );
+
+  const totalHours = filteredCrew.reduce((s, c) => s + c.hoursThisPeriod, 0);
+
+  // Build month grid for "month" view
+  const today = MOCK_TODAY;
+  const year = today.getFullYear();
+  const month = today.getMonth();
+  const firstDay = new Date(year, month, 1);
+  const startWeekday = (firstDay.getDay() + 6) % 7;
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const monthCells: (number | null)[] = [];
+  for (let i = 0; i < startWeekday; i++) monthCells.push(null);
+  for (let d = 1; d <= daysInMonth; d++) monthCells.push(d);
+
+  // Stable mock: which crew are scheduled on a given day
+  const dayAssignments = (d: number) =>
+    filteredCrew.filter((c) => (d + c.id.charCodeAt(2)) % 3 !== 0 && !c.sickToday);
+
+  return (
+    <div className="space-y-3">
+      <div className="flex flex-wrap items-center gap-2">
+        <Tabs value={view} onValueChange={(v) => setView(v as "kalender" | "oversigt")}>
+          <TabsList>
+            <TabsTrigger value="kalender">Kalender</TabsTrigger>
+            <TabsTrigger value="oversigt">Oversigt</TabsTrigger>
+          </TabsList>
+        </Tabs>
+        <Select value={employeeId} onValueChange={setEmployeeId}>
+          <SelectTrigger className="h-9 w-56">
+            <SelectValue placeholder="Vælg medarbejder" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Alle medarbejdere</SelectItem>
+            {crew.map((c) => (
+              <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <div className="inline-flex rounded-md border p-0.5">
+          {(["day", "week", "month"] as const).map((r) => (
+            <button
+              key={r}
+              onClick={() => setRange(r)}
+              className={cn(
+                "rounded px-3 py-1 text-xs font-medium transition-colors",
+                range === r ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted",
+              )}
+            >
+              {r === "day" ? "Dag" : r === "week" ? "Uge" : "Måned"}
+            </button>
+          ))}
+        </div>
+        {employeeId !== "all" && (
+          <div className="ml-auto text-body-sm text-muted-foreground">
+            Total timer: <span className="font-semibold text-foreground tabular-nums">{totalHours}t</span>
+          </div>
+        )}
+      </div>
+
+      {view === "kalender" ? (
+        <Card className="p-5">
+          {range === "day" && (
+            <div>
+              <h3 className="text-section mb-3">{today.toLocaleDateString("da-DK", { weekday: "long", day: "numeric", month: "long" })}</h3>
+              <div className="space-y-2">
+                {filteredCrew.filter((c) => !c.sickToday).map((c) => (
+                  <div key={c.id} className="flex items-center gap-3 rounded-md border border-border p-3">
+                    <div className={cn("flex h-8 w-8 items-center justify-center rounded-full text-[11px] font-bold", c.avatarColor)}>{c.initials}</div>
+                    <div className="flex-1">
+                      <div className="text-label">{c.name}</div>
+                      <div className="text-caption text-muted-foreground">{c.role}</div>
+                    </div>
+                    <Badge variant="outline" className="font-mono text-[10px]">
+                      Job #{100 + c.id.charCodeAt(2) % 50}
+                    </Badge>
+                    <span className="text-caption text-muted-foreground tabular-nums">08:00–16:00</span>
+                  </div>
+                ))}
+                {filteredCrew.filter((c) => c.sickToday).map((c) => (
+                  <div key={c.id} className="flex items-center gap-3 rounded-md border border-destructive/30 bg-destructive/5 p-3">
+                    <div className={cn("flex h-8 w-8 items-center justify-center rounded-full text-[11px] font-bold", c.avatarColor)}>{c.initials}</div>
+                    <div className="flex-1">
+                      <div className="text-label">{c.name}</div>
+                      <div className="text-caption text-destructive">Syg</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {range === "week" && (
+            <div>
+              <h3 className="text-section mb-3">Uge {weekNumber(today)}</h3>
+              <div className="grid grid-cols-7 gap-2">
+                {DAYS.map((d, i) => {
+                  const assigned = dayAssignments(today.getDate() + i - today.getDay());
+                  return (
+                    <div key={d} className="rounded-md border border-border p-2 min-h-32">
+                      <div className="mb-2 flex items-center justify-between">
+                        <span className="text-caption font-semibold">{d}</span>
+                        <span className="text-[10px] text-muted-foreground tabular-nums">{assigned.length}</span>
+                      </div>
+                      <div className="space-y-1">
+                        {assigned.slice(0, 4).map((c) => (
+                          <div key={c.id} className="flex items-center gap-1.5 rounded bg-[#F8FAFC] px-1.5 py-1">
+                            <div className={cn("h-1.5 w-1.5 rounded-full", c.avatarColor.split(" ")[0])} />
+                            <span className="truncate text-[10px] font-medium">{c.name.split(" ")[0]}</span>
+                          </div>
+                        ))}
+                        {assigned.length > 4 && (
+                          <div className="text-center text-[10px] text-muted-foreground">+{assigned.length - 4}</div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {range === "month" && (
+            <div>
+              <h3 className="text-section mb-3">{firstDay.toLocaleDateString("da-DK", { month: "long", year: "numeric" })}</h3>
+              <div className="grid grid-cols-7 gap-px overflow-hidden rounded-md border border-border bg-border text-xs">
+                {DAYS.map((d) => (
+                  <div key={d} className="bg-muted px-2 py-1.5 font-semibold uppercase tracking-wide text-[10px] text-muted-foreground">{d}</div>
+                ))}
+                {monthCells.map((d, i) => {
+                  if (d === null) return <div key={i} className="bg-background min-h-20" />;
+                  const assigned = dayAssignments(d);
+                  return (
+                    <div key={i} className="bg-background p-1.5 min-h-20">
+                      <div className="text-[10px] font-semibold tabular-nums">{d}</div>
+                      <div className="mt-1 space-y-0.5">
+                        {assigned.slice(0, 3).map((c) => (
+                          <div key={c.id} className="flex items-center gap-1">
+                            <div className={cn("h-1.5 w-1.5 rounded-full shrink-0", c.avatarColor.split(" ")[0])} />
+                            <span className="truncate text-[9px] text-muted-foreground">{c.name.split(" ")[0]}</span>
+                          </div>
+                        ))}
+                        {assigned.length > 3 && (
+                          <div className="text-[9px] text-muted-foreground">+{assigned.length - 3}</div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </Card>
+      ) : (
+        <Card className="overflow-x-auto p-5">
+          <table className="w-full text-xs">
+            <thead>
+              <tr>
+                <th className="px-2 py-2 text-left font-semibold w-44">Medarbejder</th>
+                {DAYS.map((d) => <th key={d} className="px-2 py-2 text-center font-semibold">{d}</th>)}
+                <th className="px-2 py-2 text-right font-semibold w-20">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredCrew.map((c) => (
+                <tr key={c.id} className="border-t">
+                  <td className="px-2 py-2">
+                    <div className="flex items-center gap-2">
+                      <div className={cn("flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold", c.avatarColor)}>{c.initials}</div>
+                      <div>
+                        <div className="font-medium">{c.name.split(" ")[0]}</div>
+                        {c.sickToday && <div className="text-[9px] text-destructive font-semibold">Syg</div>}
+                      </div>
+                    </div>
+                  </td>
+                  {DAYS.map((d, i) => {
+                    if (c.sickToday && i === 0) return <td key={d} className="px-1 py-1 text-center"><div className="rounded bg-destructive/10 py-1 text-[10px] text-destructive font-semibold">Syg</div></td>;
+                    const off = c.status !== "aktiv" && i > 1;
+                    const assigned = !off && (i + c.id.charCodeAt(2)) % 3 !== 0;
+                    return (
+                      <td key={d} className="px-1 py-1 text-center">
+                        {off ? (
+                          <div className="rounded bg-warning/10 py-1 text-[10px] text-warning">Ferie</div>
+                        ) : assigned ? (
+                          <div className="rounded bg-primary/10 py-1 text-[10px] font-medium text-primary">#{100 + i + c.id.charCodeAt(3) % 50}</div>
+                        ) : (
+                          <div className="rounded bg-muted py-1 text-[10px] text-muted-foreground">—</div>
+                        )}
+                      </td>
+                    );
+                  })}
+                  <td className="px-2 py-2 text-right font-semibold tabular-nums">{c.hoursThisPeriod}t</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </Card>
+      )}
+    </div>
+  );
+}
+
+function weekNumber(date: Date): number {
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  return Math.ceil(((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
 }

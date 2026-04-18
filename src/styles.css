@@ -171,6 +171,35 @@
     box-shadow: 0 4px 12px -4px rgb(15 23 42 / 0.08);
     transform: translateY(-2px);
   }
+  .kanban-column {
+    background-color: #F8FAFC;
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+  }
+  .kanban-column-header {
+    padding-bottom: 0.75rem;
+    margin-bottom: 0.75rem;
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .kanban-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .kanban-card {
+    background-color: #fff;
+    border: 1px solid #E2E8F0;
+    border-radius: 0.375rem;
+    padding: 0.75rem;
+    transition: box-shadow 150ms ease-out;
+    cursor: pointer;
+  }
+  .kanban-card:hover {
+    box-shadow: 0 1px 3px 0 rgb(15 23 42 / 0.10);
+  }
   .bg-navy { background-color: var(--navy); }
   .text-navy { color: var(--navy); }
   .bg-teal { background-color: var(--teal); }
