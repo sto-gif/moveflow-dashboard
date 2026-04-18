@@ -203,14 +203,20 @@ function JobsPage() {
 }
 
 function JobSheet({ job }: { job: Job }) {
-  const { updateJob } = useMockStore();
-  const customer = customerById(job.customerId);
+  const { updateJob, updateCustomer, customers: storeCustomers } = useMockStore();
+  const customer = storeCustomers.find((c) => c.id === job.customerId) ?? customerById(job.customerId);
   const quote = quotes.find((q) => q.customerId === job.customerId);
   const toggleCrew = (id: string) => {
     const next = job.crewIds.includes(id)
       ? job.crewIds.filter((c) => c !== id)
       : [...job.crewIds, id];
     updateJob(job.id, { crewIds: next });
+  };
+  const patchCustomer = (patch: Parameters<typeof updateCustomer>[1]) => {
+    if (customer) updateCustomer(customer.id, patch);
+  };
+  const patchAddress = (field: "street" | "zip" | "city", value: string) => {
+    if (customer) updateCustomer(customer.id, { address: { ...customer.address, [field]: value } });
   };
   return (
     <>
