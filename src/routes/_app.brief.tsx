@@ -72,28 +72,24 @@ function BriefPage() {
                   {briefs.map((b) => {
                     const S = STATUS[b.status];
                     return (
-                      <tr key={b.id} className="border-t hover:bg-muted/40">
-                        <td className="px-0 py-0" colSpan={7}>
-                          <Link
-                            to="/brief/$briefId"
-                            params={{ briefId: b.id }}
-                            className="grid w-full cursor-pointer grid-cols-[1fr_2fr_1fr_0.5fr_0.5fr_1fr_1fr] items-center"
-                          >
-                            <span className="px-4 py-2.5 font-medium">
-                              {b.date.toLocaleDateString("da-DK", { weekday: "short", day: "numeric", month: "short" })}
-                            </span>
-                            <span className="px-4 py-2.5 font-medium">{b.title}</span>
-                            <span className="px-4 py-2.5 capitalize text-muted-foreground">{b.scope}</span>
-                            <span className="px-4 py-2.5">{b.jobsCount}</span>
-                            <span className="px-4 py-2.5">{b.crewCount}</span>
-                            <span className="px-4 py-2.5">
-                              <Badge variant="outline" className={cn("gap-1 text-[10px]", S.cls)}>
-                                <S.icon className="h-3 w-3" strokeWidth={1.5} /> {S.label}
-                              </Badge>
-                            </span>
-                            <span className="px-4 py-2.5 text-muted-foreground">{b.author}</span>
-                          </Link>
+                      <tr
+                        key={b.id}
+                        onClick={() => navigate({ to: "/brief/$briefId", params: { briefId: b.id } })}
+                        className="cursor-pointer border-t hover:bg-muted/40 transition-colors"
+                      >
+                        <td className="px-4 py-2.5 font-medium">
+                          {b.date.toLocaleDateString("da-DK", { weekday: "short", day: "numeric", month: "short" })}
                         </td>
+                        <td className="px-4 py-2.5 font-medium text-primary hover:underline">{b.title}</td>
+                        <td className="px-4 py-2.5 capitalize text-muted-foreground">{b.scope}</td>
+                        <td className="px-4 py-2.5">{b.jobsCount}</td>
+                        <td className="px-4 py-2.5">{b.crewCount}</td>
+                        <td className="px-4 py-2.5">
+                          <Badge variant="outline" className={cn("gap-1 text-[10px]", S.cls)}>
+                            <S.icon className="h-3 w-3" strokeWidth={1.5} /> {S.label}
+                          </Badge>
+                        </td>
+                        <td className="px-4 py-2.5 text-muted-foreground">{b.author}</td>
                       </tr>
                     );
                   })}
