@@ -54,7 +54,8 @@ const LEAD_SOURCE_COLORS: Record<string, string> = {
 function LeadsPage() {
   const { leads, createLead, updateLeadStage } = useMockStore();
   const navigate = useNavigate();
-  const [search, setSearch] = useState("");
+  const search = Route.useSearch();
+  const [searchText, setSearch] = useState("");
   const [sortKey, setSortKey] = useState<"name" | "value" | "moveDate" | null>(null);
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
 
@@ -63,9 +64,59 @@ function LeadsPage() {
     else { setSortKey(key); setSortDir("asc"); }
   };
 
+  const filterValues: FilterValues = useMemo(
+    () => ({ stage: search.stage, source: search.source, owner: search.owner, type: search.type }),
+    [search.stage, search.source, search.owner, search.type],
+  );
+
+  const setFilters = (next: FilterValues) => {
+    navigate({
+      to: "/leads",
+      search: {
+        stage: next.stage ?? [],
+        source: next.source ?? [],
+        owner: next.owner ?? [],
+        type: next.type ?? [],
+      },
+      replace: true,
+    });
+  };
+
+  const owners = useMemo(() => Array.from(new Set(leads.map((l) => l.owner))).sort(), [leads]);
+
+  const filterGroups: FilterGroup[] = useMemo(() => {
+    const counts = (key: keyof typeof leads[number]) => {
+      const map = new Map<string, number>();
+      leads.forEach((l) => {
+        const v = String(l[key]);
+        map.set(v, (map.get(v) ?? 0) + 1);
+      });
+      return map;
+    };
+    const stageC = counts("stage");
+    const sourceC = counts("source");
+    const ownerC = counts("owner");
+    const typeC = counts("type");
+    return [
+      { key: "stage", label: "Status", options: STAGES.map((s) => ({ value: s, label: LEAD_STAGE_LABELS[s], count: stageC.get(s) })) },
+      { key: "source", label: "Kilde", options: LEAD_SOURCES.map((s) => ({ value: s, label: s, count: sourceC.get(s) })) },
+      { key: "owner", label: "Ejer", options: owners.map((o) => ({ value: o, label: o, count: ownerC.get(o) })) },
+      { key: "type", label: "Type", options: [
+        { value: "privat", label: "Privat", count: typeC.get("privat") },
+        { value: "erhverv", label: "Erhverv", count: typeC.get("erhverv") },
+      ] },
+    ];
+  }, [leads, owners]);
+
   const filtered = useMemo(() => {
-    const q = search.toLowerCase();
+    const q = searchText.toLowerCase();
     let list = leads.filter((l) => l.name.toLowerCase().includes(q) || l.email.toLowerCase().includes(q));
+    list = applyFilters(list, filterValues, {
+      stage: (l) => l.stage,
+      source: (l) => l.source,
+      owner: (l) => l.owner,
+      type: (l) => l.type,
+    });
     if (sortKey) {
       const dir = sortDir === "asc" ? 1 : -1;
       list = [...list].sort((a, b) => {
@@ -75,7 +126,7 @@ function LeadsPage() {
       });
     }
     return list;
-  }, [leads, search, sortKey, sortDir]);
+  }, [leads, searchText, sortKey, sortDir, filterValues]);
 
   const totalPipeline = useMemo(
     () => leads.filter((l) => l.stage !== "tabt" && l.stage !== "vundet").reduce((s, l) => s + l.estimatedValue, 0),
