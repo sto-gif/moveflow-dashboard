@@ -11,6 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PageHeader } from "@/components/page-header";
+import { StageSelect } from "@/components/stage-select";
 import { CreateDialog } from "@/components/create-dialog";
 import { QUOTE_STATUS_LABELS, QUOTE_STATUS_COLORS, PRICING_LABELS, type PricingModel, type QuoteLineItem, type QuoteStatus, buildQuoteLineItems } from "@/mocks/quotes";
 import { movingPackages } from "@/mocks/packages";
@@ -93,9 +94,13 @@ function QuotesPage() {
                       <td className="px-4 py-2.5 text-muted-foreground capitalize">{q.customerType}</td>
                       <td className="px-4 py-2.5 text-muted-foreground text-xs">{PRICING_LABELS[q.pricingModel]}</td>
                       <td className="px-4 py-2.5">
-                        <Badge variant="outline" className={cn("text-[10px]", QUOTE_STATUS_COLORS[q.status])}>
-                          {QUOTE_STATUS_LABELS[q.status]}
-                        </Badge>
+                        <StageSelect
+                          value={q.status}
+                          options={["udkast", "sendt", "accepteret", "afvist", "udløbet"] as QuoteStatus[]}
+                          labels={QUOTE_STATUS_LABELS}
+                          colors={QUOTE_STATUS_COLORS}
+                          onChange={(s) => { updateQuoteStatus(q.id, s); toast.success(`Q-${q.number}: ${QUOTE_STATUS_LABELS[s]}`); }}
+                        />
                       </td>
                       <td className="px-4 py-2.5 text-muted-foreground">{q.validUntil.toLocaleDateString("da-DK")}</td>
                       <td className="px-4 py-2.5 text-right">
