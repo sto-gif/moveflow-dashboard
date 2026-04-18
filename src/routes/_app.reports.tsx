@@ -89,12 +89,24 @@ function ReportsPage() {
             <Line type="monotone" dataKey="p" stroke="oklch(0.62 0.16 152)" strokeWidth={2.5} />
           </LineChart>
         </ChartCard>
-        <ChartCard title="Kundeanskaffelse pr. kilde">
+        <ChartCard title="Kundetilgang pr. kilde">
           <PieChart>
-            <Pie data={sources} dataKey="v" nameKey="name" cx="50%" cy="50%" outerRadius={80} label={{ fontSize: 11 }}>
+            <Pie data={sources} dataKey="v" nameKey="name" cx="35%" cy="50%" outerRadius={80}>
               {sources.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
             </Pie>
             <Tooltip contentStyle={{ borderRadius: 8, fontSize: 12 }} />
+            <Legend
+              layout="vertical"
+              align="right"
+              verticalAlign="middle"
+              iconType="circle"
+              wrapperStyle={{ fontSize: 12, paddingLeft: 12 }}
+              formatter={(value, entry: any) => (
+                <span className="text-xs text-foreground">
+                  {value} <span className="text-muted-foreground">({entry?.payload?.v ?? 0})</span>
+                </span>
+              )}
+            />
           </PieChart>
         </ChartCard>
         <ChartCard title="Tilbud → booking konvertering" subtitle="Procent">
