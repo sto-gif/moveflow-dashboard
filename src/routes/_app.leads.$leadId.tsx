@@ -26,6 +26,10 @@ function LeadDetailPage() {
   const { leads, updateLeadStage, convertLeadToCustomer, createQuote } = useMockStore();
   const navigate = useNavigate();
   const lead = leads.find((l) => l.id === leadId) ?? seedLeads.find((l) => l.id === leadId);
+  const [notes, setNotes] = useState<{ id: string; text: string; at: Date }[]>(
+    lead ? [{ id: "n1", text: lead.note, at: lead.createdAt }] : [],
+  );
+  const [draft, setDraft] = useState("");
   if (!lead) {
     return (
       <div className="p-10 text-center">
@@ -34,10 +38,6 @@ function LeadDetailPage() {
       </div>
     );
   }
-  const [notes, setNotes] = useState<{ id: string; text: string; at: Date }[]>([
-    { id: "n1", text: lead.note, at: lead.createdAt },
-  ]);
-  const [draft, setDraft] = useState("");
 
   const handleSendQuote = () => {
     createQuote({ customerName: lead.name, total: lead.estimatedValue });
