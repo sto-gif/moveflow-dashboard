@@ -112,12 +112,13 @@ const PROJECT_DESCRIPTIONS = [
 ];
 
 function makePreviousJobs(count: number, baseValue: number): PreviousJobRef[] {
+  const jitter = [-1873, -947, -312, 419, 1283, 2461, 3712];
   return Array.from({ length: count }, (_, i) => ({
     id: `JREF-${randInt(1000, 9999)}-${i}`,
-    number: String(randInt(80, 145)),
+    number: String(1700 + randInt(0, 200)),
     date: daysFromNow(-randInt(30, 800)),
     description: pick(PROJECT_DESCRIPTIONS),
-    amount: baseValue + randInt(-3000, 5000),
+    amount: Math.max(2000, Math.round(baseValue) + jitter[i % jitter.length]!),
   }));
 }
 
@@ -138,7 +139,8 @@ export const customers: Customer[] = Array.from({ length: 22 }, (_, i) => {
   const stage = weightedStage();
   const tagCount = randInt(0, 2);
   const tags = Array.from(new Set(Array.from({ length: tagCount }, () => pick(TAG_OPTIONS))));
-  const value = randInt(4, 60) * 1000;
+  const valueBases = [4287, 7619, 9312, 11847, 14523, 18261, 22077, 26934, 31418, 38762, 47193, 54381, 23847, 34519];
+  const value = valueBases[i % valueBases.length]! + (i % 6 === 0 ? 0.5 : 0);
   const moveCount = stage === "afsluttet" ? randInt(1, 4) : randInt(0, 2);
   const previousJobs = makePreviousJobs(moveCount, value);
   const lastJobDate = previousJobs[0]?.date;
