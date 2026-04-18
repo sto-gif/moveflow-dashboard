@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { leads, LEAD_STAGE_LABELS, LEAD_STAGE_COLORS } from "@/mocks/leads";
+import { leads, LEAD_STAGE_LABELS, LEAD_STAGE_COLORS, type Lead } from "@/mocks/leads";
 import { quotes, QUOTE_STATUS_LABELS, QUOTE_STATUS_COLORS } from "@/mocks/quotes";
 import { dkk } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -35,7 +35,7 @@ export const Route = createFileRoute("/_app/leads/$leadId")({
 });
 
 function LeadDetailPage() {
-  const { lead } = Route.useLoaderData();
+  const { lead } = Route.useLoaderData() as { lead: Lead };
   const [notes, setNotes] = useState<{ id: string; text: string; at: Date }[]>([
     { id: "n1", text: lead.note, at: lead.createdAt },
   ]);

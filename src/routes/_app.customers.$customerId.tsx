@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { customers, STAGE_LABELS } from "@/mocks/customers";
+import { customers, STAGE_LABELS, type Customer, type Communication } from "@/mocks/customers";
 import { jobs, JOB_STATUS_LABELS, JOB_STATUS_COLORS } from "@/mocks/jobs";
 import { quotes, QUOTE_STATUS_LABELS, QUOTE_STATUS_COLORS } from "@/mocks/quotes";
 import { storageUnits } from "@/mocks/storage";
@@ -35,7 +35,7 @@ export const Route = createFileRoute("/_app/customers/$customerId")({
 });
 
 function CustomerDetailPage() {
-  const { customer } = Route.useLoaderData();
+  const { customer } = Route.useLoaderData() as { customer: Customer };
   const customerJobs = jobs.filter((j) => j.customerId === customer.id);
   const customerQuotes = quotes.filter((q) => q.customerId === customer.id);
   const customerStorage = storageUnits.filter((s) => s.customerId === customer.id);
@@ -204,8 +204,8 @@ function CustomerDetailPage() {
             <Card className="space-y-3 p-4">
               {customer.communications
                 .slice()
-                .sort((a, b) => b.date.getTime() - a.date.getTime())
-                .map((c) => (
+                .sort((a: Communication, b: Communication) => b.date.getTime() - a.date.getTime())
+                .map((c: Communication) => (
                   <div key={c.id} className="border-l-2 border-border pl-3">
                     <div className="flex items-center gap-2">
                       <Badge variant="secondary" className="text-[10px] capitalize">{c.kind}</Badge>
@@ -274,7 +274,7 @@ function CustomerDetailPage() {
                 <div className="border-t border-border pt-3">
                   <div className="text-caption uppercase text-muted-foreground mb-2">Tags</div>
                   <div className="flex flex-wrap gap-1.5">
-                    {customer.tags.map((t) => <Badge key={t} variant="secondary">{t}</Badge>)}
+                    {customer.tags.map((t: string) => <Badge key={t} variant="secondary">{t}</Badge>)}
                   </div>
                 </div>
               )}
