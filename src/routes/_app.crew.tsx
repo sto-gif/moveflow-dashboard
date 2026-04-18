@@ -4,6 +4,7 @@ import { Plus, Phone, Calendar as CalIcon, Car, Sparkles, X, Check } from "lucid
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { PageHeader } from "@/components/page-header";
 import { crew, sickCrewToday } from "@/mocks/crew";
 import { dkk } from "@/lib/format";
@@ -24,6 +25,7 @@ const DAYS = ["Man", "Tir", "Ons", "Tor", "Fre", "Lør", "Søn"];
 
 function CrewPage() {
   const [selected, setSelected] = useState<string | null>(null);
+  const [calRange, setCalRange] = useState<"day" | "week" | "month">("week");
   const member = crew.find((c) => c.id === selected);
   const sick = sickCrewToday();
 
@@ -43,7 +45,7 @@ function CrewPage() {
         description={`${crew.length} medarbejdere · ${crew.filter((c) => c.status === "aktiv").length} aktive · ${sick.length} syge i dag`}
         actions={<Button size="sm"><Plus className="h-4 w-4" strokeWidth={1.5} /> Ny medarbejder</Button>}
       />
-      <div className="space-y-6 p-6">
+      <div className="space-y-4 p-6">
         {/* Sick today banner */}
         <Card className={cn("p-4", sick.length ? "border-destructive/30 bg-destructive/5" : "border-success/30 bg-success/5")}>
           <div className="flex items-center justify-between">
@@ -65,81 +67,180 @@ function CrewPage() {
           </div>
         </Card>
 
-        {/* Crew grid */}
-        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-          {crew.map((c) => (
-            <Card key={c.id} className="cursor-pointer p-4 hover:shadow-md transition-shadow" onClick={() => setSelected(c.id)}>
-              <div className="flex items-start gap-3">
-                <div className={cn("flex h-11 w-11 items-center justify-center rounded-full text-sm font-bold", c.avatarColor)}>{c.initials}</div>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between">
-                    <div className="font-semibold">{c.name}</div>
-                    <Badge variant="outline" className={cn("text-[10px] capitalize", statusBadge(c.status))}>{c.status}</Badge>
-                  </div>
-                  <div className="text-xs text-muted-foreground">{c.role}</div>
-                  <div className="mt-2 flex items-center justify-between text-xs">
-                    <span className="text-muted-foreground">{c.hoursThisPeriod} t. denne periode</span>
-                    {c.driverLicense && <Car className="h-3.5 w-3.5 text-primary" strokeWidth={1.5} />}
-                  </div>
-                  <div className="mt-2 flex flex-wrap gap-1">
-                    {c.skills.slice(0, 2).map((s) => <Badge key={s} variant="secondary" className="text-[9px] px-1.5 py-0">{s}</Badge>)}
-                  </div>
-                </div>
-              </div>
-            </Card>
-          ))}
-        </div>
+        <Tabs defaultValue="tabel">
+          <TabsList>
+            <TabsTrigger value="tabel">Tabel</TabsTrigger>
+            <TabsTrigger value="kalender">Kalender</TabsTrigger>
+          </TabsList>
 
-        {/* Weekly schedule */}
-        <Card className="p-5">
-          <div className="mb-3 flex items-center justify-between">
-            <h3 className="text-section">Ugeplan</h3>
-            <div className="text-xs text-muted-foreground">Total timer for perioden vises pr. medarbejder</div>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs">
-              <thead>
-                <tr>
-                  <th className="px-2 py-2 text-left font-semibold w-44">Medarbejder</th>
-                  {DAYS.map((d) => <th key={d} className="px-2 py-2 text-center font-semibold">{d}</th>)}
-                  <th className="px-2 py-2 text-right font-semibold w-20">Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                {crew.map((c) => (
-                  <tr key={c.id} className="border-t">
-                    <td className="px-2 py-2">
-                      <div className="flex items-center gap-2">
-                        <div className={cn("flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold", c.avatarColor)}>{c.initials}</div>
-                        <div>
-                          <div className="font-medium">{c.name.split(" ")[0]}</div>
-                          {c.sickToday && <div className="text-[9px] text-destructive font-semibold">Syg</div>}
+          <TabsContent value="tabel" className="mt-4">
+            <Card className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-muted/40">
+                  <tr className="text-left text-xs uppercase tracking-wide text-muted-foreground">
+                    <th className="px-4 py-2.5 font-medium">Navn</th>
+                    <th className="px-4 py-2.5 font-medium">Rolle</th>
+                    <th className="px-4 py-2.5 font-medium">Status</th>
+                    <th className="px-4 py-2.5 font-medium">Tildelte jobs</th>
+                    <th className="px-4 py-2.5 font-medium">Timer</th>
+                    <th className="px-4 py-2.5 font-medium">Skills & cert.</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {crew.map((c) => (
+                    <tr key={c.id} className="cursor-pointer border-t hover:bg-muted/40" onClick={() => setSelected(c.id)}>
+                      <td className="px-4 py-2.5">
+                        <div className="flex items-center gap-2">
+                          <div className={cn("flex h-7 w-7 items-center justify-center rounded-full text-[10px] font-bold", c.avatarColor)}>{c.initials}</div>
+                          <div>
+                            <div className="font-medium">{c.name}</div>
+                            <div className="text-[10px] text-muted-foreground">{c.phone}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-2.5 text-muted-foreground">{c.role}</td>
+                      <td className="px-4 py-2.5">
+                        <Badge variant="outline" className={cn("text-[10px] capitalize", statusBadge(c.status))}>{c.status}</Badge>
+                      </td>
+                      <td className="px-4 py-2.5">
+                        <div className="flex flex-wrap gap-1">
+                          {c.recentJobIds.slice(0, 3).map((id) => <Badge key={id} variant="outline" className="font-mono text-[9px]">{id}</Badge>)}
+                        </div>
+                      </td>
+                      <td className="px-4 py-2.5 font-semibold tabular-nums">{c.hoursThisPeriod}t</td>
+                      <td className="px-4 py-2.5">
+                        <div className="flex flex-wrap gap-1 max-w-xs">
+                          {c.skills.slice(0, 2).map((s) => <Badge key={s} variant="secondary" className="text-[9px] px-1.5 py-0">{s}</Badge>)}
+                          {c.certifications.slice(0, 1).map((s) => <Badge key={s} variant="outline" className="text-[9px] px-1.5 py-0">{s}</Badge>)}
+                          {c.driverLicense && <Car className="h-3 w-3 text-primary" strokeWidth={1.5} />}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="kalender" className="mt-4 space-y-3">
+            <div className="flex items-center gap-2">
+              <div className="inline-flex rounded-md border p-0.5">
+                {(["day", "week", "month"] as const).map((r) => (
+                  <button
+                    key={r}
+                    onClick={() => setCalRange(r)}
+                    className={cn(
+                      "rounded px-3 py-1 text-xs font-medium",
+                      calRange === r ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted",
+                    )}
+                  >
+                    {r === "day" ? "Dag" : r === "week" ? "Uge" : "Måned"}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {calRange === "day" && (
+              <Card className="p-5">
+                <h3 className="text-section mb-3">I dag</h3>
+                <div className="space-y-2">
+                  {crew.filter((c) => !c.sickToday && c.status === "aktiv").map((c) => (
+                    <div key={c.id} className="flex items-center gap-3 rounded-md border p-2.5">
+                      <div className={cn("flex h-8 w-8 items-center justify-center rounded-full text-[11px] font-bold", c.avatarColor)}>{c.initials}</div>
+                      <div className="flex-1">
+                        <div className="font-medium text-sm">{c.name}</div>
+                        <div className="text-[10px] text-muted-foreground">{c.role}</div>
+                      </div>
+                      <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30 text-[10px]">
+                        Job #{100 + c.id.charCodeAt(2) % 50}
+                      </Badge>
+                      <span className="text-xs text-muted-foreground tabular-nums">08:00–16:00</span>
+                    </div>
+                  ))}
+                  {crew.filter((c) => c.sickToday).map((c) => (
+                    <div key={c.id} className="flex items-center gap-3 rounded-md border border-destructive/30 bg-destructive/5 p-2.5">
+                      <div className={cn("flex h-8 w-8 items-center justify-center rounded-full text-[11px] font-bold", c.avatarColor)}>{c.initials}</div>
+                      <div className="flex-1">
+                        <div className="font-medium text-sm">{c.name}</div>
+                        <div className="text-[10px] text-destructive">Syg</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            )}
+
+            {calRange === "week" && (
+              <Card className="p-5">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs">
+                    <thead>
+                      <tr>
+                        <th className="px-2 py-2 text-left font-semibold w-44">Medarbejder</th>
+                        {DAYS.map((d) => <th key={d} className="px-2 py-2 text-center font-semibold">{d}</th>)}
+                        <th className="px-2 py-2 text-right font-semibold w-20">Total</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {crew.map((c) => (
+                        <tr key={c.id} className="border-t">
+                          <td className="px-2 py-2">
+                            <div className="flex items-center gap-2">
+                              <div className={cn("flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold", c.avatarColor)}>{c.initials}</div>
+                              <div>
+                                <div className="font-medium">{c.name.split(" ")[0]}</div>
+                                {c.sickToday && <div className="text-[9px] text-destructive font-semibold">Syg</div>}
+                              </div>
+                            </div>
+                          </td>
+                          {DAYS.map((d, i) => {
+                            if (c.sickToday && i === 0) return <td key={d} className="px-1 py-1 text-center"><div className="rounded bg-destructive/10 py-1 text-[10px] text-destructive font-semibold">Syg</div></td>;
+                            const off = c.status !== "aktiv" && i > 1;
+                            const assigned = !off && (i + c.id.charCodeAt(2)) % 3 !== 0;
+                            return (
+                              <td key={d} className="px-1 py-1 text-center">
+                                {off ? (
+                                  <div className="rounded bg-warning/10 py-1 text-[10px] text-warning">Ferie</div>
+                                ) : assigned ? (
+                                  <div className="rounded bg-primary/10 py-1 text-[10px] font-medium text-primary">#{100 + i + c.id.charCodeAt(3) % 50}</div>
+                                ) : (
+                                  <div className="rounded bg-muted py-1 text-[10px] text-muted-foreground">—</div>
+                                )}
+                              </td>
+                            );
+                          })}
+                          <td className="px-2 py-2 text-right font-semibold tabular-nums">{c.hoursThisPeriod}t</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </Card>
+            )}
+
+            {calRange === "month" && (
+              <Card className="p-5">
+                <h3 className="text-section mb-3">April 2025</h3>
+                <div className="grid grid-cols-7 gap-1 text-xs">
+                  {DAYS.map((d) => <div key={d} className="text-center font-semibold text-muted-foreground py-1">{d}</div>)}
+                  {Array.from({ length: 30 }).map((_, i) => {
+                    const assignedCount = (i * 3) % crew.length;
+                    return (
+                      <div key={i} className="aspect-square rounded border p-1.5 hover:bg-muted/40 cursor-pointer">
+                        <div className="text-[10px] font-semibold">{i + 1}</div>
+                        <div className="mt-1 space-y-0.5">
+                          {crew.slice(0, assignedCount % 3).map((c) => (
+                            <div key={c.id} className={cn("h-1 rounded-full", c.avatarColor.split(" ")[0])} />
+                          ))}
                         </div>
                       </div>
-                    </td>
-                    {DAYS.map((d, i) => {
-                      if (c.sickToday && i === 0) return <td key={d} className="px-1 py-1 text-center"><div className="rounded bg-destructive/10 py-1 text-[10px] text-destructive font-semibold">Syg</div></td>;
-                      const off = c.status !== "aktiv" && i > 1;
-                      const assigned = !off && (i + c.id.charCodeAt(2)) % 3 !== 0;
-                      return (
-                        <td key={d} className="px-1 py-1 text-center">
-                          {off ? (
-                            <div className="rounded bg-warning/10 py-1 text-[10px] text-warning">Ferie</div>
-                          ) : assigned ? (
-                            <div className="rounded bg-primary/10 py-1 text-[10px] font-medium text-primary">#{100 + i + c.id.charCodeAt(3) % 50}</div>
-                          ) : (
-                            <div className="rounded bg-muted py-1 text-[10px] text-muted-foreground">—</div>
-                          )}
-                        </td>
-                      );
-                    })}
-                    <td className="px-2 py-2 text-right font-semibold tabular-nums">{c.hoursThisPeriod}t</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </Card>
+                    );
+                  })}
+                </div>
+              </Card>
+            )}
+          </TabsContent>
+        </Tabs>
 
         <Card className="p-5">
           <h3 className="mb-3 text-section">Friønsker</h3>
