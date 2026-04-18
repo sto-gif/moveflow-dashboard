@@ -209,6 +209,8 @@ function JobSheet({ job }: { job: Job }) {
   const { updateJob, updateCustomer, customers: storeCustomers } = useMockStore();
   const customer = storeCustomers.find((c) => c.id === job.customerId) ?? customerById(job.customerId);
   const quote = quotes.find((q) => q.customerId === job.customerId);
+  const vehicle = vehicles.find((v) => v.id === job.vehicleId);
+  const assignedCrew = job.crewIds.map((id) => crew.find((c) => c.id === id)).filter(Boolean) as typeof crew;
   const toggleCrew = (id: string) => {
     const next = job.crewIds.includes(id)
       ? job.crewIds.filter((c) => c !== id)
@@ -224,18 +226,22 @@ function JobSheet({ job }: { job: Job }) {
   return (
     <>
       <SheetHeader>
-        <SheetTitle>Job #{job.number} · {job.customerName}</SheetTitle>
+        <SheetTitle className="flex items-center gap-2">
+          Job #{job.number} · {job.customerName}
+          <Badge variant="outline" className={cn("text-[10px]", JOB_STATUS_COLORS[job.status])}>{JOB_STATUS_LABELS[job.status]}</Badge>
+        </SheetTitle>
       </SheetHeader>
-      <Tabs defaultValue="detaljer" className="mt-6">
+      <Tabs defaultValue="oversigt" className="mt-6">
         <TabsList>
-          <TabsTrigger value="detaljer">Detaljer</TabsTrigger>
+          <TabsTrigger value="oversigt">Oversigt</TabsTrigger>
+          <TabsTrigger value="tidslinje"><Clock className="mr-1 h-3.5 w-3.5" strokeWidth={1.5} /> Tidslinje</TabsTrigger>
+          <TabsTrigger value="okonomi">Økonomi</TabsTrigger>
           <TabsTrigger value="fotos">
             <ImageIcon className="mr-1 h-3.5 w-3.5" strokeWidth={1.5} /> Fotos ({job.photos.length})
           </TabsTrigger>
-          <TabsTrigger value="okonomi">Økonomi</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="detaljer" className="mt-4 space-y-4">
+        <TabsContent value="oversigt" className="mt-4 space-y-4">
           {customer && (
             <Card className="border-primary/20 bg-primary/5 p-4 space-y-3">
               <div className="flex items-center justify-between gap-2">
