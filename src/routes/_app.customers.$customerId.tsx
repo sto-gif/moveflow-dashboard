@@ -88,8 +88,8 @@ function CustomerDetailPage() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Button size="sm" variant="outline"><Send className="h-4 w-4" strokeWidth={1.5} /> Send tilbud</Button>
-            <Button size="sm"><Truck className="h-4 w-4" strokeWidth={1.5} /> Nyt job</Button>
+            <Button size="sm" variant="outline" onClick={handleSendQuote}><Send className="h-4 w-4" strokeWidth={1.5} /> Send tilbud</Button>
+            <Button size="sm" onClick={handleNewJob}><Truck className="h-4 w-4" strokeWidth={1.5} /> Nyt job</Button>
           </div>
         </div>
       </div>
@@ -159,7 +159,11 @@ function CustomerDetailPage() {
                   </thead>
                   <tbody>
                     {customerJobs.map((j) => (
-                      <tr key={j.id} className="border-t hover:bg-muted/40">
+                      <tr
+                        key={j.id}
+                        className="cursor-pointer border-t hover:bg-muted/40"
+                        onClick={() => navigate({ to: "/jobs", search: { job: j.id } })}
+                      >
                         <td className="px-4 py-2.5 font-mono text-caption">#{j.number}</td>
                         <td className="px-4 py-2.5">{j.date.toLocaleDateString("da-DK")}</td>
                         <td className="px-4 py-2.5 text-muted-foreground">{j.origin.city} → {j.destination.city}</td>
