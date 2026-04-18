@@ -6,7 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { briefs, type Brief, type BriefStatus } from "@/mocks/briefs";
+import { briefs as seedBriefs, type Brief, type BriefStatus } from "@/mocks/briefs";
+import { useMockStore } from "@/store/mock-store";
 import { todaysJobs, jobs as allJobs } from "@/mocks/jobs";
 import { crew } from "@/mocks/crew";
 import { vehicles } from "@/mocks/vehicles";
@@ -28,8 +29,9 @@ const STATUS: Record<BriefStatus, { label: string; cls: string; icon: any }> = {
 function BriefDetailPage() {
   const { briefId } = Route.useParams();
   const navigate = useNavigate();
+  const { briefs } = useMockStore();
   const isNew = briefId === "new";
-  const existing = !isNew ? briefs.find((b) => b.id === briefId) : undefined;
+  const existing = !isNew ? (briefs.find((b) => b.id === briefId) ?? seedBriefs.find((b) => b.id === briefId)) : undefined;
 
   const blank: Brief = {
     id: "new",
