@@ -2,7 +2,9 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import {
   TrendingUp, TrendingDown, Briefcase, Users, Wallet, Activity,
-  AlertTriangle, Clock, CheckCircle2,
+  AlertTriangle, Clock, CheckCircle2, FileText, UserPlus, Truck, Package,
+  Star, MessageSquare, Send, Receipt, Wrench, Warehouse, Mail, ArrowRight,
+  UserCheck, XCircle, Building2,
 } from "lucide-react";
 import { CreateDialog } from "@/components/create-dialog";
 import { useMockStore } from "@/store/mock-store";
@@ -54,12 +56,19 @@ function DashboardPage() {
     (customers.length / Math.max(1, customers.length + leads.length)) * 100;
   const utilization = 78.4;
 
+  // Growth trajectory with winter dip (Dec/Jan), peaks in summer moving season
   const revenueData = Array.from({ length: 12 }, (_, i) => {
     const m = new Date(MOCK_TODAY);
     m.setMonth(m.getMonth() - (11 - i));
+    const monthIdx = m.getMonth();
+    const base = 140000 + i * 17000;
+    const seasonal: Record<number, number> = {
+      0: -45000, 1: -35000, 2: -10000, 3: 5000, 4: 20000,
+      5: 40000, 6: 55000, 7: 50000, 8: 25000, 9: 5000, 10: -15000, 11: -40000,
+    };
     return {
       m: m.toLocaleDateString("da-DK", { month: "short" }),
-      omsætning: 180000 + Math.round(Math.sin(i / 2) * 60000) + i * 12000,
+      omsætning: base + (seasonal[monthIdx] ?? 0),
     };
   });
 
@@ -166,8 +175,8 @@ function DashboardPage() {
 
         {/* Today + Alerts row */}
         <div className="grid gap-4 lg:grid-cols-3">
-          <Card className="lg:col-span-2 p-5">
-            <div className="mb-3 flex items-center justify-between">
+          <Card className="lg:col-span-2 p-7">
+            <div className="mb-4 flex items-center justify-between">
               <h3 className="text-sm font-semibold">Dagens jobs</h3>
               <Button asChild size="sm" variant="ghost"><Link to="/jobs">Se alle</Link></Button>
             </div>
@@ -175,12 +184,12 @@ function DashboardPage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b text-left text-xs uppercase tracking-wide text-muted-foreground">
-                    <th className="pb-2 font-medium">Tid</th>
-                    <th className="pb-2 font-medium">Job</th>
-                    <th className="pb-2 font-medium">Kunde</th>
-                    <th className="pb-2 font-medium">Crew</th>
-                    <th className="pb-2 font-medium">Status</th>
-                    <th className="pb-2 text-right font-medium">Værdi</th>
+                    <th className="pb-3 font-medium">Tid</th>
+                    <th className="pb-3 font-medium">Job</th>
+                    <th className="pb-3 font-medium">Kunde</th>
+                    <th className="pb-3 font-medium">Crew</th>
+                    <th className="pb-3 font-medium">Status</th>
+                    <th className="pb-3 text-right font-medium">Værdi</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -190,10 +199,10 @@ function DashboardPage() {
                       className="cursor-pointer border-b last:border-0 hover:bg-muted/40"
                       onClick={() => navigate({ to: "/jobs", search: { job: j.id } })}
                     >
-                      <td className="py-2.5 font-mono text-xs">{j.startTime}</td>
-                      <td className="py-2.5 font-medium">#{j.number}</td>
-                      <td className="py-2.5">{j.customerName}</td>
-                      <td className="py-2.5">
+                      <td className="py-4 font-mono text-xs">{j.startTime}</td>
+                      <td className="py-4 font-medium">#{j.number}</td>
+                      <td className="py-4">{j.customerName}</td>
+                      <td className="py-4">
                         <div className="flex -space-x-2">
                           {j.crewIds.slice(0, 3).map((id) => {
                             const m = crew.find((c) => c.id === id);
@@ -216,12 +225,12 @@ function DashboardPage() {
                           )}
                         </div>
                       </td>
-                      <td className="py-3">
+                      <td className="py-4">
                         <Badge variant={JOB_STATUS_BADGE[j.status]}>
                           {JOB_STATUS_LABELS[j.status]}
                         </Badge>
                       </td>
-                      <td className="py-3 text-right font-medium tabular-nums text-[#0F172A]">{dkk(j.revenue)}</td>
+                      <td className="py-4 text-right font-medium tabular-nums text-[#0F172A]">{dkk(j.revenue)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -256,35 +265,46 @@ function DashboardPage() {
             <h3 className="text-sm font-semibold">Seneste aktivitet</h3>
             <Badge variant="secondary" className="text-[10px]">Live</Badge>
           </div>
-          <div className="max-h-[360px] space-y-3 overflow-y-auto pr-2 text-sm">
+          <div className="max-h-[360px] overflow-y-auto pr-2 text-sm">
             {[
-              { t: "Anne Pedersen accepterede tilbud Q-3015 (24.500 DKK)", time: "5 min" },
-              { t: "Mette Sørensen anmodede om fri 24. apr", time: "32 min" },
-              { t: "Job #145 oprettet — København → Aarhus, 65 m³", time: "1 t" },
-              { t: "Ny anmeldelse på Trustpilot fra Emilie Jensen (5★)", time: "2 t" },
-              { t: "Crew-tildeling ændret på job #142 (Anders → Mikkel)", time: "3 t" },
-              { t: "Nyt lead modtaget fra hjemmesiden — Søren Christensen", time: "4 t" },
-              { t: "Tilbud Q-3014 sendt til Lars Holm (18.200 DKK)", time: "5 t" },
-              { t: "Job #141 markeret som afsluttet — Frederiksberg", time: "6 t" },
-              { t: "Faktura F-2204 betalt af Nordisk Logistik ApS", time: "7 t" },
-              { t: "Køretøj BIL-04 sendt til service", time: "8 t" },
-              { t: "Lager-enhed L-12 udlejet til Camilla Berg", time: "9 t" },
-              { t: "Daglig brief sendt til 7 crew-medlemmer", time: "10 t" },
-              { t: "Lead L-5018 flyttet til Forhandling", time: "12 t" },
-              { t: "Ny besked fra Peter Madsen om flytning 2. maj", time: "14 t" },
-              { t: "Tilbud Q-3013 udløb — påmindelse sendt", time: "16 t" },
-              { t: "Crew-medlem Kasper J. tilføjet til job #144", time: "18 t" },
-              { t: "Pakkeordre på 30 flyttekasser leveret", time: "1 d" },
-              { t: "Job #140 fik 5★ anmeldelse fra kunde", time: "1 d" },
-              { t: "Ny kunde oprettet: Bredgade Erhverv ApS", time: "1 d" },
-              { t: "Lead L-5012 markeret som tabt — for dyrt", time: "2 d" },
-            ].map((a, i) => (
-              <div key={i} className="flex items-start gap-3 border-b pb-3 last:border-0 last:pb-0">
-                <div className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                <div className="flex-1">{a.t}</div>
-                <div className="shrink-0 text-xs text-muted-foreground">{a.time}</div>
-              </div>
-            ))}
+              { icon: CheckCircle2, tone: "ok", t: "Anne Pedersen accepterede tilbud Q-3015 (24.500 DKK)", time: "5 min" },
+              { icon: UserCheck, tone: "info", t: "Mette Sørensen anmodede om fri 24. apr", time: "32 min" },
+              { icon: Briefcase, tone: "info", t: "Job #145 oprettet — København → Aarhus, 65 m³", time: "1 t" },
+              { icon: Star, tone: "ok", t: "Ny anmeldelse på Trustpilot fra Emilie Jensen (5★)", time: "2 t" },
+              { icon: Users, tone: "info", t: "Crew-tildeling ændret på job #142 (Anders → Mikkel)", time: "3 t" },
+              { icon: UserPlus, tone: "info", t: "Nyt lead modtaget fra hjemmesiden — Søren Christensen", time: "4 t" },
+              { icon: Send, tone: "info", t: "Tilbud Q-3014 sendt til Lars Holm (18.200 DKK)", time: "5 t" },
+              { icon: CheckCircle2, tone: "ok", t: "Job #141 markeret som afsluttet — Frederiksberg", time: "6 t" },
+              { icon: Receipt, tone: "ok", t: "Faktura F-2204 betalt af Nordisk Logistik ApS", time: "7 t" },
+              { icon: Wrench, tone: "warn", t: "Køretøj BIL-04 sendt til service", time: "8 t" },
+              { icon: Warehouse, tone: "info", t: "Lager-enhed L-12 udlejet til Camilla Berg", time: "9 t" },
+              { icon: Mail, tone: "info", t: "Daglig brief sendt til 7 crew-medlemmer", time: "10 t" },
+              { icon: ArrowRight, tone: "info", t: "Lead L-5018 flyttet til Forhandling", time: "12 t" },
+              { icon: MessageSquare, tone: "info", t: "Ny besked fra Peter Madsen om flytning 2. maj", time: "14 t" },
+              { icon: Clock, tone: "warn", t: "Tilbud Q-3013 udløb — påmindelse sendt", time: "16 t" },
+              { icon: Users, tone: "info", t: "Crew-medlem Kasper J. tilføjet til job #144", time: "18 t" },
+              { icon: Package, tone: "info", t: "Pakkeordre på 30 flyttekasser leveret", time: "1 d" },
+              { icon: Star, tone: "ok", t: "Job #140 fik 5★ anmeldelse fra kunde", time: "1 d" },
+              { icon: Building2, tone: "info", t: "Ny kunde oprettet: Bredgade Erhverv ApS", time: "1 d" },
+              { icon: XCircle, tone: "danger", t: "Lead L-5012 markeret som tabt — for dyrt", time: "2 d" },
+            ].map((a, i) => {
+              const Icon = a.icon;
+              const toneCls = {
+                ok: "bg-[#DCFCE7] text-[#16A34A]",
+                warn: "bg-[#FEF3C7] text-[#D97706]",
+                danger: "bg-[#FEE2E2] text-[#DC2626]",
+                info: "bg-muted text-muted-foreground",
+              }[a.tone as "ok" | "warn" | "danger" | "info"];
+              return (
+                <div key={i} className="flex items-start gap-3 border-b py-3 first:pt-0 last:border-0 last:pb-0">
+                  <div className={cn("flex h-7 w-7 shrink-0 items-center justify-center rounded-full", toneCls)}>
+                    <Icon className="h-3.5 w-3.5" />
+                  </div>
+                  <div className="flex-1 leading-snug">{a.t}</div>
+                  <div className="shrink-0 text-xs text-muted-foreground tabular-nums">{a.time}</div>
+                </div>
+              );
+            })}
           </div>
         </Card>
       </div>
@@ -360,8 +380,8 @@ function Alert({
     <div className={cn("flex items-start gap-3 rounded-md border px-3 py-2.5", colors)}>
       <Icon className="mt-0.5 h-4 w-4 shrink-0" />
       <div className="flex-1 leading-snug">
-        <div className="text-body font-medium">{title}</div>
-        <div className="text-caption opacity-80">{meta}</div>
+        <div className="text-body font-semibold">{title}</div>
+        <div className="text-caption opacity-75">{meta}</div>
       </div>
     </div>
   );
