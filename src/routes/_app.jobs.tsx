@@ -1,5 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { zodValidator, fallback } from "@tanstack/zod-adapter";
+import { z } from "zod";
 import { Plus, Search, Image as ImageIcon, Upload, Camera, Building2, User, Mail, Phone } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -7,15 +10,24 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { PageHeader } from "@/components/page-header";
-import { jobs, JOB_STATUS_LABELS, JOB_STATUS_COLORS, type JobStatus, type Job } from "@/mocks/jobs";
+import { JOB_STATUS_LABELS, JOB_STATUS_COLORS, type JobStatus, type Job } from "@/mocks/jobs";
 import { crew } from "@/mocks/crew";
 import { customerById } from "@/mocks/customers";
 import { quotes, PRICING_LABELS } from "@/mocks/quotes";
 import { dkk } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { useMockStore } from "@/store/mock-store";
+import { CreateDialog } from "@/components/create-dialog";
+import { KanbanBoard } from "@/components/kanban-board";
+import { StageSelect } from "@/components/stage-select";
+
+const searchSchema = z.object({
+  job: fallback(z.string().optional(), undefined),
+});
 
 export const Route = createFileRoute("/_app/jobs")({
+  validateSearch: zodValidator(searchSchema),
   head: () => ({
     meta: [
       { title: "Jobs — Movena" },
@@ -28,14 +40,32 @@ export const Route = createFileRoute("/_app/jobs")({
 const STATUSES: JobStatus[] = ["planlagt", "bekraeftet", "i_gang", "afsluttet", "annulleret"];
 
 function JobsPage() {
+  const { jobs, createJob, updateJobStatus } = useMockStore();
+  const { job: jobParam } = Route.useSearch();
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (jobParam) setSelected(jobParam);
+  }, [jobParam]);
+
   const filtered = jobs.filter(
     (j) =>
       j.customerName.toLowerCase().includes(search.toLowerCase()) ||
       j.number.includes(search),
   );
   const job = jobs.find((j) => j.id === selected);
+
+  const itemsByColumn = STATUSES.reduce((acc, s) => {
+    acc[s] = filtered.filter((j) => j.status === s);
+    return acc;
+  }, {} as Record<JobStatus, Job[]>);
+
+  const closeSheet = () => {
+    setSelected(null);
+    if (jobParam) navigate({ to: "/jobs", search: {} });
+  };
 
   return (
     <div>
@@ -48,7 +78,25 @@ function JobsPage() {
               <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" strokeWidth={1.5} />
               <Input placeholder="Søg jobs…" value={search} onChange={(e) => setSearch(e.target.value)} className="h-9 w-56 pl-8" />
             </div>
-            <Button size="sm"><Plus className="h-4 w-4" strokeWidth={1.5} /> Nyt job</Button>
+            <CreateDialog
+              trigger={<Button size="sm"><Plus className="h-4 w-4" strokeWidth={1.5} /> Nyt job</Button>}
+              title="Opret nyt job"
+              fields={[
+                { name: "customerName", label: "Kunde", defaultValue: "Ny kunde" },
+                { name: "volumeM3", label: "Volumen (m³)", type: "number", defaultValue: 30 },
+                { name: "revenue", label: "Omsætning (DKK)", type: "number", defaultValue: 18000 },
+                { name: "startTime", label: "Starttid", defaultValue: "08:00" },
+              ]}
+              onSubmit={(v) => {
+                const j = createJob({
+                  customerName: v.customerName,
+                  volumeM3: Number(v.volumeM3) || 30,
+                  revenue: Number(v.revenue) || 18000,
+                  startTime: v.startTime || "08:00",
+                });
+                toast.success(`Job #${j.number} oprettet`);
+              }}
+            />
           </>
         }
       />
@@ -61,41 +109,35 @@ function JobsPage() {
           </TabsList>
 
           <TabsContent value="kanban" className="mt-4">
-            <div className="grid gap-3 lg:grid-cols-5">
-              {STATUSES.map((s) => {
-                const items = filtered.filter((j) => j.status === s);
-                return (
-                  <div key={s} className="kanban-column">
-                    <div className="kanban-column-header">
-                      <span className="text-[11px] font-semibold uppercase tracking-wide text-[#94A3B8]">{JOB_STATUS_LABELS[s]}</span>
-                      <Badge variant="secondary" className="h-5 px-1.5 text-[10px]">{items.length}</Badge>
-                    </div>
-                    <div className="kanban-cards">
-                      {items.slice(0, 8).map((j) => (
-                        <div key={j.id} onClick={() => setSelected(j.id)} className="kanban-card">
-                          <div className="flex items-center justify-between">
-                            <span className="font-mono text-[11px] text-muted-foreground">#{j.number}</span>
-                            <span className="text-[10px] text-muted-foreground tabular-nums">{j.startTime}</span>
-                          </div>
-                          <div className="mt-1 text-label">{j.customerName}</div>
-                          <div className="mt-0.5 text-caption text-muted-foreground">
-                            {j.origin.city} → {j.destination.city}
-                          </div>
-                          <div className="mt-2 flex items-center justify-between">
-                            <span className="text-caption tabular-nums">{j.volumeM3} m³</span>
-                            <span className="text-caption font-semibold tabular-nums">{dkk(j.revenue)}</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+            <KanbanBoard
+              className="grid gap-3 lg:grid-cols-5"
+              columns={STATUSES.map((s) => ({ id: s, label: JOB_STATUS_LABELS[s], items: itemsByColumn[s] }))}
+              itemsByColumn={itemsByColumn}
+              onMove={(id, to) => {
+                updateJobStatus(id, to);
+                toast.success(`Status: ${JOB_STATUS_LABELS[to]}`);
+              }}
+              renderCard={(j) => (
+                <div onClick={() => setSelected(j.id)} className="kanban-card">
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-[11px] text-muted-foreground">#{j.number}</span>
+                    <span className="text-[10px] text-muted-foreground tabular-nums">{j.startTime}</span>
                   </div>
-                );
-              })}
-            </div>
+                  <div className="mt-1 text-label">{j.customerName}</div>
+                  <div className="mt-0.5 text-caption text-muted-foreground">
+                    {j.origin.city} → {j.destination.city}
+                  </div>
+                  <div className="mt-2 flex items-center justify-between">
+                    <span className="text-caption tabular-nums">{j.volumeM3} m³</span>
+                    <span className="text-caption font-semibold tabular-nums">{dkk(j.revenue)}</span>
+                  </div>
+                </div>
+              )}
+            />
           </TabsContent>
 
           <TabsContent value="calendar" className="mt-4">
-            <Card className="p-5"><CalendarGrid /></Card>
+            <Card className="p-5"><CalendarGrid jobs={jobs} onJobClick={(id) => setSelected(id)} /></Card>
           </TabsContent>
 
           <TabsContent value="table" className="mt-4">
@@ -132,9 +174,16 @@ function JobsPage() {
                         </div>
                       </td>
                       <td className="px-4 py-2.5">
-                        <Badge variant="outline" className={cn("text-[10px]", JOB_STATUS_COLORS[j.status])}>
-                          {JOB_STATUS_LABELS[j.status]}
-                        </Badge>
+                        <StageSelect
+                          value={j.status}
+                          options={STATUSES}
+                          labels={JOB_STATUS_LABELS}
+                          colors={JOB_STATUS_COLORS}
+                          onChange={(next) => {
+                            updateJobStatus(j.id, next);
+                            toast.success(`#${j.number}: ${JOB_STATUS_LABELS[next]}`);
+                          }}
+                        />
                       </td>
                       <td className="px-4 py-2.5 text-right font-medium">{dkk(j.revenue)}</td>
                     </tr>
@@ -146,7 +195,7 @@ function JobsPage() {
         </Tabs>
       </div>
 
-      <Sheet open={!!selected} onOpenChange={(o) => !o && setSelected(null)}>
+      <Sheet open={!!selected} onOpenChange={(o) => !o && closeSheet()}>
         <SheetContent className="w-full sm:max-w-2xl overflow-y-auto">
           {job && <JobSheet job={job} />}
         </SheetContent>
@@ -248,7 +297,7 @@ function JobSheet({ job }: { job: Job }) {
             <Upload className="mx-auto h-8 w-8 text-muted-foreground" strokeWidth={1.5} />
             <div className="mt-2 text-sm font-medium">Træk fotos hertil eller klik for at uploade</div>
             <div className="mt-1 text-xs text-muted-foreground">JPG, PNG · Crew kan også uploade direkte fra mobilappen</div>
-            <Button size="sm" variant="outline" className="mt-3"><Camera className="h-4 w-4" strokeWidth={1.5} /> Vælg billeder</Button>
+            <Button size="sm" variant="outline" className="mt-3" onClick={() => toast.success("Vælg billeder")}><Camera className="h-4 w-4" strokeWidth={1.5} /> Vælg billeder</Button>
           </Card>
 
           {(["før", "efter"] as const).map((label) => {
@@ -325,7 +374,7 @@ function JobSheet({ job }: { job: Job }) {
   );
 }
 
-function CalendarGrid() {
+function CalendarGrid({ jobs, onJobClick }: { jobs: Job[]; onJobClick: (id: string) => void }) {
   const today = new Date();
   const year = today.getFullYear();
   const month = today.getMonth();
@@ -355,9 +404,9 @@ function CalendarGrid() {
                 <div className={cn("text-[11px] font-semibold", d === today.getDate() && "text-primary")}>{d}</div>
                 <div className="mt-1 space-y-0.5">
                   {dayJobs(d).slice(0, 2).map((j) => (
-                    <div key={j.id} className={cn("truncate rounded px-1 py-0.5 text-[10px]", JOB_STATUS_COLORS[j.status])}>
+                    <button key={j.id} onClick={() => onJobClick(j.id)} className={cn("block w-full truncate rounded px-1 py-0.5 text-left text-[10px] hover:opacity-80", JOB_STATUS_COLORS[j.status])}>
                       #{j.number} {j.customerName.split(" ")[0]}
-                    </div>
+                    </button>
                   ))}
                   {dayJobs(d).length > 2 && (
                     <div className="px-1 text-[10px] text-muted-foreground">+{dayJobs(d).length - 2}</div>
