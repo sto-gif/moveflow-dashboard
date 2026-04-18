@@ -112,27 +112,34 @@ function JobsPage() {
           <TabsContent value="kanban" className="mt-4">
             <KanbanBoard
               className="grid gap-3 lg:grid-cols-5"
-              columns={STATUSES.map((s) => ({ id: s, label: JOB_STATUS_LABELS[s], items: itemsByColumn[s] }))}
+              collapseAfter={10}
+              columns={STATUSES.map((s) => ({
+                id: s,
+                label: JOB_STATUS_LABELS[s],
+                items: itemsByColumn[s],
+                footer: dkk(itemsByColumn[s].reduce((sum, j) => sum + j.revenue, 0)),
+              }))}
               itemsByColumn={itemsByColumn}
               onMove={(id, to) => {
                 updateJobStatus(id, to);
                 toast.success(`Status: ${JOB_STATUS_LABELS[to]}`);
               }}
               renderCard={(j) => (
-                <div onClick={() => setSelected(j.id)} className="kanban-card">
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono text-[11px] text-muted-foreground">#{j.number}</span>
-                    <span className="text-[10px] text-muted-foreground tabular-nums">{j.startTime}</span>
+                <button type="button" onClick={() => setSelected(j.id)} className="kanban-card block w-full text-left">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="text-label leading-snug">{j.customerName}</div>
+                    <span className="font-mono text-[10px] text-muted-foreground shrink-0">#{j.number}</span>
                   </div>
-                  <div className="mt-1 text-label">{j.customerName}</div>
-                  <div className="mt-0.5 text-caption text-muted-foreground">
+                  <div className="mt-1 text-caption text-muted-foreground">
                     {j.origin.city} → {j.destination.city}
                   </div>
                   <div className="mt-2 flex items-center justify-between">
-                    <span className="text-caption tabular-nums">{j.volumeM3} m³</span>
                     <span className="text-caption font-semibold tabular-nums">{dkk(j.revenue)}</span>
+                    <Badge variant="outline" className="text-[10px] tabular-nums">
+                      {j.startTime} · {j.volumeM3} m³
+                    </Badge>
                   </div>
-                </div>
+                </button>
               )}
             />
           </TabsContent>
