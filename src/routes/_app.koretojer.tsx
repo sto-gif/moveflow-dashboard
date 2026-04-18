@@ -4,6 +4,7 @@ import { Plus, Truck, Wrench, CalendarDays } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { PageHeader } from "@/components/page-header";
 import { vehicles, vehicleAssignments, type VehicleStatus } from "@/mocks/vehicles";
 import { number } from "@/lib/format";
