@@ -91,7 +91,11 @@ function MaterialsPage() {
                     </thead>
                     <tbody>
                       {inventory.filter((i) => i.category === cat).map((i) => (
-                        <tr key={i.id} className={cn("border-t hover:bg-muted/40", i.inStorage < i.minStock && "bg-warning/5")}>
+                        <tr
+                          key={i.id}
+                          onClick={() => setSelectedId(i.id)}
+                          className={cn("cursor-pointer border-t hover:bg-muted/40 transition-colors", i.inStorage < i.minStock && "bg-warning/5")}
+                        >
                           <td className="px-4 py-2.5 font-medium">{i.name}</td>
                           <td className="px-4 py-2.5 text-right">{number(i.owned)}</td>
                           <td className="px-4 py-2.5 text-right font-semibold">{number(i.inStorage)}</td>
@@ -108,7 +112,7 @@ function MaterialsPage() {
               <Card className="p-5 h-fit">
                 <h3 className="mb-3 text-section">Bevægelser</h3>
                 <div className="space-y-3 text-sm">
-                  {inventoryLog.slice(0, 8).map((l) => {
+                  {allLogs.slice(0, 8).map((l) => {
                     const Icon = l.type === "ud" ? ArrowUpCircle : l.type === "ind" ? ArrowDownCircle : l.type === "indkoeb" ? ShoppingCart : XCircle;
                     const tone = l.type === "ud" ? "text-warning" : l.type === "ind" ? "text-success" : l.type === "indkoeb" ? "text-primary" : "text-destructive";
                     return (
