@@ -54,7 +54,8 @@ const MONTHS = ["jan", "feb", "mar", "apr", "maj", "jun", "jul", "aug", "sep", "
 
 function JobsPage() {
   const { jobs, createJob, updateJobStatus } = useMockStore();
-  const { job: jobParam } = Route.useSearch();
+  const searchParams = Route.useSearch();
+  const jobParam = searchParams.job;
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<string | null>(null);
@@ -63,11 +64,69 @@ function JobsPage() {
     if (jobParam) setSelected(jobParam);
   }, [jobParam]);
 
-  const filtered = jobs.filter(
-    (j) =>
-      j.customerName.toLowerCase().includes(search.toLowerCase()) ||
-      j.number.includes(search),
+  const filterValues: FilterValues = useMemo(
+    () => ({
+      status: searchParams.status,
+      crew: searchParams.crew,
+      vehicle: searchParams.vehicle,
+      month: searchParams.month,
+    }),
+    [searchParams.status, searchParams.crew, searchParams.vehicle, searchParams.month],
   );
+
+  const setFilters = (next: FilterValues) => {
+    navigate({
+      to: "/jobs",
+      search: {
+        job: jobParam,
+        status: next.status ?? [],
+        crew: next.crew ?? [],
+        vehicle: next.vehicle ?? [],
+        month: next.month ?? [],
+      },
+      replace: true,
+    });
+  };
+
+  const filterGroups: FilterGroup[] = useMemo(() => {
+    const statusC = new Map<string, number>();
+    const crewC = new Map<string, number>();
+    const monthC = new Map<string, number>();
+    const vehicleC = new Map<string, number>();
+    jobs.forEach((j) => {
+      statusC.set(j.status, (statusC.get(j.status) ?? 0) + 1);
+      j.crewIds.forEach((id) => crewC.set(id, (crewC.get(id) ?? 0) + 1));
+      const m = String(j.date.getMonth());
+      monthC.set(m, (monthC.get(m) ?? 0) + 1);
+      const v = j.vehicleId ? "yes" : "no";
+      vehicleC.set(v, (vehicleC.get(v) ?? 0) + 1);
+    });
+    return [
+      { key: "status", label: "Status", options: STATUSES.map((s) => ({ value: s, label: JOB_STATUS_LABELS[s], count: statusC.get(s) })) },
+      { key: "crew", label: "Crew-medlem", options: crew.map((c) => ({ value: c.id, label: c.name, count: crewC.get(c.id) })) },
+      { key: "vehicle", label: "Køretøj tildelt", options: [
+        { value: "yes", label: "Ja", count: vehicleC.get("yes") },
+        { value: "no", label: "Nej", count: vehicleC.get("no") },
+      ] },
+      { key: "month", label: "Måned", options: MONTHS.map((label, idx) => ({ value: String(idx), label, count: monthC.get(String(idx)) })).filter((o) => (o.count ?? 0) > 0) },
+    ];
+  }, [jobs]);
+
+  const filtered = useMemo(() => {
+    let list = jobs.filter(
+      (j) =>
+        j.customerName.toLowerCase().includes(search.toLowerCase()) ||
+        j.number.includes(search),
+    );
+    list = applyFilters(list, filterValues, {
+      status: (j) => j.status,
+      crew: (j) => j.crewIds,
+      vehicle: (j) => (j.vehicleId ? "yes" : "no"),
+      month: (j) => String(j.date.getMonth()),
+    });
+    return list;
+  }, [jobs, search, filterValues]);
+
   const job = jobs.find((j) => j.id === selected);
 
   const itemsByColumn = STATUSES.reduce((acc, s) => {
@@ -77,7 +136,7 @@ function JobsPage() {
 
   const closeSheet = () => {
     setSelected(null);
-    if (jobParam) navigate({ to: "/jobs", search: {} });
+    if (jobParam) navigate({ to: "/jobs", search: { ...searchParams, job: undefined } });
   };
 
   return (
