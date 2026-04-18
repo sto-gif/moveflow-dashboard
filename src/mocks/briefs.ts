@@ -1,5 +1,7 @@
-import { daysFromNow, randInt, pick } from "./_helpers";
+import { daysFromNow, randInt, pick, resetSeed } from "./_helpers";
 
+
+resetSeed(1000);
 export type BriefStatus = "udkast" | "sendt" | "afsluttet";
 export type BriefScope = "dag" | "uge" | "måned";
 

@@ -1,7 +1,9 @@
 import { customers } from "./customers";
 import { crew } from "./crew";
-import { pick, randInt, daysFromNow, randomAddress, MOCK_TODAY } from "./_helpers";
+import { pick, randInt, daysFromNow, randomAddress, MOCK_TODAY, resetSeed } from "./_helpers";
 
+
+resetSeed(1388);
 export type JobStatus = "planlagt" | "bekraeftet" | "i_gang" | "afsluttet" | "annulleret";
 
 export const JOB_STATUS_LABELS: Record<JobStatus, string> = {

@@ -1,5 +1,7 @@
-import { fullName, phone, email, randomAddress, pick, randInt, daysFromNow, DANISH_LAST_NAMES, randFloat } from "./_helpers";
+import { fullName, phone, email, randomAddress, pick, randInt, daysFromNow, DANISH_LAST_NAMES, randFloat, resetSeed } from "./_helpers";
 
+
+resetSeed(1194);
 export type LeadSource = "Hjemmeside" | "Anbefaling" | "Google" | "Facebook" | "Trustpilot" | "Telefonopkald";
 export type CustomerStage = "booket" | "i_gang" | "afsluttet";
 export type CustomerType = "privat" | "erhverv";

@@ -1,6 +1,8 @@
 import { customers } from "./customers";
-import { pick, randInt, daysFromNow } from "./_helpers";
+import { pick, randInt, daysFromNow, resetSeed } from "./_helpers";
 
+
+resetSeed(1873);
 export type QuoteStatus = "udkast" | "sendt" | "accepteret" | "udløbet" | "afvist";
 export type PricingModel = "kvm" | "time" | "manuel";
 

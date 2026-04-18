@@ -1,3 +1,6 @@
+import { resetSeed } from "./_helpers";
+resetSeed(1679);
+
 export type NotificationType = "alert" | "info" | "warning" | "success";
 
 export interface Notification {

@@ -1,5 +1,7 @@
-import { fullName, phone, pick, randInt, daysFromNow } from "./_helpers";
+import { fullName, phone, pick, randInt, daysFromNow, resetSeed } from "./_helpers";
 
+
+resetSeed(1097);
 export type CrewRole = "Chauffør" | "Flyttemand" | "Holdleder" | "Pakker" | "Lærling";
 export type CrewStatus = "aktiv" | "ferie" | "syg";
 

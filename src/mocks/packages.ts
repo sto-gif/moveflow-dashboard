@@ -1,3 +1,6 @@
+import { resetSeed } from "./_helpers";
+resetSeed(1776);
+
 export interface MovingPackage {
   id: string;
   name: string;
