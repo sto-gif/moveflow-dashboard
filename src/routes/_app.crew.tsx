@@ -1,15 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Plus, Phone, Calendar as CalIcon, Car, Sparkles, X, Check } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PageHeader } from "@/components/page-header";
 import { crew, sickCrewToday } from "@/mocks/crew";
 import { dkk } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { MOCK_TODAY } from "@/mocks/_helpers";
 
 export const Route = createFileRoute("/_app/crew")({
   head: () => ({
