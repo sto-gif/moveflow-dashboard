@@ -203,6 +203,59 @@ function LeadDetailPage() {
             </Card>
           </TabsContent>
 
+          <TabsContent value="activity" className="mt-4">
+            <Card className="space-y-3 p-4">
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <Select value={actType} onValueChange={(v) => setActType(v as typeof actType)}>
+                  <SelectTrigger className="w-full sm:w-40"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="opkald">📞 Opkald</SelectItem>
+                    <SelectItem value="moede">🤝 Møde</SelectItem>
+                    <SelectItem value="email">✉️ E-mail</SelectItem>
+                    <SelectItem value="sms">💬 SMS</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Input
+                  placeholder="Beskriv aktiviteten…"
+                  value={actNote}
+                  onChange={(e) => setActNote(e.target.value)}
+                  className="flex-1"
+                />
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    if (!actNote.trim()) return;
+                    setActivities((a) => [{ id: `a${a.length + 1}`, type: actType, note: actNote, at: new Date() }, ...a]);
+                    setActNote("");
+                    toast.success("Aktivitet logget");
+                  }}
+                  disabled={!actNote.trim()}
+                >
+                  <Plus className="h-4 w-4" strokeWidth={1.5} /> Log
+                </Button>
+              </div>
+              {activities.length === 0 ? (
+                <div className="rounded-md border border-dashed bg-muted/20 p-6 text-center text-body-sm text-muted-foreground">
+                  Ingen aktiviteter logget endnu. Tilføj opkald, møder, e-mails eller SMS ovenfor.
+                </div>
+              ) : (
+                <ol className="space-y-2 pt-2">
+                  {activities.map((a) => (
+                    <li key={a.id} className="flex items-start gap-3 border-l-2 border-primary/40 pl-3">
+                      <Badge variant="outline" className="text-[10px] capitalize">{a.type}</Badge>
+                      <div className="flex-1">
+                        <div className="text-body-sm">{a.note}</div>
+                        <div className="text-caption text-muted-foreground">
+                          {a.at.toLocaleString("da-DK", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}
+                        </div>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              )}
+            </Card>
+          </TabsContent>
+
           <TabsContent value="quotes" className="mt-4">
             <Card className="overflow-x-auto">
               {leadQuotes.length === 0 ? (
