@@ -327,6 +327,33 @@ function JobSheet({ job }: { job: Job }) {
             </Card>
           </div>
           <Card className="p-3">
+            <div className="mb-2 flex items-center gap-2">
+              <Truck className="h-4 w-4 text-primary" strokeWidth={1.5} />
+              <div className="text-xs font-semibold uppercase text-muted-foreground">Køretøj</div>
+            </div>
+            <Select
+              value={job.vehicleId ?? "none"}
+              onValueChange={(v) => updateJob(job.id, { vehicleId: v === "none" ? undefined : v })}
+            >
+              <SelectTrigger className="h-9 text-sm"><SelectValue placeholder="Vælg køretøj" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">Ingen tildelt</SelectItem>
+                {vehicles.map((v) => (
+                  <SelectItem key={v.id} value={v.id}>
+                    {v.name} · {v.plate} · {v.capacityM3} m³
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {vehicle && (
+              <div className="mt-2 grid grid-cols-3 gap-2 text-center text-[11px]">
+                <div><div className="text-muted-foreground">Nummerplade</div><div className="font-mono font-semibold">{vehicle.plate}</div></div>
+                <div><div className="text-muted-foreground">Kapacitet</div><div className="font-semibold">{vehicle.capacityM3} m³</div></div>
+                <div><div className="text-muted-foreground">Chauffør</div><div className="font-semibold">{vehicle.driverName ?? "—"}</div></div>
+              </div>
+            )}
+          </Card>
+          <Card className="p-3">
             <div className="grid grid-cols-3 gap-3 text-center">
               <div>
                 <div className="text-xs text-muted-foreground">Dato</div>
