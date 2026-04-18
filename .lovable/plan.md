@@ -1,60 +1,52 @@
 
-# Movena — Design Polish Pass
+# Movena — Detail Pages, Kanban Polish & Vagtplan Calendar
 
-Global polish across typography, color, spacing, tables, micro-interactions, and sidebar. Token-driven so changes propagate everywhere.
+## 1. Kanban polish (global, single source of truth)
+Add reusable utilities in `src/styles.css`:
+- `.kanban-column` → `bg-[#F8FAFC] rounded-lg p-3` 
+- `.kanban-column-header` → `pb-3 mb-3 border-b border-border flex items-center justify-between`
+- `.kanban-card` → `bg-white border border-[#E2E8F0] rounded-md p-3 transition-shadow duration-150 hover:shadow-sm cursor-pointer`
+- `.kanban-cards` → `flex flex-col gap-3` (12px)
 
-## 1. Typography tokens (`src/styles.css`)
-Update existing utilities to spec:
-- `.text-page-title` → 24px / weight 600 (was 700)
-- `.text-section` → 18px / 600
-- `.text-label` → 14px / 500 (was 600)
-- `.text-body` → 14px / 400
-- `.text-body-sm` → 13px / 400
-- `.text-caption` → 12px / 500
-Add global rule: `table { font-variant-numeric: tabular-nums; }` plus `.tabular` utility.
+Apply across `_app.jobs.tsx`, `_app.leads.tsx`, `_app.customers.tsx` kanban renderers — replace ad-hoc card classes with these utilities.
 
-## 2. Color restraint
-- Audit `_app.index.tsx`, KPI cards, charts, and badges for decorative blue/teal/orange usage. Strip color from anything that isn't a CTA, link, active state, or status.
-- Centralize status badge styles in `src/components/ui/badge.tsx` — add `success | warning | error | neutral` variants with the muted pill palette (light bg + dark text). Replace ad-hoc `bg-green-*`, `bg-yellow-*`, etc. across pages with these variants.
-- Orange accent retained only on dashboard stat callout icons per brand rules.
+## 2. Lead detail — full page (`/leads/$leadId`)
+- New route `src/routes/_app.leads.$leadId.tsx`. Header (back link, name, type/status/source badges, "Send tilbud" + "Konverter til kunde" buttons), contact card, quote info card.
+- Tabs: **Timeline | Tilbud | Noter**.
+  - Timeline: derive mock activity feed from lead (`createdAt`, stage transitions, generated contact/quote/sms entries) — icon + date + description.
+  - Tilbud: filter `quotes` mock by matching customer name/lead id (best-effort) → list with status badge + amount + link.
+  - Noter: textarea + list of mock notes (in-memory `useState`).
+- `_app.leads.tsx`: rows/kanban cards become `<Link to="/leads/$leadId">`. Remove existing inline drawer if present.
 
-## 3. Spacing
-- `PageHeader` keeps existing rhythm; bump page wrapper to `space-y-8` (32px) between sections in all routes.
-- Cards: enforce `p-4` (16px) minimum via `card.tsx` defaults; grids use `gap-6` (24px).
+## 3. Customer detail — full page (`/customers/$customerId`)
+- New route `src/routes/_app.customers.$customerId.tsx`. Header (back, name, type badge, CVR if erhverv, lifetime value, back arrow), contact card, stats row (total value, # moves, source, first move date).
+- Tabs: **Flytninger | Tilbud | Kommunikation | Lager | Noter**.
+  - Flytninger: table of jobs filtered by `job.customerId === customer.id` (job#, date, from→to, volume, crew, status, price) — rows link to jobs page (anchor by id).
+  - Tilbud: filtered quotes table.
+  - Kommunikation: chronological SMS/email mock list.
+  - Lager: filter `storage` mock by customer.
+  - Noter: notes textarea (local state).
+- `_app.customers.tsx`: rows/kanban cards link to `/customers/$customerId`.
+- Hydration fix: customer table description (`986.000 kr. … 13 nye`) is recomputed from random mock — pin via `MOCK_TODAY` or memoized seed so SSR/client match. Same sweep for leads description string causing the current hydration warning.
 
-## 4. Tables (global via `ui/table.tsx`)
-- `TableRow`: `h-12` (48px), `hover:bg-[#F8FAFC]`, 100ms transition.
-- `TableHead` / `TableCell`: add `data-numeric` support → `text-right tabular-nums`. Provide a `numeric` className convention used in route tables.
-- `TableCell` default text uses `text-[#475569]`; add `.cell-primary` helper for `font-medium text-[#0F172A]`.
-- Update tables in `_app.jobs.tsx`, `_app.leads.tsx`, `_app.customers.tsx`, `_app.lager.tsx`, `_app.koretojer.tsx`, `_app.crew.tsx`, `_app.inventory.tsx`, `_app.quotes.tsx`, `_app.brief.tsx` to right-align numeric/price/hours/qty cells and use new badge variants.
+## 4. Vagtplan calendar (`_app.crew.tsx`)
+Restructure Kalender tab:
+- Sub-tabs: **Kalender | Oversigt** (rename existing grid to "Oversigt").
+- Kalender: month/week/day view (reuse Jobs `CalendarGrid` pattern) where each day cell lists employees scheduled and their job IDs. Color dots per employee.
+- Add **employee filter** `<Select>` above the calendar: "Alle medarbejdere" or single member → filters cells to that person and shows total hours for the period.
+- Keep existing Dag/Uge/Måned range toggle.
 
-## 5. Dashboard hierarchy (`_app.index.tsx`)
-- Split KPI grid: top row = 2–3 hero KPIs (Omsætning MTD, Aktive jobs, evt. Jobs i dag) at `text-3xl` numbers, larger card padding.
-- Secondary row = smaller cards (Konvertering, Snit pr. job, Crew-udnyttelse) with `text-xl` numbers.
-- Add 1-line insight `<p className="text-caption text-muted-foreground">` under each chart with mock copy ("Omsætning er steget 18 % vs. sidste måned", "3 jobs mangler crew-tildeling", etc.).
+## 5. Consistent kanban tab labels
+- `_app.leads.tsx`: tabs `Kanban | Tabel` (already done — verify spacing matches Jobs).
+- `_app.customers.tsx`: rename tabs to `Pipeline | Tabel` (Pipeline = kanban view, since customer stages differ).
+- `_app.jobs.tsx`: keep `Kanban | Kalender | Tabel`.
+All three use identical `<Tabs>` styling/position directly under PageHeader.
 
-## 6. Micro-interactions
-- `card.tsx`: add `transition-shadow duration-150 hover:shadow-sm hover:-translate-y-0.5` (only when interactive — gate via prop or new `.card-interactive` utility used on KPI/list cards).
-- `button.tsx`: add `active:scale-[0.98] transition-transform duration-75`.
-- `__root.tsx` route outlet: wrap children in a `key`-based fade (`animate-fade-in`, 150ms).
-- Sidebar items already animate; tighten to 100ms.
-
-## 7. Loading & empty states
-- Add `src/components/empty-state.tsx` (icon + title + helper + CTA) and use in tables/kanban that can be empty (Leads when filter empties, Brief list, Lager, Materialer udlån). Mock data is rich so most show content; component still wired for filtered-empty cases.
-- Add `src/components/table-skeleton.tsx` (rows of `Skeleton`) — used for any route with future async, ready to drop in (no current loaders, but available).
-
-## 8. Sidebar polish (`app-sidebar.tsx` + `ui/sidebar.tsx`)
-- Active item: 3px left border `#1D4ED8`, bg `#EFF6FF`, text `#1D4ED8`, weight 500.
-- Hover: bg `#F1F5F9`, 100ms.
-- Group label: `text-[11px] uppercase tracking-wide font-semibold text-[#94A3B8] mb-2`.
-- Confirm tight vertical density (existing compact spacing kept).
-
-## 9. Hydration fix (quietly)
-`_app.index.tsx` derives "jobs i dag" from `new Date()` causing SSR/client mismatch. Pin "today" to a fixed mock date constant (e.g., `MOCK_TODAY` from `mocks/_helpers.ts`) so server and client agree.
-
-## Files modified
-`styles.css`, `components/ui/{badge,button,card,table,sidebar}.tsx`, `components/app-sidebar.tsx`, `components/page-header.tsx`, `routes/__root.tsx`, all route files listed above for table/badge sweeps, `routes/_app.index.tsx` for KPI hierarchy + insights + hydration fix. New: `components/empty-state.tsx`, `components/table-skeleton.tsx`.
+## Files
+**Create**: `src/routes/_app.leads.$leadId.tsx`, `src/routes/_app.customers.$customerId.tsx`.
+**Modify**: `src/styles.css`, `_app.jobs.tsx`, `_app.leads.tsx`, `_app.customers.tsx`, `_app.crew.tsx`. Touch `mocks/_helpers.ts` only if needed for deterministic counts.
 
 ## Out of scope
-- Real loading states (no async data exists).
-- Reworking chart palettes beyond removing decorative color (keeps recharts defaults constrained to neutral + single blue).
+- Real notes persistence (in-memory only).
+- Drag-and-drop on kanban.
+- Editing lead/customer fields from detail page (read-only with action buttons stubbed).
