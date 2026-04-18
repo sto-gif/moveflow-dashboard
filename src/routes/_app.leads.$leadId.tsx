@@ -118,31 +118,57 @@ function LeadDetailPage() {
           <Card className="p-4">
             <div className="text-caption uppercase text-muted-foreground">Kontakt</div>
             <div className="mt-3 space-y-2 text-body">
-              <div className="flex items-center gap-2"><Mail className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} /> {lead.email}</div>
-              <div className="flex items-center gap-2"><Phone className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} /> {lead.phone}</div>
-              <div className="flex items-center gap-2"><MapPin className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} /> {lead.city}</div>
-              <div className="flex items-center gap-2"><Calendar className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} /> Flyttedato {lead.moveDate.toLocaleDateString("da-DK")}</div>
+              <label className="flex items-center gap-2">
+                <Mail className="h-4 w-4 shrink-0 text-muted-foreground" strokeWidth={1.5} />
+                <Input value={lead.email} onChange={(e) => updateLead(lead.id, { email: e.target.value })} className="h-8 text-sm" />
+              </label>
+              <label className="flex items-center gap-2">
+                <Phone className="h-4 w-4 shrink-0 text-muted-foreground" strokeWidth={1.5} />
+                <Input value={lead.phone} onChange={(e) => updateLead(lead.id, { phone: e.target.value })} className="h-8 text-sm" />
+              </label>
+              <label className="flex items-center gap-2">
+                <MapPin className="h-4 w-4 shrink-0 text-muted-foreground" strokeWidth={1.5} />
+                <Input value={lead.city} onChange={(e) => updateLead(lead.id, { city: e.target.value })} className="h-8 text-sm" />
+              </label>
+              <label className="flex items-center gap-2">
+                <Calendar className="h-4 w-4 shrink-0 text-muted-foreground" strokeWidth={1.5} />
+                <Input
+                  type="date"
+                  value={lead.moveDate.toISOString().slice(0, 10)}
+                  onChange={(e) => {
+                    const d = new Date(e.target.value);
+                    if (!isNaN(d.getTime())) updateLead(lead.id, { moveDate: d });
+                  }}
+                  className="h-8 text-sm"
+                />
+              </label>
             </div>
           </Card>
 
           <Card className="p-4">
             <div className="text-caption uppercase text-muted-foreground">Tilbud</div>
             <div className="mt-3 grid grid-cols-2 gap-4">
-              <div>
-                <div className="text-caption text-muted-foreground">Estimeret værdi</div>
-                <div className="text-section tabular-nums">{dkk(lead.estimatedValue)}</div>
-              </div>
-              <div>
-                <div className="text-caption text-muted-foreground">Ejer</div>
-                <div className="text-label">{lead.owner}</div>
-              </div>
+              <label className="space-y-1">
+                <span className="text-caption text-muted-foreground">Estimeret værdi (DKK)</span>
+                <Input
+                  type="number"
+                  min={0}
+                  value={lead.estimatedValue}
+                  onChange={(e) => updateLead(lead.id, { estimatedValue: Number(e.target.value) || 0 })}
+                  className="h-9 text-section tabular-nums"
+                />
+              </label>
+              <label className="space-y-1">
+                <span className="text-caption text-muted-foreground">Ejer</span>
+                <Input value={lead.owner} onChange={(e) => updateLead(lead.id, { owner: e.target.value })} className="h-9 text-sm" />
+              </label>
               <div>
                 <div className="text-caption text-muted-foreground">Oprettet</div>
-                <div className="text-label">{lead.createdAt.toLocaleDateString("da-DK")}</div>
+                <div className="text-label py-2">{lead.createdAt.toLocaleDateString("da-DK")}</div>
               </div>
               <div>
                 <div className="text-caption text-muted-foreground">Kilde</div>
-                <div className="text-label">{lead.source}</div>
+                <div className="text-label py-2">{lead.source}</div>
               </div>
             </div>
           </Card>
@@ -151,6 +177,7 @@ function LeadDetailPage() {
         <Tabs defaultValue="timeline">
           <TabsList>
             <TabsTrigger value="timeline"><Clock className="mr-1 h-3.5 w-3.5" strokeWidth={1.5} /> Timeline</TabsTrigger>
+            <TabsTrigger value="activity"><Activity className="mr-1 h-3.5 w-3.5" strokeWidth={1.5} /> Aktivitet ({activities.length})</TabsTrigger>
             <TabsTrigger value="quotes"><FileText className="mr-1 h-3.5 w-3.5" strokeWidth={1.5} /> Tilbud ({leadQuotes.length})</TabsTrigger>
             <TabsTrigger value="notes"><MessageSquare className="mr-1 h-3.5 w-3.5" strokeWidth={1.5} /> Noter ({notes.length})</TabsTrigger>
           </TabsList>
