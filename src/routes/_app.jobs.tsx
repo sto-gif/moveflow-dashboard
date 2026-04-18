@@ -150,6 +150,7 @@ function JobsPage() {
               <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" strokeWidth={1.5} />
               <Input placeholder="Søg jobs…" value={search} onChange={(e) => setSearch(e.target.value)} className="h-9 w-56 pl-8" />
             </div>
+            <FilterBar filters={filterGroups} value={filterValues} onChange={setFilters} />
             <CreateDialog
               trigger={<Button size="sm"><Plus className="h-4 w-4" strokeWidth={1.5} /> Nyt job</Button>}
               title="Opret nyt job"
@@ -173,6 +174,7 @@ function JobsPage() {
         }
       />
       <div className="p-6">
+        <FilterChips filters={filterGroups} value={filterValues} onChange={setFilters} />
         <Tabs defaultValue="kanban">
           <TabsList>
             <TabsTrigger value="kanban"><LayoutGrid className="mr-1.5 h-3.5 w-3.5" strokeWidth={1.5} /> Kanban</TabsTrigger>
