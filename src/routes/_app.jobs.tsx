@@ -1,8 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { zodValidator, fallback } from "@tanstack/zod-adapter";
-import { z } from "zod";
 import { Plus, Search, Image as ImageIcon, Upload, Camera, Building2, User, Mail, Phone } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -22,12 +20,10 @@ import { CreateDialog } from "@/components/create-dialog";
 import { KanbanBoard } from "@/components/kanban-board";
 import { StageSelect } from "@/components/stage-select";
 
-const searchSchema = z.object({
-  job: fallback(z.string().optional(), undefined),
-});
-
 export const Route = createFileRoute("/_app/jobs")({
-  validateSearch: zodValidator(searchSchema),
+  validateSearch: (s: Record<string, unknown>): { job?: string } => ({
+    job: typeof s.job === "string" ? s.job : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Jobs — Movena" },
