@@ -175,8 +175,8 @@ function DashboardPage() {
 
         {/* Today + Alerts row */}
         <div className="grid gap-4 lg:grid-cols-3">
-          <Card className="lg:col-span-2 p-5">
-            <div className="mb-3 flex items-center justify-between">
+          <Card className="lg:col-span-2 p-7">
+            <div className="mb-4 flex items-center justify-between">
               <h3 className="text-sm font-semibold">Dagens jobs</h3>
               <Button asChild size="sm" variant="ghost"><Link to="/jobs">Se alle</Link></Button>
             </div>
@@ -184,12 +184,12 @@ function DashboardPage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b text-left text-xs uppercase tracking-wide text-muted-foreground">
-                    <th className="pb-2 font-medium">Tid</th>
-                    <th className="pb-2 font-medium">Job</th>
-                    <th className="pb-2 font-medium">Kunde</th>
-                    <th className="pb-2 font-medium">Crew</th>
-                    <th className="pb-2 font-medium">Status</th>
-                    <th className="pb-2 text-right font-medium">Værdi</th>
+                    <th className="pb-3 font-medium">Tid</th>
+                    <th className="pb-3 font-medium">Job</th>
+                    <th className="pb-3 font-medium">Kunde</th>
+                    <th className="pb-3 font-medium">Crew</th>
+                    <th className="pb-3 font-medium">Status</th>
+                    <th className="pb-3 text-right font-medium">Værdi</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -199,10 +199,10 @@ function DashboardPage() {
                       className="cursor-pointer border-b last:border-0 hover:bg-muted/40"
                       onClick={() => navigate({ to: "/jobs", search: { job: j.id } })}
                     >
-                      <td className="py-2.5 font-mono text-xs">{j.startTime}</td>
-                      <td className="py-2.5 font-medium">#{j.number}</td>
-                      <td className="py-2.5">{j.customerName}</td>
-                      <td className="py-2.5">
+                      <td className="py-4 font-mono text-xs">{j.startTime}</td>
+                      <td className="py-4 font-medium">#{j.number}</td>
+                      <td className="py-4">{j.customerName}</td>
+                      <td className="py-4">
                         <div className="flex -space-x-2">
                           {j.crewIds.slice(0, 3).map((id) => {
                             const m = crew.find((c) => c.id === id);
@@ -225,12 +225,12 @@ function DashboardPage() {
                           )}
                         </div>
                       </td>
-                      <td className="py-3">
+                      <td className="py-4">
                         <Badge variant={JOB_STATUS_BADGE[j.status]}>
                           {JOB_STATUS_LABELS[j.status]}
                         </Badge>
                       </td>
-                      <td className="py-3 text-right font-medium tabular-nums text-[#0F172A]">{dkk(j.revenue)}</td>
+                      <td className="py-4 text-right font-medium tabular-nums text-[#0F172A]">{dkk(j.revenue)}</td>
                     </tr>
                   ))}
                 </tbody>
