@@ -33,6 +33,7 @@ interface Ctx {
   // customers
   createCustomer: (input: { name: string; email: string; phone: string; type: CustomerType }) => Customer;
   updateCustomerStage: (id: string, stage: CustomerStage) => void;
+  updateCustomer: (id: string, patch: Partial<Customer>) => void;
   // jobs
   createJob: (input: { customerName: string; volumeM3: number; revenue: number; startTime: string }) => Job;
   updateJobStatus: (id: string, status: JobStatus) => void;
