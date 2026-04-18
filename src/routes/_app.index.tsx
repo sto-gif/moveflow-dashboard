@@ -2,7 +2,9 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import {
   TrendingUp, TrendingDown, Briefcase, Users, Wallet, Activity,
-  AlertTriangle, Clock, CheckCircle2,
+  AlertTriangle, Clock, CheckCircle2, FileText, UserPlus, Truck, Package,
+  Star, MessageSquare, Send, Receipt, Wrench, Warehouse, Mail, ArrowRight,
+  UserCheck, XCircle, Building2,
 } from "lucide-react";
 import { CreateDialog } from "@/components/create-dialog";
 import { useMockStore } from "@/store/mock-store";
