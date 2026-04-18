@@ -252,22 +252,37 @@ function DashboardPage() {
 
         {/* Activity feed */}
         <Card className="p-5">
-          <h3 className="mb-3 text-sm font-semibold">Seneste aktivitet</h3>
-          <div className="space-y-3 text-sm">
+          <div className="mb-3 flex items-center justify-between">
+            <h3 className="text-sm font-semibold">Seneste aktivitet</h3>
+            <Badge variant="secondary" className="text-[10px]">Live</Badge>
+          </div>
+          <div className="max-h-[360px] space-y-3 overflow-y-auto pr-2 text-sm">
             {[
-              "Anne Pedersen accepterede tilbud Q-3015 (24.500 DKK)",
-              "Mette Sørensen anmodede om fri 24. apr",
-              "Job #145 oprettet — København → Aarhus, 65 m³",
-              "Ny anmeldelse på Trustpilot fra Emilie Jensen (5★)",
-              "Crew-tildeling ændret på job #142 (Anders → Mikkel)",
-              "Nyt lead modtaget fra hjemmesiden — Søren Christensen",
-            ].map((t, i) => (
+              { t: "Anne Pedersen accepterede tilbud Q-3015 (24.500 DKK)", time: "5 min" },
+              { t: "Mette Sørensen anmodede om fri 24. apr", time: "32 min" },
+              { t: "Job #145 oprettet — København → Aarhus, 65 m³", time: "1 t" },
+              { t: "Ny anmeldelse på Trustpilot fra Emilie Jensen (5★)", time: "2 t" },
+              { t: "Crew-tildeling ændret på job #142 (Anders → Mikkel)", time: "3 t" },
+              { t: "Nyt lead modtaget fra hjemmesiden — Søren Christensen", time: "4 t" },
+              { t: "Tilbud Q-3014 sendt til Lars Holm (18.200 DKK)", time: "5 t" },
+              { t: "Job #141 markeret som afsluttet — Frederiksberg", time: "6 t" },
+              { t: "Faktura F-2204 betalt af Nordisk Logistik ApS", time: "7 t" },
+              { t: "Køretøj BIL-04 sendt til service", time: "8 t" },
+              { t: "Lager-enhed L-12 udlejet til Camilla Berg", time: "9 t" },
+              { t: "Daglig brief sendt til 7 crew-medlemmer", time: "10 t" },
+              { t: "Lead L-5018 flyttet til Forhandling", time: "12 t" },
+              { t: "Ny besked fra Peter Madsen om flytning 2. maj", time: "14 t" },
+              { t: "Tilbud Q-3013 udløb — påmindelse sendt", time: "16 t" },
+              { t: "Crew-medlem Kasper J. tilføjet til job #144", time: "18 t" },
+              { t: "Pakkeordre på 30 flyttekasser leveret", time: "1 d" },
+              { t: "Job #140 fik 5★ anmeldelse fra kunde", time: "1 d" },
+              { t: "Ny kunde oprettet: Bredgade Erhverv ApS", time: "1 d" },
+              { t: "Lead L-5012 markeret som tabt — for dyrt", time: "2 d" },
+            ].map((a, i) => (
               <div key={i} className="flex items-start gap-3 border-b pb-3 last:border-0 last:pb-0">
                 <div className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                <div className="flex-1">{t}</div>
-                <div className="text-xs text-muted-foreground">
-                  {i === 0 ? "5 min" : i === 1 ? "32 min" : `${i + 1} t`}
-                </div>
+                <div className="flex-1">{a.t}</div>
+                <div className="shrink-0 text-xs text-muted-foreground">{a.time}</div>
               </div>
             ))}
           </div>
