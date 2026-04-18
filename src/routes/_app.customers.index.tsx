@@ -111,7 +111,7 @@ function CustomersPage() {
 
         <Tabs defaultValue="pipeline">
           <TabsList>
-            <TabsTrigger value="pipeline"><LayoutGrid className="mr-1.5 h-3.5 w-3.5" strokeWidth={1.5} /> Pipeline</TabsTrigger>
+            <TabsTrigger value="pipeline"><LayoutGrid className="mr-1.5 h-3.5 w-3.5" strokeWidth={1.5} /> Kanban</TabsTrigger>
             <TabsTrigger value="table"><TableIcon className="mr-1.5 h-3.5 w-3.5" strokeWidth={1.5} /> Tabel</TabsTrigger>
           </TabsList>
 
