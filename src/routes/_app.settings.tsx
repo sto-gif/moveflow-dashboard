@@ -33,13 +33,13 @@ const TEAM = [
   { name: "Kasper Jensen", email: "kasper@movena.dk", role: "Bogholder" },
 ];
 
-const ONBOARDING = [
-  { task: "Opret virksomhedsprofil", done: true },
-  { task: "Tilføj første medarbejder", done: true },
-  { task: "Opret første tilbud", done: true },
-  { task: "Konfigurer email-skabeloner", done: false },
-  { task: "Tilslut Stripe til betalinger", done: false },
-  { task: "Importér eksisterende kunder", done: false },
+const ONBOARDING: { task: string; done: boolean; section?: string }[] = [
+  { task: "Opret virksomhedsprofil", done: true, section: "company" },
+  { task: "Tilføj første medarbejder", done: true, section: "team" },
+  { task: "Opret første tilbud", done: true, section: "quoteform" },
+  { task: "Konfigurer email-skabeloner", done: false, section: "quoteform" },
+  { task: "Tilslut Stripe til betalinger", done: false, section: "integ" },
+  { task: "Importér eksisterende kunder", done: false, section: "integ" },
 ];
 
 const PLANS = [
@@ -218,7 +218,7 @@ function SettingsPage() {
                 ["Forfaldne fakturaer", true],
                 ["Crew-friønsker", true],
                 ["Lager under minimum", true],
-                ["Daglig morgensummering", false],
+                ["Daglig morgensummering", true],
                 ["Ugentlig rapport", true],
               ].map(([label, on]) => (
                 <div key={String(label)} className="flex items-center justify-between border-b pb-3 last:border-0 last:pb-0">
@@ -231,11 +231,13 @@ function SettingsPage() {
 
           <TabsContent value="integ" className="mt-4 grid gap-3 md:grid-cols-2">
             {[
-              { name: "Stripe", desc: "Modtag online betalinger", connected: false },
-              { name: "Economic", desc: "Synkronisér fakturaer og bogføring", connected: true },
+              { name: "MobilePay", desc: "Modtag betalinger via MobilePay (DK)", connected: false },
+              { name: "Dinero", desc: "Dansk regnskabssystem — synk fakturaer", connected: true },
+              { name: "Fortnox", desc: "Nordisk regnskabssystem — for SE/NO ekspansion", connected: false },
+              { name: "Stripe", desc: "Modtag online betalinger med kort", connected: false },
+              { name: "e-conomic", desc: "Synkronisér fakturaer og bogføring", connected: true },
               { name: "Google Calendar", desc: "Synkronisér jobs til kalender", connected: false },
               { name: "Twilio", desc: "Send SMS til kunder", connected: true },
-              { name: "Mailchimp", desc: "Email-marketing", connected: false },
               { name: "Trustpilot", desc: "Hent anmeldelser automatisk", connected: true },
             ].map((i) => (
               <Card key={i.name} className="p-4">
@@ -258,12 +260,18 @@ function SettingsPage() {
               <p className="mt-1 text-sm text-muted-foreground">{ONBOARDING.filter((o) => o.done).length} af {ONBOARDING.length} trin gennemført</p>
               <div className="mt-4 space-y-2">
                 {ONBOARDING.map((o) => (
-                  <div key={o.task} className="flex items-center gap-3 rounded-md border p-3">
+                  <button
+                    key={o.task}
+                    type="button"
+                    onClick={() => o.section && setActive(o.section)}
+                    className="flex w-full items-center gap-3 rounded-md border p-3 text-left transition-colors hover:bg-muted/40"
+                  >
                     <div className={`flex h-5 w-5 items-center justify-center rounded-full ${o.done ? "bg-success text-white" : "border-2 border-muted-foreground/40"}`}>
                       {o.done && <Check className="h-3 w-3" strokeWidth={2} />}
                     </div>
-                    <span className={`text-sm ${o.done ? "line-through text-muted-foreground" : "font-medium"}`}>{o.task}</span>
-                  </div>
+                    <span className={`flex-1 text-sm ${o.done ? "line-through text-muted-foreground" : "font-medium"}`}>{o.task}</span>
+                    {!o.done && <span className="text-xs text-primary">Åbn →</span>}
+                  </button>
                 ))}
               </div>
             </Card>

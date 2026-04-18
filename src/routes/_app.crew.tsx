@@ -132,9 +132,9 @@ function CrewPage() {
           <h3 className="mb-3 text-section">Friønsker</h3>
           <div className="space-y-2 text-sm">
             {[
-              { name: "Mette Sørensen", date: "24. apr 2025", reason: "Privat", status: "Afventer" },
-              { name: "Mikkel Pedersen", date: "1.–7. maj 2025", reason: "Ferie", status: "Godkendt" },
-              { name: "Ida Larsen", date: "12. apr 2025", reason: "Læge", status: "Godkendt" },
+              { name: "Mette Sørensen", date: "24. apr 2026", reason: "Privat", status: "Afventer" },
+              { name: "Mikkel Pedersen", date: "1.–7. maj 2026", reason: "Ferie", status: "Godkendt" },
+              { name: "Ida Larsen", date: "28. apr 2026", reason: "Læge", status: "Godkendt" },
             ].map((r) => (
               <div key={r.name} className="flex items-center justify-between border-b py-2 last:border-0">
                 <div>

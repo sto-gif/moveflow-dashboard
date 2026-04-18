@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Plus, AlertTriangle, ArrowDownCircle, ArrowUpCircle, ShoppingCart, XCircle, Smartphone, Sparkles, Package } from "lucide-react";
+import { Plus, AlertTriangle, ArrowDownCircle, ArrowUpCircle, ShoppingCart, XCircle, Sparkles, Package } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -42,9 +42,6 @@ function MaterialsPage() {
         description={`${inventory.length} varer · ${low.length} under minimum · ${lentItems.length} udlån (${overdue.length} forfaldne)`}
         actions={
           <>
-            <Badge variant="outline" className="gap-1.5 border-success/30 bg-success/5 text-success">
-              <Smartphone className="h-3 w-3" strokeWidth={1.5} /> Synkroniseret med mobilapp
-            </Badge>
             <NewMaterialDialog />
             <Button size="sm"><Plus className="h-4 w-4" strokeWidth={1.5} /> Tilføj vare</Button>
           </>

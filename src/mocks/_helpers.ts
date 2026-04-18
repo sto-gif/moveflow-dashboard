@@ -38,7 +38,7 @@ export const STREETS = [
 ];
 
 /** Stable "today" used across mocks to avoid SSR/client hydration mismatches. */
-export const MOCK_TODAY = new Date("2025-04-15T08:00:00.000Z");
+export const MOCK_TODAY = new Date("2026-04-15T08:00:00.000Z");
 
 let seed = 42;
 const rand = () => {
