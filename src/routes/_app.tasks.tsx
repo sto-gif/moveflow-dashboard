@@ -126,9 +126,9 @@ function TasksPage() {
             </div>
           </TabsContent>
           <TabsContent value="table" className="mt-4">
-            <Card className="overflow-x-auto">
+            <Card className="max-h-[640px] overflow-auto">
               <table className="w-full text-sm">
-                <thead className="bg-muted/40">
+                <thead className="sticky top-0 z-10 bg-muted">
                   <tr className="text-left text-xs uppercase tracking-wide text-muted-foreground">
                     <th className="px-4 py-2.5">Opgave</th>
                     <th className="px-4 py-2.5">Status</th>

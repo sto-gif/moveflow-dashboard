@@ -191,12 +191,12 @@ function CustomerDetailPage() {
           </TabsList>
 
           <TabsContent value="moves" className="mt-4">
-            <Card className="overflow-x-auto">
+            <Card className="max-h-[640px] overflow-auto">
               {customerJobs.length === 0 ? (
                 <div className="p-8 text-center text-body-sm text-muted-foreground">Ingen flytninger registreret.</div>
               ) : (
                 <table className="w-full text-sm">
-                  <thead className="bg-muted/40">
+                  <thead className="sticky top-0 z-10 bg-muted">
                     <tr className="text-left text-caption uppercase text-muted-foreground">
                       <th className="px-4 py-2.5">Job #</th>
                       <th className="px-4 py-2.5">Dato</th>
@@ -232,12 +232,12 @@ function CustomerDetailPage() {
           </TabsContent>
 
           <TabsContent value="quotes" className="mt-4">
-            <Card className="overflow-x-auto">
+            <Card className="max-h-[640px] overflow-auto">
               {customerQuotes.length === 0 ? (
                 <div className="p-8 text-center text-body-sm text-muted-foreground">Ingen tilbud.</div>
               ) : (
                 <table className="w-full text-sm">
-                  <thead className="bg-muted/40">
+                  <thead className="sticky top-0 z-10 bg-muted">
                     <tr className="text-left text-caption uppercase text-muted-foreground">
                       <th className="px-4 py-2.5">Nr.</th>
                       <th className="px-4 py-2.5">Oprettet</th>
@@ -283,12 +283,12 @@ function CustomerDetailPage() {
           </TabsContent>
 
           <TabsContent value="storage" className="mt-4">
-            <Card className="overflow-x-auto">
+            <Card className="max-h-[640px] overflow-auto">
               {customerStorage.length === 0 ? (
                 <div className="p-8 text-center text-body-sm text-muted-foreground">Ingen aktive lagerenheder.</div>
               ) : (
                 <table className="w-full text-sm">
-                  <thead className="bg-muted/40">
+                  <thead className="sticky top-0 z-10 bg-muted">
                     <tr className="text-left text-caption uppercase text-muted-foreground">
                       <th className="px-4 py-2.5">Enhed</th>
                       <th className="px-4 py-2.5">Beskrivelse</th>
