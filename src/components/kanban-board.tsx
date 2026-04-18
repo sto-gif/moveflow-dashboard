@@ -63,24 +63,28 @@ export function KanbanBoard<S extends string, T extends { id: string }>({
 
   return (
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-      <div className={className}>
-        {columns.map((col) => {
-          const items = itemsByColumn[col.id] ?? [];
-          return (
-            <DroppableColumn key={col.id} id={col.id} label={col.label} count={items.length} total={col.footer}>
-              {items.map((item) => (
-                <DraggableCard key={item.id} id={item.id}>
-                  {renderCard(item)}
-                </DraggableCard>
-              ))}
-              {items.length === 0 && (
-                <div className="rounded border border-dashed border-border px-2 py-6 text-center text-caption text-muted-foreground">
-                  Træk hertil
-                </div>
-              )}
-            </DroppableColumn>
-          );
-        })}
+      <div className={cn("overflow-x-auto -mx-1 px-1 pb-2", className)}>
+        <div className="flex gap-3 min-w-max">
+          {columns.map((col) => {
+            const items = itemsByColumn[col.id] ?? [];
+            return (
+              <div key={col.id} className="w-[280px] shrink-0">
+                <DroppableColumn id={col.id} label={col.label} count={items.length} total={col.footer}>
+                  {items.map((item) => (
+                    <DraggableCard key={item.id} id={item.id}>
+                      {renderCard(item)}
+                    </DraggableCard>
+                  ))}
+                  {items.length === 0 && (
+                    <div className="rounded border border-dashed border-border px-2 py-6 text-center text-caption text-muted-foreground">
+                      Træk hertil
+                    </div>
+                  )}
+                </DroppableColumn>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </DndContext>
   );
