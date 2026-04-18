@@ -65,28 +65,27 @@ function JobsPage() {
               {STATUSES.map((s) => {
                 const items = filtered.filter((j) => j.status === s);
                 return (
-                  <div key={s} className="rounded-lg bg-muted/40 p-2.5">
-                    <div className="mb-2 flex items-center justify-between px-1">
-                      <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{JOB_STATUS_LABELS[s]}</span>
+                  <div key={s} className="kanban-column">
+                    <div className="kanban-column-header">
+                      <span className="text-[11px] font-semibold uppercase tracking-wide text-[#94A3B8]">{JOB_STATUS_LABELS[s]}</span>
                       <Badge variant="secondary" className="h-5 px-1.5 text-[10px]">{items.length}</Badge>
                     </div>
-                    <div className="space-y-2">
+                    <div className="kanban-cards">
                       {items.slice(0, 8).map((j) => (
-                        <Card key={j.id} onClick={() => setSelected(j.id)}
-                          className="cursor-pointer p-3 hover:shadow-md transition-shadow">
+                        <div key={j.id} onClick={() => setSelected(j.id)} className="kanban-card">
                           <div className="flex items-center justify-between">
                             <span className="font-mono text-[11px] text-muted-foreground">#{j.number}</span>
-                            <span className="text-[10px] text-muted-foreground">{j.startTime}</span>
+                            <span className="text-[10px] text-muted-foreground tabular-nums">{j.startTime}</span>
                           </div>
-                          <div className="mt-1 font-medium text-sm">{j.customerName}</div>
-                          <div className="mt-0.5 text-xs text-muted-foreground">
+                          <div className="mt-1 text-label">{j.customerName}</div>
+                          <div className="mt-0.5 text-caption text-muted-foreground">
                             {j.origin.city} → {j.destination.city}
                           </div>
                           <div className="mt-2 flex items-center justify-between">
-                            <span className="text-xs">{j.volumeM3} m³</span>
-                            <span className="text-xs font-semibold">{dkk(j.revenue)}</span>
+                            <span className="text-caption tabular-nums">{j.volumeM3} m³</span>
+                            <span className="text-caption font-semibold tabular-nums">{dkk(j.revenue)}</span>
                           </div>
-                        </Card>
+                        </div>
                       ))}
                     </div>
                   </div>
