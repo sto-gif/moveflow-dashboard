@@ -56,12 +56,19 @@ function DashboardPage() {
     (customers.length / Math.max(1, customers.length + leads.length)) * 100;
   const utilization = 78.4;
 
+  // Growth trajectory with winter dip (Dec/Jan), peaks in summer moving season
   const revenueData = Array.from({ length: 12 }, (_, i) => {
     const m = new Date(MOCK_TODAY);
     m.setMonth(m.getMonth() - (11 - i));
+    const monthIdx = m.getMonth();
+    const base = 140000 + i * 17000;
+    const seasonal: Record<number, number> = {
+      0: -45000, 1: -35000, 2: -10000, 3: 5000, 4: 20000,
+      5: 40000, 6: 55000, 7: 50000, 8: 25000, 9: 5000, 10: -15000, 11: -40000,
+    };
     return {
       m: m.toLocaleDateString("da-DK", { month: "short" }),
-      omsætning: 180000 + Math.round(Math.sin(i / 2) * 60000) + i * 12000,
+      omsætning: base + (seasonal[monthIdx] ?? 0),
     };
   });
 
