@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { RowCount } from "@/components/row-count";
 import { useState, useMemo } from "react";
 import { Plus, Search, LayoutGrid, Table as TableIcon } from "lucide-react";
 import { toast } from "sonner";

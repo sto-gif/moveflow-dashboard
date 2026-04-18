@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { RowCount } from "@/components/row-count";
 import { useState } from "react";
 import { Plus, Search, Mail, Phone, MapPin, Warehouse } from "lucide-react";
 import { Card } from "@/components/ui/card";

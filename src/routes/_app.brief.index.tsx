@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { RowCount } from "@/components/row-count";
 import { toast } from "sonner";
 import { Plus, Send, FileText, CheckCircle2, List, Calendar as CalendarIcon } from "lucide-react";
 import { Card } from "@/components/ui/card";

@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { RowCount } from "@/components/row-count";
 import { useState, useMemo } from "react";
 import { toast } from "sonner";
 import { Plus, Send, Sparkles, Calculator, Trash2, Check } from "lucide-react";

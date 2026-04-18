@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { RowCount } from "@/components/row-count";
 import { useMemo, useState } from "react";
 import { Plus, LayoutGrid, Table as TableIcon, Calendar as CalendarIcon, Filter } from "lucide-react";
 import { Card } from "@/components/ui/card";

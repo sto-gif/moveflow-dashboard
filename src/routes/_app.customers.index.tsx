@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { RowCount } from "@/components/row-count";
 import { useState, useMemo } from "react";
 import { CustomerDrawer } from "@/components/customer-drawer";
 import { Plus, Search, Building2, User, LayoutGrid, Table as TableIcon } from "lucide-react";

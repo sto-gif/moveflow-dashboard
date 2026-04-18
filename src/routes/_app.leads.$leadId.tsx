@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { RowCount } from "@/components/row-count";
 import { useState } from "react";
 import { toast } from "sonner";
 import {

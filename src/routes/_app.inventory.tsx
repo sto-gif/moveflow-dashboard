@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { RowCount } from "@/components/row-count";
 import { useMemo, useState } from "react";
 import { Plus, AlertTriangle, ArrowDownCircle, ArrowUpCircle, ShoppingCart, XCircle, Sparkles, Package } from "lucide-react";
 import { Card } from "@/components/ui/card";

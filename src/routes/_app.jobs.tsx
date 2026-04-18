@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { RowCount } from "@/components/row-count";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Plus, Search, Image as ImageIcon, Upload, Camera, Building2, User, Mail, Phone, Pencil, LayoutGrid, Table as TableIcon, Calendar as CalendarIcon, Truck, MapPin, CheckCircle2, Circle, Clock, ExternalLink } from "lucide-react";
