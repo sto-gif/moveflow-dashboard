@@ -197,3 +197,58 @@ function VehiclesPage() {
     </div>
   );
 }
+
+function VehicleMonthCalendar() {
+  const today = MOCK_TODAY;
+  const year = today.getFullYear();
+  const month = today.getMonth();
+  const firstDay = new Date(year, month, 1);
+  const startWeekday = (firstDay.getDay() + 6) % 7;
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const cells: (number | null)[] = [];
+  for (let i = 0; i < startWeekday; i++) cells.push(null);
+  for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+
+  // Aggregate vehicle bookings per day from upcoming assignments
+  const bookingsByDay = new Map<number, { vehicleId: string; plate: string; jobNumber: string; customerName: string }[]>();
+  vehicleAssignments.forEach((va) => {
+    const v = vehicles.find((x) => x.id === va.vehicleId);
+    if (!v) return;
+    va.upcoming.forEach((u) => {
+      if (u.date.getMonth() !== month || u.date.getFullYear() !== year) return;
+      const d = u.date.getDate();
+      const arr = bookingsByDay.get(d) ?? [];
+      arr.push({ vehicleId: v.id, plate: v.plate, jobNumber: u.jobNumber, customerName: u.customerName });
+      bookingsByDay.set(d, arr);
+    });
+  });
+
+  return (
+    <Card className="p-5">
+      <h3 className="text-section mb-3 capitalize">{firstDay.toLocaleDateString("da-DK", { month: "long", year: "numeric" })} — vognassignments</h3>
+      <div className="grid grid-cols-7 gap-px overflow-hidden rounded-md border bg-border text-xs">
+        {DAYS.map((d) => <div key={d} className="bg-muted px-2 py-1.5 font-semibold uppercase tracking-wide text-[10px] text-muted-foreground">{d}</div>)}
+        {cells.map((d, i) => {
+          const list = d ? bookingsByDay.get(d) ?? [] : [];
+          return (
+            <div key={i} className="min-h-[110px] bg-background p-1.5">
+              {d && (
+                <>
+                  <div className={cn("text-[11px] font-semibold", d === today.getDate() && "text-primary")}>{d}</div>
+                  <div className="mt-1 space-y-0.5">
+                    {list.slice(0, 3).map((b, k) => (
+                      <div key={k} className="rounded bg-primary/10 px-1 py-0.5 text-[10px] font-medium text-primary truncate" title={`${b.plate} · #${b.jobNumber} ${b.customerName}`}>
+                        {b.plate} #{b.jobNumber}
+                      </div>
+                    ))}
+                    {list.length > 3 && <div className="text-[9px] text-muted-foreground">+{list.length - 3}</div>}
+                  </div>
+                </>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </Card>
+  );
+}
