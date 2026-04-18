@@ -293,7 +293,8 @@ function SettingsPage() {
               <Button variant="outline" className="mt-4">Åbn hjælpecenter</Button>
             </Card>
           </TabsContent>
-        </Tabs>
+          </Tabs>
+        </div>
       </div>
     </div>
   );
