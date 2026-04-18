@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-import { Plus, AlertTriangle, ArrowDownCircle, ArrowUpCircle, ShoppingCart, XCircle, Smartphone, Sparkles } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Plus, AlertTriangle, ArrowDownCircle, ArrowUpCircle, ShoppingCart, XCircle, Smartphone, Sparkles, Package } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,10 +8,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { PageHeader } from "@/components/page-header";
-import { inventory, inventoryLog, lowStockItems, lentItems, overdueLentItems, type MaterialCategory } from "@/mocks/inventory";
+import { inventory, inventoryLog, lowStockItems, lentItems, overdueLentItems, type MaterialCategory, type MaterialItem, type InventoryLog } from "@/mocks/inventory";
 import { number } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+
+type MovementType = "ud" | "ind" | "indkoeb" | "tabt";
+const MOVEMENT_LABELS: Record<MovementType, string> = { ud: "Ud", ind: "Ind", indkoeb: "Indkøb", tabt: "Tabt" };
 
 export const Route = createFileRoute("/_app/inventory")({
   head: () => ({
@@ -26,6 +31,10 @@ export const Route = createFileRoute("/_app/inventory")({
 function MaterialsPage() {
   const low = lowStockItems();
   const overdue = overdueLentItems();
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [extraLog, setExtraLog] = useState<InventoryLog[]>([]);
+  const allLogs = useMemo(() => [...extraLog, ...inventoryLog], [extraLog]);
+  const selected = inventory.find((i) => i.id === selectedId) ?? null;
   return (
     <div>
       <PageHeader
