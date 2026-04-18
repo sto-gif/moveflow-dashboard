@@ -1,4 +1,4 @@
-import { type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import {
   DndContext, useDraggable, useDroppable, PointerSensor, useSensor, useSensors,
   type DragEndEvent,
@@ -19,6 +19,8 @@ interface Props<S extends string, T extends { id: string }> {
   renderCard: (item: T) => ReactNode;
   onMove: (itemId: string, toColumn: S) => void;
   className?: string;
+  /** If set, columns initially show only this many cards with a "Vis flere" toggle. */
+  collapseAfter?: number;
 }
 
 function DraggableCard({ id, children }: { id: string; children: ReactNode }) {
@@ -51,8 +53,49 @@ function DroppableColumn<S extends string>({
   );
 }
 
+function ColumnCards<T extends { id: string }>({
+  items, renderCard, collapseAfter,
+}: { items: T[]; renderCard: (item: T) => ReactNode; collapseAfter?: number }) {
+  const [expanded, setExpanded] = useState(false);
+  const limit = collapseAfter ?? Infinity;
+  const shouldCollapse = items.length > limit && !expanded;
+  const visible = shouldCollapse ? items.slice(0, limit) : items;
+  return (
+    <>
+      {visible.map((item) => (
+        <DraggableCard key={item.id} id={item.id}>
+          {renderCard(item)}
+        </DraggableCard>
+      ))}
+      {items.length === 0 && (
+        <div className="rounded border border-dashed border-border px-2 py-6 text-center text-caption text-muted-foreground">
+          Træk hertil
+        </div>
+      )}
+      {shouldCollapse && (
+        <button
+          type="button"
+          onClick={() => setExpanded(true)}
+          className="w-full rounded border border-dashed border-border px-2 py-2 text-caption text-muted-foreground hover:bg-muted/40 hover:text-foreground transition-colors"
+        >
+          Vis flere ({items.length - limit})
+        </button>
+      )}
+      {expanded && items.length > limit && (
+        <button
+          type="button"
+          onClick={() => setExpanded(false)}
+          className="w-full px-2 py-1 text-caption text-muted-foreground hover:text-foreground transition-colors"
+        >
+          Vis færre
+        </button>
+      )}
+    </>
+  );
+}
+
 export function KanbanBoard<S extends string, T extends { id: string }>({
-  columns, itemsByColumn, renderCard, onMove, className,
+  columns, itemsByColumn, renderCard, onMove, className, collapseAfter,
 }: Props<S, T>) {
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
@@ -70,16 +113,7 @@ export function KanbanBoard<S extends string, T extends { id: string }>({
             return (
               <div key={col.id} className="w-[340px] shrink-0">
                 <DroppableColumn id={col.id} label={col.label} count={items.length} total={col.footer}>
-                  {items.map((item) => (
-                    <DraggableCard key={item.id} id={item.id}>
-                      {renderCard(item)}
-                    </DraggableCard>
-                  ))}
-                  {items.length === 0 && (
-                    <div className="rounded border border-dashed border-border px-2 py-6 text-center text-caption text-muted-foreground">
-                      Træk hertil
-                    </div>
-                  )}
+                  <ColumnCards items={items} renderCard={renderCard} collapseAfter={collapseAfter} />
                 </DroppableColumn>
               </div>
             );
