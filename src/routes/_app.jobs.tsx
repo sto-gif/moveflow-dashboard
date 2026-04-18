@@ -1,7 +1,7 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Plus, Search, Image as ImageIcon, Upload, Camera, Building2, User, Mail, Phone, Pencil, LayoutGrid, Table as TableIcon, Calendar as CalendarIcon } from "lucide-react";
+import { Plus, Search, Image as ImageIcon, Upload, Camera, Building2, User, Mail, Phone, Pencil, LayoutGrid, Table as TableIcon, Calendar as CalendarIcon, Truck, MapPin, CheckCircle2, Circle, Clock, ExternalLink } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,7 @@ import { PageHeader } from "@/components/page-header";
 import { JOB_STATUS_LABELS, JOB_STATUS_COLORS, type JobStatus, type Job } from "@/mocks/jobs";
 import { crew } from "@/mocks/crew";
 import { customerById } from "@/mocks/customers";
+import { vehicles } from "@/mocks/vehicles";
 import { quotes, PRICING_LABELS } from "@/mocks/quotes";
 import { dkk } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -208,6 +209,8 @@ function JobSheet({ job }: { job: Job }) {
   const { updateJob, updateCustomer, customers: storeCustomers } = useMockStore();
   const customer = storeCustomers.find((c) => c.id === job.customerId) ?? customerById(job.customerId);
   const quote = quotes.find((q) => q.customerId === job.customerId);
+  const vehicle = vehicles.find((v) => v.id === job.vehicleId);
+  const assignedCrew = job.crewIds.map((id) => crew.find((c) => c.id === id)).filter(Boolean) as typeof crew;
   const toggleCrew = (id: string) => {
     const next = job.crewIds.includes(id)
       ? job.crewIds.filter((c) => c !== id)
@@ -223,18 +226,22 @@ function JobSheet({ job }: { job: Job }) {
   return (
     <>
       <SheetHeader>
-        <SheetTitle>Job #{job.number} · {job.customerName}</SheetTitle>
+        <SheetTitle className="flex items-center gap-2">
+          Job #{job.number} · {job.customerName}
+          <Badge variant="outline" className={cn("text-[10px]", JOB_STATUS_COLORS[job.status])}>{JOB_STATUS_LABELS[job.status]}</Badge>
+        </SheetTitle>
       </SheetHeader>
-      <Tabs defaultValue="detaljer" className="mt-6">
+      <Tabs defaultValue="oversigt" className="mt-6">
         <TabsList>
-          <TabsTrigger value="detaljer">Detaljer</TabsTrigger>
+          <TabsTrigger value="oversigt">Oversigt</TabsTrigger>
+          <TabsTrigger value="tidslinje"><Clock className="mr-1 h-3.5 w-3.5" strokeWidth={1.5} /> Tidslinje</TabsTrigger>
+          <TabsTrigger value="okonomi">Økonomi</TabsTrigger>
           <TabsTrigger value="fotos">
             <ImageIcon className="mr-1 h-3.5 w-3.5" strokeWidth={1.5} /> Fotos ({job.photos.length})
           </TabsTrigger>
-          <TabsTrigger value="okonomi">Økonomi</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="detaljer" className="mt-4 space-y-4">
+        <TabsContent value="oversigt" className="mt-4 space-y-4">
           {customer && (
             <Card className="border-primary/20 bg-primary/5 p-4 space-y-3">
               <div className="flex items-center justify-between gap-2">
@@ -255,6 +262,13 @@ function JobSheet({ job }: { job: Job }) {
                     <SelectItem value="erhverv">Erhverv</SelectItem>
                   </SelectContent>
                 </Select>
+                <Link
+                  to="/customers/$customerId"
+                  params={{ customerId: customer.id }}
+                  className="inline-flex h-8 items-center gap-1 rounded-md border border-primary/30 bg-background px-2 text-[11px] font-medium text-primary hover:bg-primary/10"
+                >
+                  Se kunde <ExternalLink className="h-3 w-3" strokeWidth={1.5} />
+                </Link>
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <label className="space-y-1">
@@ -312,6 +326,33 @@ function JobSheet({ job }: { job: Job }) {
               <div className="mt-1 text-[11px]">Etage {job.floorDest} {job.hasElevatorDest ? "· Elevator" : "· Ingen elevator"}</div>
             </Card>
           </div>
+          <Card className="p-3">
+            <div className="mb-2 flex items-center gap-2">
+              <Truck className="h-4 w-4 text-primary" strokeWidth={1.5} />
+              <div className="text-xs font-semibold uppercase text-muted-foreground">Køretøj</div>
+            </div>
+            <Select
+              value={job.vehicleId ?? "none"}
+              onValueChange={(v) => updateJob(job.id, { vehicleId: v === "none" ? undefined : v })}
+            >
+              <SelectTrigger className="h-9 text-sm"><SelectValue placeholder="Vælg køretøj" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">Ingen tildelt</SelectItem>
+                {vehicles.map((v) => (
+                  <SelectItem key={v.id} value={v.id}>
+                    {v.name} · {v.plate} · {v.capacityM3} m³
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {vehicle && (
+              <div className="mt-2 grid grid-cols-3 gap-2 text-center text-[11px]">
+                <div><div className="text-muted-foreground">Nummerplade</div><div className="font-mono font-semibold">{vehicle.plate}</div></div>
+                <div><div className="text-muted-foreground">Kapacitet</div><div className="font-semibold">{vehicle.capacityM3} m³</div></div>
+                <div><div className="text-muted-foreground">Chauffør</div><div className="font-semibold">{vehicle.driverName ?? "—"}</div></div>
+              </div>
+            )}
+          </Card>
           <Card className="p-3">
             <div className="grid grid-cols-3 gap-3 text-center">
               <div>
@@ -400,6 +441,10 @@ function JobSheet({ job }: { job: Job }) {
               <p className="rounded-md bg-muted p-3 text-sm">{job.instructions}</p>
             </div>
           )}
+        </TabsContent>
+
+        <TabsContent value="tidslinje" className="mt-4">
+          <JobTimeline job={job} />
         </TabsContent>
 
         <TabsContent value="fotos" className="mt-4 space-y-4">
@@ -507,6 +552,62 @@ function JobSheet({ job }: { job: Job }) {
         </TabsContent>
       </Tabs>
     </>
+  );
+}
+
+function JobTimeline({ job }: { job: Job }) {
+  const created = new Date(job.date.getTime() - 14 * 24 * 60 * 60 * 1000);
+  const confirmed = new Date(job.date.getTime() - 5 * 24 * 60 * 60 * 1000);
+  const [startH, startM] = job.startTime.split(":").map(Number);
+  const started = new Date(job.date);
+  started.setHours(startH ?? 8, startM ?? 0, 0, 0);
+  const completed = new Date(started.getTime() + job.estimatedHours * 60 * 60 * 1000);
+  const now = new Date();
+
+  const events: { label: string; at: Date; done: boolean; status: JobStatus }[] = [
+    { label: "Job oprettet", at: created, done: true, status: "planlagt" },
+    { label: "Bekræftet af kunde", at: confirmed, done: ["bekraeftet", "i_gang", "afsluttet"].includes(job.status), status: "bekraeftet" },
+    { label: "Job startet", at: started, done: ["i_gang", "afsluttet"].includes(job.status), status: "i_gang" },
+    { label: "Job afsluttet", at: completed, done: job.status === "afsluttet", status: "afsluttet" },
+  ];
+  if (job.status === "annulleret") {
+    events.push({ label: "Job annulleret", at: now, done: true, status: "annulleret" });
+  }
+
+  const fmt = (d: Date) =>
+    d.toLocaleDateString("da-DK", { day: "numeric", month: "short" }) +
+    " · " +
+    d.toLocaleTimeString("da-DK", { hour: "2-digit", minute: "2-digit" });
+
+  return (
+    <Card className="p-5">
+      <div className="relative space-y-5 pl-7">
+        <div className="absolute left-[10px] top-2 bottom-2 w-px bg-border" />
+        {events.map((ev, i) => (
+          <div key={i} className="relative">
+            <div className="absolute -left-7 top-0 flex h-5 w-5 items-center justify-center">
+              {ev.done
+                ? <CheckCircle2 className="h-5 w-5 text-success" strokeWidth={2} />
+                : <Circle className="h-5 w-5 text-muted-foreground/40" strokeWidth={1.5} />}
+            </div>
+            <div className="flex items-center justify-between gap-2">
+              <div>
+                <div className={cn("text-sm font-medium", !ev.done && "text-muted-foreground")}>{ev.label}</div>
+                <div className="text-[11px] text-muted-foreground tabular-nums">{fmt(ev.at)}</div>
+              </div>
+              <Badge variant="outline" className={cn("text-[10px]", JOB_STATUS_COLORS[ev.status])}>
+                {JOB_STATUS_LABELS[ev.status]}
+              </Badge>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="mt-5 grid grid-cols-3 gap-3 border-t pt-4 text-center text-xs">
+        <div><MapPin className="mx-auto h-3.5 w-3.5 text-muted-foreground" strokeWidth={1.5} /><div className="mt-1 text-muted-foreground">Estimeret tid</div><div className="font-semibold">{job.estimatedHours} timer</div></div>
+        <div><Clock className="mx-auto h-3.5 w-3.5 text-muted-foreground" strokeWidth={1.5} /><div className="mt-1 text-muted-foreground">Starttid</div><div className="font-semibold">{job.startTime}</div></div>
+        <div><Truck className="mx-auto h-3.5 w-3.5 text-muted-foreground" strokeWidth={1.5} /><div className="mt-1 text-muted-foreground">Volumen</div><div className="font-semibold">{job.volumeM3} m³</div></div>
+      </div>
+    </Card>
   );
 }
 
