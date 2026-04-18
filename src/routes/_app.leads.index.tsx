@@ -154,8 +154,9 @@ function LeadsPage() {
           <>
             <div className="relative">
               <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" strokeWidth={1.5} />
-              <Input placeholder="Søg leads…" value={search} onChange={(e) => setSearch(e.target.value)} className="h-9 w-56 pl-8" />
+              <Input placeholder="Søg leads…" value={searchText} onChange={(e) => setSearch(e.target.value)} className="h-9 w-56 pl-8" />
             </div>
+            <FilterBar filters={filterGroups} value={filterValues} onChange={setFilters} />
             <CreateDialog
               title="Nyt lead"
               fields={[
