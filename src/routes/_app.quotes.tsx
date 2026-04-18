@@ -143,7 +143,17 @@ function QuotesPage() {
                       </li>
                     ))}
                   </ul>
-                  <Button className="mt-5 w-full" variant={p.recommended ? "default" : "outline"}>Vælg pakke</Button>
+                  <Button
+                    className="mt-5 w-full"
+                    variant={p.recommended ? "default" : "outline"}
+                    onClick={() => {
+                      const q = createQuote({ customerName: "Ny kunde", total: p.basePrice });
+                      toast.success(`Tilbud oprettet med pakke ${p.name}`);
+                      void q;
+                    }}
+                  >
+                    Vælg pakke
+                  </Button>
                 </Card>
               ))}
             </div>
