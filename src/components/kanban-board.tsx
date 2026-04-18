@@ -68,7 +68,7 @@ export function KanbanBoard<S extends string, T extends { id: string }>({
           {columns.map((col) => {
             const items = itemsByColumn[col.id] ?? [];
             return (
-              <div key={col.id} className="w-[280px] shrink-0">
+              <div key={col.id} className="w-[340px] shrink-0">
                 <DroppableColumn id={col.id} label={col.label} count={items.length} total={col.footer}>
                   {items.map((item) => (
                     <DraggableCard key={item.id} id={item.id}>
