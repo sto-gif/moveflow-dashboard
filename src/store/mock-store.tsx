@@ -291,7 +291,7 @@ export function MockStoreProvider({ children }: { children: ReactNode }) {
   const value: Ctx = {
     leads, customers, jobs, quotes, briefs, notifications, settings, unreadCount,
     createLead, updateLeadStage, convertLeadToCustomer,
-    createCustomer, updateCustomerStage,
+    createCustomer, updateCustomerStage, updateCustomer,
     createJob, updateJobStatus, updateJob,
     createQuote, updateQuoteStatus, convertQuoteToJob,
     createBrief,
