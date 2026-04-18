@@ -48,7 +48,7 @@ function DroppableColumn<S extends string>({
         </div>
         <Badge variant="secondary" className="h-5 px-1.5 text-[10px]">{count}</Badge>
       </div>
-      <div className="kanban-cards min-h-12">{children}</div>
+      <div className="kanban-cards min-h-12 max-h-[calc(10*5.5rem+9*0.5rem)] overflow-y-auto pr-1">{children}</div>
     </div>
   );
 }
