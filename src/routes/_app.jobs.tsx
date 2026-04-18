@@ -1,13 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Plus, Search } from "lucide-react";
+import { Plus, Search, Image as ImageIcon, Upload, Camera } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { PageHeader } from "@/components/page-header";
-import { jobs, JOB_STATUS_LABELS, JOB_STATUS_COLORS, type JobStatus } from "@/mocks/jobs";
+import { jobs, JOB_STATUS_LABELS, JOB_STATUS_COLORS, type JobStatus, type Job } from "@/mocks/jobs";
 import { crew } from "@/mocks/crew";
 import { dkk } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -16,7 +16,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 export const Route = createFileRoute("/_app/jobs")({
   head: () => ({
     meta: [
-      { title: "Jobs — Flyt" },
+      { title: "Jobs — Movena" },
       { name: "description", content: "Planlæg flytteopgaver i kanban, kalender eller tabel." },
     ],
   }),
@@ -43,10 +43,10 @@ function JobsPage() {
         actions={
           <>
             <div className="relative">
-              <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" strokeWidth={1.5} />
               <Input placeholder="Søg jobs…" value={search} onChange={(e) => setSearch(e.target.value)} className="h-9 w-56 pl-8" />
             </div>
-            <Button size="sm"><Plus className="h-4 w-4" /> Nyt job</Button>
+            <Button size="sm"><Plus className="h-4 w-4" strokeWidth={1.5} /> Nyt job</Button>
           </>
         }
       />
@@ -94,9 +94,7 @@ function JobsPage() {
           </TabsContent>
 
           <TabsContent value="calendar" className="mt-4">
-            <Card className="p-5">
-              <CalendarGrid />
-            </Card>
+            <Card className="p-5"><CalendarGrid /></Card>
           </TabsContent>
 
           <TabsContent value="table" className="mt-4">
@@ -148,73 +146,135 @@ function JobsPage() {
       </div>
 
       <Sheet open={!!selected} onOpenChange={(o) => !o && setSelected(null)}>
-        <SheetContent className="w-full sm:max-w-xl overflow-y-auto">
-          {job && (
-            <>
-              <SheetHeader>
-                <SheetTitle>Job #{job.number} · {job.customerName}</SheetTitle>
-              </SheetHeader>
-              <div className="mt-6 space-y-4">
-                <div className="grid grid-cols-2 gap-3">
-                  <Card className="p-3">
-                    <div className="text-[11px] uppercase text-muted-foreground">Fra</div>
-                    <div className="mt-1 text-sm font-medium">{job.origin.street}</div>
-                    <div className="text-xs text-muted-foreground">{job.origin.zip} {job.origin.city}</div>
-                    <div className="mt-1 text-[11px]">Etage {job.floorOrigin} {job.hasElevatorOrigin ? "· Elevator" : "· Ingen elevator"}</div>
-                  </Card>
-                  <Card className="p-3">
-                    <div className="text-[11px] uppercase text-muted-foreground">Til</div>
-                    <div className="mt-1 text-sm font-medium">{job.destination.street}</div>
-                    <div className="text-xs text-muted-foreground">{job.destination.zip} {job.destination.city}</div>
-                    <div className="mt-1 text-[11px]">Etage {job.floorDest} {job.hasElevatorDest ? "· Elevator" : "· Ingen elevator"}</div>
-                  </Card>
-                </div>
-                <Card className="p-3">
-                  <div className="grid grid-cols-3 gap-3 text-center">
-                    <div><div className="text-xs text-muted-foreground">Dato</div><div className="text-sm font-semibold">{job.date.toLocaleDateString("da-DK")}</div></div>
-                    <div><div className="text-xs text-muted-foreground">Tid</div><div className="text-sm font-semibold">{job.startTime}</div></div>
-                    <div><div className="text-xs text-muted-foreground">Volumen</div><div className="text-sm font-semibold">{job.volumeM3} m³</div></div>
-                  </div>
-                </Card>
-                <div>
-                  <div className="text-xs font-semibold uppercase text-muted-foreground mb-2">Crew (træk for at omfordele)</div>
-                  <div className="flex flex-wrap gap-2">
-                    {job.crewIds.map((id) => {
-                      const m = crew.find((c) => c.id === id);
-                      return (
-                        <Badge key={id} variant="secondary" className="gap-1.5 py-1">
-                          <span className={cn("flex h-5 w-5 items-center justify-center rounded-full text-[9px] font-bold", m?.avatarColor)}>{m?.initials}</span>
-                          {m?.name}
-                        </Badge>
-                      );
-                    })}
-                  </div>
-                </div>
-                <div>
-                  <div className="text-xs font-semibold uppercase text-muted-foreground mb-2">Udstyr</div>
-                  <div className="flex flex-wrap gap-1.5">
-                    {job.equipment.map((e) => <Badge key={e} variant="outline">{e}</Badge>)}
-                  </div>
-                </div>
-                {job.instructions && (
-                  <div>
-                    <div className="text-xs font-semibold uppercase text-muted-foreground mb-2">Særlige instruktioner</div>
-                    <p className="rounded-md bg-muted p-3 text-sm">{job.instructions}</p>
-                  </div>
-                )}
-                <Card className="p-4">
-                  <div className="grid grid-cols-3 gap-3 text-center">
-                    <div><div className="text-xs text-muted-foreground">Omsætning</div><div className="text-base font-bold">{dkk(job.revenue)}</div></div>
-                    <div><div className="text-xs text-muted-foreground">Omkostning</div><div className="text-base font-bold">{dkk(job.cost)}</div></div>
-                    <div><div className="text-xs text-muted-foreground">Margin</div><div className="text-base font-bold text-emerald-600">{dkk(job.revenue - job.cost)}</div></div>
-                  </div>
-                </Card>
-              </div>
-            </>
-          )}
+        <SheetContent className="w-full sm:max-w-2xl overflow-y-auto">
+          {job && <JobSheet job={job} />}
         </SheetContent>
       </Sheet>
     </div>
+  );
+}
+
+function JobSheet({ job }: { job: Job }) {
+  return (
+    <>
+      <SheetHeader>
+        <SheetTitle>Job #{job.number} · {job.customerName}</SheetTitle>
+      </SheetHeader>
+      <Tabs defaultValue="detaljer" className="mt-6">
+        <TabsList>
+          <TabsTrigger value="detaljer">Detaljer</TabsTrigger>
+          <TabsTrigger value="fotos">
+            <ImageIcon className="mr-1 h-3.5 w-3.5" strokeWidth={1.5} /> Fotos ({job.photos.length})
+          </TabsTrigger>
+          <TabsTrigger value="okonomi">Økonomi</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="detaljer" className="mt-4 space-y-4">
+          <div className="grid grid-cols-2 gap-3">
+            <Card className="p-3">
+              <div className="text-[11px] uppercase text-muted-foreground">Fra</div>
+              <div className="mt-1 text-sm font-medium">{job.origin.street}</div>
+              <div className="text-xs text-muted-foreground">{job.origin.zip} {job.origin.city}</div>
+              <div className="mt-1 text-[11px]">Etage {job.floorOrigin} {job.hasElevatorOrigin ? "· Elevator" : "· Ingen elevator"}</div>
+            </Card>
+            <Card className="p-3">
+              <div className="text-[11px] uppercase text-muted-foreground">Til</div>
+              <div className="mt-1 text-sm font-medium">{job.destination.street}</div>
+              <div className="text-xs text-muted-foreground">{job.destination.zip} {job.destination.city}</div>
+              <div className="mt-1 text-[11px]">Etage {job.floorDest} {job.hasElevatorDest ? "· Elevator" : "· Ingen elevator"}</div>
+            </Card>
+          </div>
+          <Card className="p-3">
+            <div className="grid grid-cols-3 gap-3 text-center">
+              <div><div className="text-xs text-muted-foreground">Dato</div><div className="text-sm font-semibold">{job.date.toLocaleDateString("da-DK")}</div></div>
+              <div><div className="text-xs text-muted-foreground">Tid</div><div className="text-sm font-semibold">{job.startTime}</div></div>
+              <div><div className="text-xs text-muted-foreground">Volumen</div><div className="text-sm font-semibold">{job.volumeM3} m³</div></div>
+            </div>
+          </Card>
+          <div>
+            <div className="text-xs font-semibold uppercase text-muted-foreground mb-2">Crew</div>
+            <div className="flex flex-wrap gap-2">
+              {job.crewIds.map((id) => {
+                const m = crew.find((c) => c.id === id);
+                return (
+                  <Badge key={id} variant="secondary" className="gap-1.5 py-1">
+                    <span className={cn("flex h-5 w-5 items-center justify-center rounded-full text-[9px] font-bold", m?.avatarColor)}>{m?.initials}</span>
+                    {m?.name}
+                  </Badge>
+                );
+              })}
+            </div>
+          </div>
+          <div>
+            <div className="text-xs font-semibold uppercase text-muted-foreground mb-2">Udstyr</div>
+            <div className="flex flex-wrap gap-1.5">
+              {job.equipment.map((e) => <Badge key={e} variant="outline">{e}</Badge>)}
+            </div>
+          </div>
+          {job.instructions && (
+            <div>
+              <div className="text-xs font-semibold uppercase text-muted-foreground mb-2">Særlige instruktioner</div>
+              <p className="rounded-md bg-muted p-3 text-sm">{job.instructions}</p>
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="fotos" className="mt-4 space-y-4">
+          <Card className="border-dashed border-2 p-6 text-center">
+            <Upload className="mx-auto h-8 w-8 text-muted-foreground" strokeWidth={1.5} />
+            <div className="mt-2 text-sm font-medium">Træk fotos hertil eller klik for at uploade</div>
+            <div className="mt-1 text-xs text-muted-foreground">JPG, PNG · Crew kan også uploade direkte fra mobilappen</div>
+            <Button size="sm" variant="outline" className="mt-3"><Camera className="h-4 w-4" strokeWidth={1.5} /> Vælg billeder</Button>
+          </Card>
+
+          {(["før", "efter"] as const).map((label) => {
+            const photos = job.photos.filter((p) => p.label === label);
+            if (photos.length === 0) return null;
+            return (
+              <div key={label}>
+                <div className="mb-2 flex items-center justify-between">
+                  <div className="text-xs font-semibold uppercase text-muted-foreground">{label === "før" ? "Før flytning" : "Efter flytning"}</div>
+                  <Badge variant="secondary" className="text-[10px]">{photos.length}</Badge>
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  {photos.map((p) => (
+                    <div key={p.id} className="group relative overflow-hidden rounded-md border bg-muted">
+                      <img src={p.url} alt={p.caption} className="aspect-square w-full object-cover" loading="lazy" />
+                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-2">
+                        <div className="text-[10px] font-medium text-white">{p.caption}</div>
+                      </div>
+                      <Badge className={cn("absolute left-1.5 top-1.5 text-[9px]", label === "før" ? "bg-blue-600" : "bg-emerald-600")}>
+                        {label.toUpperCase()}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+
+          {job.photos.length === 0 && (
+            <div className="rounded-md border border-dashed bg-muted/20 p-8 text-center text-sm text-muted-foreground">
+              Ingen fotos uploadet endnu.
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="okonomi" className="mt-4 space-y-4">
+          <Card className="p-4">
+            <div className="grid grid-cols-3 gap-3 text-center">
+              <div><div className="text-xs text-muted-foreground">Omsætning</div><div className="text-base font-bold">{dkk(job.revenue)}</div></div>
+              <div><div className="text-xs text-muted-foreground">Omkostning</div><div className="text-base font-bold">{dkk(job.cost)}</div></div>
+              <div><div className="text-xs text-muted-foreground">Margin</div><div className="text-base font-bold text-success">{dkk(job.revenue - job.cost)}</div></div>
+            </div>
+          </Card>
+          <Card className="p-4">
+            <div className="text-xs text-muted-foreground">Margin %</div>
+            <div className="mt-1 text-2xl font-bold">{(((job.revenue - job.cost) / job.revenue) * 100).toFixed(1)}%</div>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </>
   );
 }
 
@@ -223,7 +283,7 @@ function CalendarGrid() {
   const year = today.getFullYear();
   const month = today.getMonth();
   const firstDay = new Date(year, month, 1);
-  const startWeekday = (firstDay.getDay() + 6) % 7; // Mon=0
+  const startWeekday = (firstDay.getDay() + 6) % 7;
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const cells: (number | null)[] = [];
   for (let i = 0; i < startWeekday; i++) cells.push(null);
@@ -235,7 +295,7 @@ function CalendarGrid() {
   return (
     <div>
       <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-sm font-semibold">{firstDay.toLocaleDateString("da-DK", { month: "long", year: "numeric" })}</h3>
+        <h3 className="text-section">{firstDay.toLocaleDateString("da-DK", { month: "long", year: "numeric" })}</h3>
       </div>
       <div className="grid grid-cols-7 gap-px overflow-hidden rounded-md border bg-border text-xs">
         {["Man", "Tir", "Ons", "Tor", "Fre", "Lør", "Søn"].map((d) => (
