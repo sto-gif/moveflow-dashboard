@@ -1,5 +1,7 @@
-import { fullName, phone, email, pick, randInt, daysFromNow, DANISH_CITIES } from "./_helpers";
+import { fullName, phone, email, pick, randInt, daysFromNow, DANISH_CITIES, resetSeed } from "./_helpers";
 
+
+resetSeed(1485);
 export type LeadStage = "ny" | "kontaktet" | "tilbud_sendt" | "forhandling" | "vundet" | "tabt";
 export type LeadSourceUI =
   | "Hjemmeside"

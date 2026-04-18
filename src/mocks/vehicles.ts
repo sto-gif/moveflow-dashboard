@@ -1,6 +1,8 @@
 import { jobs } from "./jobs";
-import { daysFromNow, randInt } from "./_helpers";
+import { daysFromNow, randInt, resetSeed } from "./_helpers";
 
+
+resetSeed(2164);
 export type VehicleStatus = "tilgaengelig" | "i_brug" | "service";
 
 export interface Vehicle {

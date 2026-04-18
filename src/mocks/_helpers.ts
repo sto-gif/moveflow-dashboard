@@ -45,6 +45,11 @@ const rand = () => {
   seed = (seed * 9301 + 49297) % 233280;
   return seed / 233280;
 };
+/** Reset the PRNG seed so each mock file produces deterministic output
+ * regardless of module import order (prevents SSR/client hydration drift). */
+export const resetSeed = (s = 42) => {
+  seed = s;
+};
 
 export const pick = <T>(arr: T[]) => arr[Math.floor(rand() * arr.length)]!;
 export const randInt = (min: number, max: number) =>

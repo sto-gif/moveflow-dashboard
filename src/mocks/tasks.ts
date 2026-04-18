@@ -1,6 +1,8 @@
 import { crew } from "./crew";
-import { pick, randInt, daysFromNow } from "./_helpers";
+import { pick, randInt, daysFromNow, resetSeed } from "./_helpers";
 
+
+resetSeed(2067);
 export type TaskStatus = "todo" | "i_gang" | "afventer" | "faerdig";
 export type TaskPriority = "lav" | "normal" | "hoej" | "kritisk";
 

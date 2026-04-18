@@ -1,6 +1,8 @@
 import { customers } from "./customers";
-import { pick, daysFromNow, randInt } from "./_helpers";
+import { pick, daysFromNow, randInt, resetSeed } from "./_helpers";
 
+
+resetSeed(1582);
 export type MessageChannel = "sms" | "email";
 export type MessageDirection = "ud" | "ind";
 

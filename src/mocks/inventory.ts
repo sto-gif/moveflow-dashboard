@@ -1,6 +1,8 @@
 import { customers } from "./customers";
-import { randInt, daysFromNow, pick } from "./_helpers";
+import { randInt, daysFromNow, pick, resetSeed } from "./_helpers";
 
+
+resetSeed(1291);
 export type MaterialCategory = "boxes" | "equipment";
 
 export interface MaterialItem {
