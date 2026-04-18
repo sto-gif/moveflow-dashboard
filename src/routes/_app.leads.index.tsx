@@ -28,6 +28,16 @@ export const Route = createFileRoute("/_app/leads/")({
 
 const STAGES: LeadStage[] = ["ny", "kontaktet", "tilbud_sendt", "forhandling", "vundet", "tabt"];
 
+const LEAD_SOURCE_COLORS: Record<string, string> = {
+  Hjemmeside: "bg-blue-50 text-blue-700",
+  Telefon: "bg-emerald-50 text-emerald-700",
+  Anbefaling: "bg-amber-50 text-amber-700",
+  Facebook: "bg-indigo-50 text-indigo-700",
+  Google: "bg-rose-50 text-rose-700",
+  Instagram: "bg-pink-50 text-pink-700",
+  Trustpilot: "bg-teal-50 text-teal-700",
+};
+
 function LeadsPage() {
   const { leads, createLead, updateLeadStage } = useMockStore();
   const navigate = useNavigate();
