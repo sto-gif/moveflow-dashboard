@@ -35,7 +35,7 @@ function BriefDetailPage() {
     id: "new",
     date: new Date(),
     title: `Brief ${new Date().toLocaleDateString("da-DK", { day: "numeric", month: "long" })}`,
-    scope: "daglig",
+    scope: "dag",
     status: "udkast",
     author: "Anders Nielsen",
     jobsCount: todaysJobs().length || 3,
@@ -48,7 +48,15 @@ function BriefDetailPage() {
   };
 
   const brief = existing ?? blank;
-  if (!isNew && !existing) {
+  const notFound = !isNew && !existing;
+
+  const [title, setTitle] = useState(brief.title);
+  const [notes, setNotes] = useState(brief.generalNotes);
+  const [special, setSpecial] = useState(brief.specialInstructions);
+  const [breaks, setBreaks] = useState(brief.breakSchedule);
+  const [announcements, setAnnouncements] = useState(brief.announcements);
+
+  if (notFound) {
     return (
       <div className="p-6">
         <p className="text-sm text-muted-foreground">Brief ikke fundet.</p>
@@ -65,12 +73,6 @@ function BriefDetailPage() {
   const assignedCrewIds = Array.from(new Set(sourceJobs.flatMap((j) => j.crewIds))).slice(0, brief.crewCount);
   const assignedVehicles = vehicles.slice(0, brief.vehiclesCount);
   const S = STATUS[brief.status];
-
-  const [title, setTitle] = useState(brief.title);
-  const [notes, setNotes] = useState(brief.generalNotes);
-  const [special, setSpecial] = useState(brief.specialInstructions);
-  const [breaks, setBreaks] = useState(brief.breakSchedule);
-  const [announcements, setAnnouncements] = useState(brief.announcements);
 
   return (
     <div>
