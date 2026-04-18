@@ -86,12 +86,23 @@ function LeadDetailPage() {
         </Link>
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 className="text-page-title">{lead.name}</h1>
+            <Input
+              value={lead.name}
+              onChange={(e) => updateLead(lead.id, { name: e.target.value })}
+              className="h-auto border-0 bg-transparent p-0 text-page-title focus-visible:ring-0 focus-visible:ring-offset-0 shadow-none"
+            />
             <div className="mt-2 flex flex-wrap items-center gap-2">
               <Badge variant="outline" className="text-[11px] capitalize">{lead.type}</Badge>
-              <Badge variant="outline" className={cn("text-[11px]", LEAD_STAGE_COLORS[lead.stage])}>
-                {LEAD_STAGE_LABELS[lead.stage]}
-              </Badge>
+              <Select value={lead.stage} onValueChange={(v) => updateLeadStage(lead.id, v as typeof lead.stage)}>
+                <SelectTrigger className={cn("h-7 w-auto gap-1.5 px-2 text-[11px]", LEAD_STAGE_COLORS[lead.stage])}>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {(Object.keys(LEAD_STAGE_LABELS) as Array<typeof lead.stage>).map((s) => (
+                    <SelectItem key={s} value={s}>{LEAD_STAGE_LABELS[s]}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <Badge variant="outline" className="text-[11px]">{lead.source}</Badge>
             </div>
           </div>
