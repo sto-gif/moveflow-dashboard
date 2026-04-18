@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { toast } from "sonner";
 import { ArrowLeft, Sparkles, Send, Clock, FileText, CheckCircle2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -98,10 +99,10 @@ function BriefDetailPage() {
           </Badge>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={() => navigate({ to: "/brief" })}>
+          <Button variant="outline" size="sm" onClick={() => { toast.success("Brief gemt som udkast"); navigate({ to: "/brief" }); }}>
             <Clock className="h-4 w-4" strokeWidth={1.5} /> Gem som udkast
           </Button>
-          <Button size="sm" onClick={() => navigate({ to: "/brief" })}>
+          <Button size="sm" onClick={() => { toast.success("Brief delt med crew"); navigate({ to: "/brief" }); }}>
             <Send className="h-4 w-4" strokeWidth={1.5} /> Del med crew
           </Button>
         </div>
