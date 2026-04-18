@@ -143,9 +143,9 @@ function CustomersPage() {
           </TabsContent>
 
           <TabsContent value="table" className="mt-4">
-            <Card className="overflow-x-auto">
+            <Card className="overflow-auto max-h-[calc(100vh-280px)]">
               <table className="w-full text-sm">
-                <thead className="bg-muted/40">
+                <thead className="bg-muted/40 sticky top-0 z-10">
                   <tr className="text-left text-caption uppercase text-muted-foreground">
                     <th className="px-4 py-2.5 font-medium">Navn</th>
                     <th className="px-4 py-2.5 font-medium">Type</th>
