@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { RowCount } from "@/components/row-count";
 import { useState } from "react";
 import { toast } from "sonner";
 import {
@@ -306,6 +307,7 @@ function LeadDetailPage() {
                 </table>
               )}
             </Card>
+            {leadQuotes.length > 0 && <RowCount shown={leadQuotes.length} total={leadQuotes.length} noun="tilbud" />}
           </TabsContent>
 
           <TabsContent value="notes" className="mt-4">

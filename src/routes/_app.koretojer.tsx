@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { RowCount } from "@/components/row-count";
 import { useState } from "react";
 import { Plus, Truck, Wrench, CalendarDays, Table as TableIcon, CalendarRange } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -95,6 +96,7 @@ function VehiclesPage() {
                 </tbody>
               </table>
             </Card>
+            <RowCount shown={vehicles.length} total={vehicles.length} noun="køretøjer" />
           </TabsContent>
 
           <TabsContent value="ugentlig" className="mt-4">

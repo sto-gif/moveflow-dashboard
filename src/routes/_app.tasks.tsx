@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { RowCount } from "@/components/row-count";
 import { useMemo, useState } from "react";
 import { Plus, LayoutGrid, Table as TableIcon, Calendar as CalendarIcon, Filter } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -158,6 +159,7 @@ function TasksPage() {
                 </tbody>
               </table>
             </Card>
+            <RowCount shown={filtered.length} total={tasks.length} noun="opgaver" />
           </TabsContent>
           <TabsContent value="calendar" className="mt-4">
             <TasksCalendar items={filtered} />

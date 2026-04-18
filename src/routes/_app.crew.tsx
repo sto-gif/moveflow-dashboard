@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { RowCount } from "@/components/row-count";
 import { useState, useMemo } from "react";
 import { Plus, Phone, Calendar as CalIcon, Car, Sparkles, X, Check, Table as TableIcon, List } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -128,6 +129,7 @@ function CrewPage() {
                 </tbody>
               </table>
             </Card>
+            <RowCount shown={crew.length} total={crew.length} noun="medarbejdere" />
           </TabsContent>
 
           <TabsContent value="kalender" className="mt-4">
