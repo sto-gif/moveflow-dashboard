@@ -115,6 +115,7 @@ function LeadsPage() {
           <TabsContent value="kanban" className="mt-4">
             <KanbanBoard
               className="grid gap-3 md:grid-cols-3 xl:grid-cols-6"
+              collapseAfter={10}
               columns={STAGES.map((s) => ({
                 id: s,
                 label: LEAD_STAGE_LABELS[s],
@@ -131,12 +132,14 @@ function LeadsPage() {
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="text-label leading-snug">{l.name}</div>
-                    <Badge variant="outline" className="text-[9px] capitalize">{l.type}</Badge>
+                    <Badge variant="outline" className="text-[10px] capitalize shrink-0">{l.type}</Badge>
                   </div>
                   <div className="mt-1 text-caption text-muted-foreground">{l.city}</div>
                   <div className="mt-2 flex items-center justify-between">
                     <span className="text-caption font-semibold tabular-nums">{dkk(l.estimatedValue)}</span>
-                    <Badge variant="outline" className="text-[10px]">{l.source}</Badge>
+                    <span className={cn("inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-medium", LEAD_SOURCE_COLORS[l.source] ?? "bg-muted text-muted-foreground")}>
+                      {l.source}
+                    </span>
                   </div>
                 </Link>
               )}
