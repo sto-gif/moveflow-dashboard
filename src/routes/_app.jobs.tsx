@@ -1,6 +1,10 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { zodValidator, fallback } from "@tanstack/zod-adapter";
+import { z } from "zod";
 import { RowCount } from "@/components/row-count";
-import { useEffect, useState } from "react";
+import { FilterBar, FilterChips, type FilterGroup } from "@/components/filter-bar";
+import { applyFilters, type FilterValues } from "@/hooks/use-filters";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Plus, Search, Image as ImageIcon, Upload, Camera, Building2, User, Mail, Phone, Pencil, LayoutGrid, Table as TableIcon, Calendar as CalendarIcon, Truck, MapPin, CheckCircle2, Circle, Clock, ExternalLink } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -26,10 +30,16 @@ import { CreateDialog } from "@/components/create-dialog";
 import { KanbanBoard } from "@/components/kanban-board";
 import { StageSelect } from "@/components/stage-select";
 
+const jobsSearchSchema = z.object({
+  job: fallback(z.string().optional(), undefined),
+  status: fallback(z.string().array(), []).default([]),
+  crew: fallback(z.string().array(), []).default([]),
+  vehicle: fallback(z.string().array(), []).default([]),
+  month: fallback(z.string().array(), []).default([]),
+});
+
 export const Route = createFileRoute("/_app/jobs")({
-  validateSearch: (s: Record<string, unknown>): { job?: string } => ({
-    job: typeof s.job === "string" ? s.job : undefined,
-  }),
+  validateSearch: zodValidator(jobsSearchSchema),
   head: () => ({
     meta: [
       { title: "Jobs — Movena" },
@@ -40,6 +50,7 @@ export const Route = createFileRoute("/_app/jobs")({
 });
 
 const STATUSES: JobStatus[] = ["planlagt", "bekraeftet", "i_gang", "afsluttet", "annulleret"];
+const MONTHS = ["jan", "feb", "mar", "apr", "maj", "jun", "jul", "aug", "sep", "okt", "nov", "dec"];
 
 function JobsPage() {
   const { jobs, createJob, updateJobStatus } = useMockStore();
