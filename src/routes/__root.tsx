@@ -1,6 +1,7 @@
 import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
+import faviconUrl from "../assets/movena-icon.svg?url";
 
 function NotFoundComponent() {
   return (
@@ -29,28 +30,25 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Testing SSS" },
+      { title: "Movena — Alt-i-én platform for flyttefirmaer" },
       {
         name: "description",
         content:
-          "Alt-i-én SaaS til flyttefirmaer: jobs, tilbud, crew, fakturaer, lager og kundekommunikation.",
+          "Movena er den moderne SaaS-platform til danske flyttefirmaer: leads, tilbud, jobs, crew, lager, fakturaer og kommunikation samlet ét sted.",
       },
-      { name: "author", content: "Flyt" },
-      { property: "og:title", content: "Testing SSS" },
+      { name: "author", content: "Movena" },
+      { property: "og:title", content: "Movena — Alt-i-én platform for flyttefirmaer" },
       {
         property: "og:description",
         content: "Driv hele dit flyttefirma fra én moderne platform.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:title", content: "Testing SSS" },
-      { name: "description", content: "MoveFlow Dashboard is a comprehensive SaaS platform for moving companies, managing operations from lead to invoice." },
-      { property: "og:description", content: "MoveFlow Dashboard is a comprehensive SaaS platform for moving companies, managing operations from lead to invoice." },
-      { name: "twitter:description", content: "MoveFlow Dashboard is a comprehensive SaaS platform for moving companies, managing operations from lead to invoice." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/bd87703d-0e54-46bc-a02f-02c89b1da04c/id-preview-ea2c0c1d--cc9ef946-3789-4582-a577-e6378c7c50f5.lovable.app-1776439148607.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/bd87703d-0e54-46bc-a02f-02c89b1da04c/id-preview-ea2c0c1d--cc9ef946-3789-4582-a577-e6378c7c50f5.lovable.app-1776439148607.png" },
+      { name: "twitter:title", content: "Movena" },
+      { name: "twitter:description", content: "Alt-i-én platform for flyttefirmaer." },
     ],
     links: [
+      { rel: "icon", type: "image/svg+xml", href: faviconUrl },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {

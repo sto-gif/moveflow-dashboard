@@ -20,6 +20,13 @@ export const JOB_STATUS_COLORS: Record<JobStatus, string> = {
   annulleret: "bg-rose-100 text-rose-700 border-rose-200",
 };
 
+export interface JobPhoto {
+  id: string;
+  url: string;
+  label: "før" | "efter";
+  caption: string;
+}
+
 export interface Job {
   id: string;
   number: string;
@@ -41,6 +48,8 @@ export interface Job {
   floorDest: number;
   hasElevatorOrigin: boolean;
   hasElevatorDest: boolean;
+  vehicleId?: string;
+  photos: JobPhoto[];
 }
 
 const EQUIPMENT_OPTIONS = [
@@ -58,6 +67,30 @@ const INSTRUCTIONS = [
   "",
 ];
 const TIMES = ["07:00", "07:30", "08:00", "08:30", "09:00", "10:00", "12:00", "13:00"];
+const VEHICLE_IDS = ["V-001", "V-002", "V-003", "V-004", "V-006"];
+
+const PHOTO_THUMBS = [
+  "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&h=300&fit=crop",
+  "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop",
+  "https://images.unsplash.com/photo-1505691938895-1758d7feb511?w=400&h=300&fit=crop",
+  "https://images.unsplash.com/photo-1567016526105-22da7c13161a?w=400&h=300&fit=crop",
+  "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=400&h=300&fit=crop",
+  "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=400&h=300&fit=crop",
+];
+
+function makePhotos(status: JobStatus): JobPhoto[] {
+  if (status === "planlagt" || status === "annulleret") return [];
+  const count = status === "afsluttet" ? randInt(3, 6) : randInt(1, 3);
+  return Array.from({ length: count }, (_, i) => {
+    const label: "før" | "efter" = status === "afsluttet" && i >= Math.floor(count / 2) ? "efter" : "før";
+    return {
+      id: `P-${randInt(1000, 99999)}-${i}`,
+      url: PHOTO_THUMBS[i % PHOTO_THUMBS.length]!,
+      label,
+      caption: label === "før" ? pick(["Stue", "Soveværelse", "Køkken", "Entré", "Kontor"]) : pick(["Tom stue", "Tom entré", "Færdig læsset", "Slutkontrol"]),
+    };
+  });
+}
 
 export const jobs: Job[] = Array.from({ length: 64 }, (_, i) => {
   const customer = pick(customers);
@@ -94,6 +127,8 @@ export const jobs: Job[] = Array.from({ length: 64 }, (_, i) => {
     floorDest: randInt(0, 5),
     hasElevatorOrigin: Math.random() > 0.4,
     hasElevatorDest: Math.random() > 0.4,
+    vehicleId: pick(VEHICLE_IDS),
+    photos: makePhotos(status),
   };
 });
 

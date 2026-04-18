@@ -1,11 +1,12 @@
-import { randInt, daysFromNow } from "./_helpers";
+import { customers } from "./customers";
+import { randInt, daysFromNow, pick } from "./_helpers";
 
-export type InventoryCategory = "boxes" | "equipment" | "vehicles";
+export type MaterialCategory = "boxes" | "equipment";
 
-export interface InventoryItem {
+export interface MaterialItem {
   id: string;
   name: string;
-  category: InventoryCategory;
+  category: MaterialCategory;
   owned: number;
   inStorage: number;
   out: number;
@@ -15,7 +16,7 @@ export interface InventoryItem {
   unit: string;
 }
 
-export const inventory: InventoryItem[] = [
+export const inventory: MaterialItem[] = [
   // Boxes
   { id: "INV-001", category: "boxes", name: "Flyttekasse standard", owned: 420, inStorage: 280, out: 122, lost: 18, purchasedThisYear: 200, minStock: 100, unit: "stk" },
   { id: "INV-002", category: "boxes", name: "Bogkasse lille", owned: 240, inStorage: 180, out: 55, lost: 5, purchasedThisYear: 80, minStock: 50, unit: "stk" },
@@ -27,14 +28,37 @@ export const inventory: InventoryItem[] = [
   { id: "INV-011", category: "equipment", name: "Møbeltæppe", owned: 140, inStorage: 70, out: 65, lost: 5, purchasedThisYear: 30, minStock: 40, unit: "stk" },
   { id: "INV-012", category: "equipment", name: "Bæresele (par)", owned: 28, inStorage: 14, out: 12, lost: 2, purchasedThisYear: 8, minStock: 8, unit: "par" },
   { id: "INV-013", category: "equipment", name: "Klaverdolly", owned: 4, inStorage: 2, out: 2, lost: 0, purchasedThisYear: 1, minStock: 2, unit: "stk" },
-  { id: "INV-014", category: "equipment", name: "Stropper og bånd", owned: 60, inStorage: 35, out: 22, lost: 3, purchasedThisYear: 20, minStock: 15, unit: "stk" },
+  { id: "INV-014", category: "equipment", name: "Stropper og bånd", owned: 60, inStorage: 35, out: 22, lost: 3, purchasedThisYear: 15, minStock: 15, unit: "stk" },
   { id: "INV-015", category: "equipment", name: "Værktøjskasse komplet", owned: 8, inStorage: 4, out: 4, lost: 0, purchasedThisYear: 2, minStock: 3, unit: "stk" },
-  // Vehicles
-  { id: "INV-020", category: "vehicles", name: "Mercedes Sprinter (DK 12345)", owned: 1, inStorage: 0, out: 1, lost: 0, purchasedThisYear: 0, minStock: 0, unit: "stk" },
-  { id: "INV-021", category: "vehicles", name: "MAN TGL 8t (DK 23456)", owned: 1, inStorage: 0, out: 1, lost: 0, purchasedThisYear: 0, minStock: 0, unit: "stk" },
-  { id: "INV-022", category: "vehicles", name: "Volvo FL 12t (DK 34567)", owned: 1, inStorage: 1, out: 0, lost: 0, purchasedThisYear: 0, minStock: 0, unit: "stk" },
-  { id: "INV-023", category: "vehicles", name: "Iveco Daily (DK 45678)", owned: 1, inStorage: 0, out: 1, lost: 0, purchasedThisYear: 1, minStock: 0, unit: "stk" },
 ];
+
+export interface LentItem {
+  id: string;
+  itemId: string;
+  itemName: string;
+  qty: number;
+  customerId: string;
+  customerName: string;
+  lentDate: Date;
+  returnDeadline: Date;
+}
+
+export const lentItems: LentItem[] = Array.from({ length: 12 }, (_, i) => {
+  const item = pick(inventory);
+  const customer = pick(customers);
+  const lent = daysFromNow(-randInt(2, 60));
+  const deadline = daysFromNow(-randInt(-15, 25));
+  return {
+    id: `LENT-${String(900 + i).padStart(3, "0")}`,
+    itemId: item.id,
+    itemName: item.name,
+    qty: randInt(1, 30),
+    customerId: customer.id,
+    customerName: customer.name,
+    lentDate: lent,
+    returnDeadline: deadline,
+  };
+});
 
 export interface InventoryLog {
   id: string;
@@ -58,6 +82,7 @@ export const inventoryLog: InventoryLog[] = [
 ];
 
 export const lowStockItems = () =>
-  inventory.filter((i) => i.category !== "vehicles" && i.inStorage < i.minStock);
+  inventory.filter((i) => i.inStorage < i.minStock);
 
-void randInt;
+export const overdueLentItems = () =>
+  lentItems.filter((l) => l.returnDeadline.getTime() < Date.now());
