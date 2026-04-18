@@ -93,16 +93,6 @@ function LeadDetailPage() {
             />
             <div className="mt-2 flex flex-wrap items-center gap-2">
               <Badge variant="outline" className="text-[11px] capitalize">{lead.type}</Badge>
-              <Select value={lead.stage} onValueChange={(v) => updateLeadStage(lead.id, v as typeof lead.stage)}>
-                <SelectTrigger className={cn("h-7 w-auto gap-1.5 px-2 text-[11px]", LEAD_STAGE_COLORS[lead.stage])}>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {(Object.keys(LEAD_STAGE_LABELS) as Array<typeof lead.stage>).map((s) => (
-                    <SelectItem key={s} value={s}>{LEAD_STAGE_LABELS[s]}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
               <Select value={lead.source} onValueChange={(v) => updateLead(lead.id, { source: v as typeof lead.source })}>
                 <SelectTrigger className="h-7 w-auto gap-1.5 px-2 text-[11px]">
                   <SelectValue />
@@ -157,6 +147,19 @@ function LeadDetailPage() {
           <Card className="p-4">
             <div className="text-caption uppercase text-muted-foreground">Tilbud</div>
             <div className="mt-3 grid grid-cols-2 gap-4">
+              <label className="space-y-1">
+                <span className="text-caption text-muted-foreground">Status</span>
+                <Select value={lead.stage} onValueChange={(v) => updateLeadStage(lead.id, v as typeof lead.stage)}>
+                  <SelectTrigger className={cn("h-9 text-sm", LEAD_STAGE_COLORS[lead.stage])}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {(Object.keys(LEAD_STAGE_LABELS) as Array<typeof lead.stage>).map((s) => (
+                      <SelectItem key={s} value={s}>{LEAD_STAGE_LABELS[s]}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </label>
               <label className="space-y-1">
                 <span className="text-caption text-muted-foreground">Estimeret værdi (DKK)</span>
                 <Input
