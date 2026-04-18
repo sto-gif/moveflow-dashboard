@@ -11,12 +11,21 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/page-header";
-import { todaysJobs, jobs, JOB_STATUS_LABELS, JOB_STATUS_COLORS } from "@/mocks/jobs";
+import { todaysJobs, jobs, JOB_STATUS_LABELS } from "@/mocks/jobs";
 import { customers } from "@/mocks/customers";
 import { leads, LEAD_STAGE_LABELS } from "@/mocks/leads";
 import { crew } from "@/mocks/crew";
+import { MOCK_TODAY } from "@/mocks/_helpers";
 import { dkk, pct, number } from "@/lib/format";
 import { cn } from "@/lib/utils";
+
+const JOB_STATUS_BADGE: Record<string, "success" | "warning" | "neutral" | "error"> = {
+  planlagt: "neutral",
+  bekraeftet: "warning",
+  i_gang: "warning",
+  afsluttet: "success",
+  annulleret: "error",
+};
 
 export const Route = createFileRoute("/_app/")({
   head: () => ({
