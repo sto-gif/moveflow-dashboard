@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import {
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
-  BarChart, Bar, PieChart, Pie, Cell,
+  BarChart, Bar, PieChart, Pie, Cell, Legend,
 } from "recharts";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -101,7 +101,7 @@ function ReportsPage() {
               verticalAlign="middle"
               iconType="circle"
               wrapperStyle={{ fontSize: 12, paddingLeft: 12 }}
-              formatter={(value, entry: any) => (
+              formatter={(value: string, entry: any) => (
                 <span className="text-xs text-foreground">
                   {value} <span className="text-muted-foreground">({entry?.payload?.v ?? 0})</span>
                 </span>
