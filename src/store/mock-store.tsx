@@ -36,6 +36,7 @@ interface Ctx {
   // jobs
   createJob: (input: { customerName: string; volumeM3: number; revenue: number; startTime: string }) => Job;
   updateJobStatus: (id: string, status: JobStatus) => void;
+  updateJob: (id: string, patch: Partial<Job>) => void;
   // quotes
   createQuote: (input: { customerName: string; total: number; pricingModel?: Quote["pricingModel"] }) => Quote;
   updateQuoteStatus: (id: string, status: QuoteStatus) => void;
