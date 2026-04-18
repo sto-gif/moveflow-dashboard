@@ -149,6 +149,10 @@ export function MockStoreProvider({ children }: { children: ReactNode }) {
     setCustomers((cs) => cs.map((c) => (c.id === id ? { ...c, stage } : c)));
   }, []);
 
+  const updateCustomer: Ctx["updateCustomer"] = useCallback((id, patch) => {
+    setCustomers((cs) => cs.map((c) => (c.id === id ? { ...c, ...patch } : c)));
+  }, []);
+
   const createJob: Ctx["createJob"] = useCallback((input) => {
     const num = String(200 + Math.floor(Math.random() * 999));
     const addr = randomAddress();
