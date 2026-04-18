@@ -262,6 +262,13 @@ function JobSheet({ job }: { job: Job }) {
                     <SelectItem value="erhverv">Erhverv</SelectItem>
                   </SelectContent>
                 </Select>
+                <Link
+                  to="/customers/$customerId"
+                  params={{ customerId: customer.id }}
+                  className="inline-flex h-8 items-center gap-1 rounded-md border border-primary/30 bg-background px-2 text-[11px] font-medium text-primary hover:bg-primary/10"
+                >
+                  Se kunde <ExternalLink className="h-3 w-3" strokeWidth={1.5} />
+                </Link>
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <label className="space-y-1">
