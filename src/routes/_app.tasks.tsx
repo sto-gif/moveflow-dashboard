@@ -1,12 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Plus, LayoutGrid, Table as TableIcon, Calendar as CalendarIcon } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Plus, LayoutGrid, Table as TableIcon, Calendar as CalendarIcon, Filter } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PageHeader } from "@/components/page-header";
-import { tasks, TASK_STATUS_LABELS, TASK_PRIORITY_COLORS, type TaskStatus } from "@/mocks/tasks";
+import { tasks, TASK_STATUS_LABELS, TASK_PRIORITY_COLORS, type TaskStatus, type TaskPriority } from "@/mocks/tasks";
 import { crew } from "@/mocks/crew";
+import { MOCK_TODAY } from "@/mocks/_helpers";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_app/tasks")({
