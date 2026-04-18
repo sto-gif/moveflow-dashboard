@@ -47,12 +47,14 @@ function ReportsPage() {
         actions={
           <>
             <Select defaultValue="12m">
-              <SelectTrigger className="h-9 w-36"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="h-9 w-44"><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="30d">Sidste 30 dage</SelectItem>
                 <SelectItem value="3m">Sidste 3 mdr.</SelectItem>
+                <SelectItem value="6m">Sidste 6 mdr.</SelectItem>
                 <SelectItem value="12m">Sidste 12 mdr.</SelectItem>
                 <SelectItem value="ytd">År til dato</SelectItem>
+                <SelectItem value="custom">Brugerdefineret…</SelectItem>
               </SelectContent>
             </Select>
             <Button size="sm" variant="outline">Eksportér PDF</Button>
