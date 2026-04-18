@@ -108,7 +108,7 @@ function CrewPage() {
                       </td>
                       <td className="px-4 py-2.5 text-muted-foreground">{c.role}</td>
                       <td className="px-4 py-2.5">
-                        <Badge variant="outline" className={cn("text-[10px] capitalize", statusBadge(c.status))}>{c.status}</Badge>
+                        <Badge variant="outline" className={cn("text-[10px]", statusBadge(c.status))}>{STATUS_LABELS[c.status] ?? c.status}</Badge>
                       </td>
                       <td className="px-4 py-2.5">
                         <div className="flex flex-wrap gap-1">
@@ -169,7 +169,7 @@ function CrewPage() {
                     <div className="font-semibold">{member.role}</div>
                     <div className="text-xs text-muted-foreground flex items-center gap-1"><Phone className="h-3 w-3" strokeWidth={1.5} />{member.phone}</div>
                   </div>
-                  <Badge variant="outline" className={cn("text-[10px] capitalize", statusBadge(member.status))}>{member.status}</Badge>
+                  <Badge variant="outline" className={cn("text-[10px]", statusBadge(member.status))}>{STATUS_LABELS[member.status] ?? member.status}</Badge>
                 </div>
 
                 <Card className="p-3">
