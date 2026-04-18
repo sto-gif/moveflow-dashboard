@@ -446,14 +446,40 @@ function JobSheet({ job }: { job: Job }) {
         <TabsContent value="okonomi" className="mt-4 space-y-4">
           <Card className="p-4">
             <div className="grid grid-cols-3 gap-3 text-center">
-              <div><div className="text-xs text-muted-foreground">Omsætning</div><div className="text-base font-bold">{dkk(job.revenue)}</div></div>
-              <div><div className="text-xs text-muted-foreground">Omkostning</div><div className="text-base font-bold">{dkk(job.cost)}</div></div>
-              <div><div className="text-xs text-muted-foreground">Margin</div><div className="text-base font-bold text-success">{dkk(job.revenue - job.cost)}</div></div>
+              <div>
+                <div className="text-xs text-muted-foreground">Omsætning</div>
+                <Input
+                  type="number"
+                  min={0}
+                  value={job.revenue}
+                  onChange={(e) => updateJob(job.id, { revenue: Number(e.target.value) || 0 })}
+                  className="mt-1 h-9 text-center text-base font-bold"
+                />
+              </div>
+              <div>
+                <div className="text-xs text-muted-foreground">Omkostning</div>
+                <Input
+                  type="number"
+                  min={0}
+                  value={job.cost}
+                  onChange={(e) => updateJob(job.id, { cost: Number(e.target.value) || 0 })}
+                  className="mt-1 h-9 text-center text-base font-bold"
+                />
+              </div>
+              <div>
+                <div className="text-xs text-muted-foreground">Margin</div>
+                <div className="mt-1 flex h-9 items-center justify-center text-base font-bold text-success tabular-nums">{dkk(job.revenue - job.cost)}</div>
+              </div>
+            </div>
+            <div className="mt-2 text-center text-[11px] text-muted-foreground">
+              Ændringer synkroniseres på tværs af kanban, tabel og kundekortet.
             </div>
           </Card>
           <Card className="p-4">
             <div className="text-xs text-muted-foreground">Margin %</div>
-            <div className="mt-1 text-2xl font-bold">{(((job.revenue - job.cost) / job.revenue) * 100).toFixed(1)}%</div>
+            <div className="mt-1 text-2xl font-bold tabular-nums">
+              {job.revenue > 0 ? (((job.revenue - job.cost) / job.revenue) * 100).toFixed(1) : "0.0"}%
+            </div>
           </Card>
           {quote && (
             <Card className="p-4">
