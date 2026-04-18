@@ -145,14 +145,20 @@ export const quotes: Quote[] = Array.from({ length: 28 }, (_, i) => {
   const baseTotal = lineItems.reduce((s, li) => s + li.amount, 0);
   const manuallyAdjusted = Math.random() > 0.78;
   const total = manuallyAdjusted ? Math.round(baseTotal * (0.92 + Math.random() * 0.12)) : baseTotal;
+  // Quote numbers start at 3142 with realistic gaps
+  const quoteNumberOffsets = [0, 1, 2, 4, 5, 6, 8, 9, 11, 12, 13, 14, 16, 17, 19, 20, 21, 22, 24, 25, 27, 28, 29, 31, 32, 33, 34, 36];
+  const quoteNumber = String(3142 + (quoteNumberOffsets[i] ?? i));
+  // Non-round adjustments: add small odd amounts so totals don't end in 000/500
+  const adjustNoise = [173, 247, 419, 587, 691, 813, 47, 129, 263, 379, 461, 542];
+  const noise = adjustNoise[i % adjustNoise.length]!;
   return {
     id: `Q-${String(3000 + i).padStart(4, "0")}`,
-    number: String(200 + i),
+    number: quoteNumber,
     ...partial,
     lineItems,
-    baseTotal,
+    baseTotal: baseTotal + noise,
     manuallyAdjusted,
-    total,
+    total: (manuallyAdjusted ? total : baseTotal) + noise + (i % 8 === 0 ? 0.5 : 0),
   } as Quote;
 });
 

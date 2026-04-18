@@ -74,6 +74,13 @@ function weightedStage(): LeadStage {
   return "ny";
 }
 
+// Non-round estimated values, occasionally with ,50 ører
+function realisticLeadValue(i: number): number {
+  const bases = [4287, 7619, 9312, 11847, 14523, 18261, 22077, 26934, 31418, 38762, 47193, 54381];
+  const v = bases[i % bases.length]!;
+  return i % 9 === 0 ? v + 0.5 : v;
+}
+
 export const leads: Lead[] = Array.from({ length: 32 }, (_, i) => {
   const type: "privat" | "erhverv" = i % 5 === 0 ? "erhverv" : "privat";
   const name = type === "erhverv"
@@ -88,7 +95,7 @@ export const leads: Lead[] = Array.from({ length: 32 }, (_, i) => {
     city: pick(DANISH_CITIES).city,
     stage: weightedStage(),
     source: pick(SOURCES),
-    estimatedValue: randInt(4, 55) * 1000,
+    estimatedValue: realisticLeadValue(i),
     moveDate: daysFromNow(randInt(3, 75)),
     createdAt: daysFromNow(-randInt(0, 30)),
     note: pick(NOTES),

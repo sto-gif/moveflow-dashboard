@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import {
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
-  BarChart, Bar, PieChart, Pie, Cell,
+  BarChart, Bar, PieChart, Pie, Cell, Legend,
 } from "recharts";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -47,12 +47,14 @@ function ReportsPage() {
         actions={
           <>
             <Select defaultValue="12m">
-              <SelectTrigger className="h-9 w-36"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="h-9 w-44"><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="30d">Sidste 30 dage</SelectItem>
                 <SelectItem value="3m">Sidste 3 mdr.</SelectItem>
+                <SelectItem value="6m">Sidste 6 mdr.</SelectItem>
                 <SelectItem value="12m">Sidste 12 mdr.</SelectItem>
                 <SelectItem value="ytd">År til dato</SelectItem>
+                <SelectItem value="custom">Brugerdefineret…</SelectItem>
               </SelectContent>
             </Select>
             <Button size="sm" variant="outline">Eksportér PDF</Button>
@@ -87,12 +89,24 @@ function ReportsPage() {
             <Line type="monotone" dataKey="p" stroke="oklch(0.62 0.16 152)" strokeWidth={2.5} />
           </LineChart>
         </ChartCard>
-        <ChartCard title="Kundeanskaffelse pr. kilde">
+        <ChartCard title="Kundetilgang pr. kilde">
           <PieChart>
-            <Pie data={sources} dataKey="v" nameKey="name" cx="50%" cy="50%" outerRadius={80} label={{ fontSize: 11 }}>
+            <Pie data={sources} dataKey="v" nameKey="name" cx="35%" cy="50%" outerRadius={80}>
               {sources.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
             </Pie>
             <Tooltip contentStyle={{ borderRadius: 8, fontSize: 12 }} />
+            <Legend
+              layout="vertical"
+              align="right"
+              verticalAlign="middle"
+              iconType="circle"
+              wrapperStyle={{ fontSize: 12, paddingLeft: 12 }}
+              formatter={(value: string, entry: any) => (
+                <span className="text-xs text-foreground">
+                  {value} <span className="text-muted-foreground">({entry?.payload?.v ?? 0})</span>
+                </span>
+              )}
+            />
           </PieChart>
         </ChartCard>
         <ChartCard title="Tilbud → booking konvertering" subtitle="Procent">

@@ -10,7 +10,7 @@ import { CreateDialog } from "@/components/create-dialog";
 import { useMockStore } from "@/store/mock-store";
 import {
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
-  BarChart, Bar,
+  BarChart, Bar, Area, ComposedChart,
 } from "recharts";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -56,19 +56,16 @@ function DashboardPage() {
     (customers.length / Math.max(1, customers.length + leads.length)) * 100;
   const utilization = 78.4;
 
-  // Growth trajectory with winter dip (Dec/Jan), peaks in summer moving season
+  // Healthy growing moving company: summer peak, winter dip, slight irregular noise per month
+  // Sequence (May → Apr): 165, 195, 220, 235, 210, 190, 175, 145, 140, 160, 185, 199 (k DKK)
+  const REV_SEQUENCE = [165, 195, 220, 235, 210, 190, 175, 145, 140, 160, 185, 199];
+  const NOISE = [-2, 3, -4, 2, -1, 4, -3, 2, -2, 3, -1, 0]; // ±2-4k jitter
   const revenueData = Array.from({ length: 12 }, (_, i) => {
     const m = new Date(MOCK_TODAY);
     m.setMonth(m.getMonth() - (11 - i));
-    const monthIdx = m.getMonth();
-    const base = 140000 + i * 17000;
-    const seasonal: Record<number, number> = {
-      0: -45000, 1: -35000, 2: -10000, 3: 5000, 4: 20000,
-      5: 40000, 6: 55000, 7: 50000, 8: 25000, 9: 5000, 10: -15000, 11: -40000,
-    };
     return {
       m: m.toLocaleDateString("da-DK", { month: "short" }),
-      omsætning: base + (seasonal[monthIdx] ?? 0),
+      omsætning: (REV_SEQUENCE[i]! + NOISE[i]!) * 1000,
     };
   });
 
@@ -130,10 +127,16 @@ function DashboardPage() {
                 <h3 className="text-section">Omsætning, sidste 12 mdr.</h3>
                 <p className="text-caption text-muted-foreground">DKK pr. måned</p>
               </div>
-              <Badge variant="success">+18,2 % YoY</Badge>
+              <Badge variant="success">+21 % YoY</Badge>
             </div>
             <ResponsiveContainer width="100%" height={240}>
-              <LineChart data={revenueData}>
+              <ComposedChart data={revenueData}>
+                <defs>
+                  <linearGradient id="revFill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#3B82F6" stopOpacity={0.18} />
+                    <stop offset="100%" stopColor="#3B82F6" stopOpacity={0.01} />
+                  </linearGradient>
+                </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
                 <XAxis dataKey="m" tick={{ fontSize: 11 }} stroke="#94A3B8" />
                 <YAxis tick={{ fontSize: 11 }} stroke="#94A3B8"
@@ -142,15 +145,16 @@ function DashboardPage() {
                   formatter={(v: any) => dkk(Number(v))}
                   contentStyle={{ borderRadius: 8, fontSize: 12, border: "1px solid #E2E8F0" }}
                 />
+                <Area type="monotone" dataKey="omsætning" stroke="none" fill="url(#revFill)" />
                 <Line
                   type="monotone" dataKey="omsætning"
                   stroke="#1D4ED8" strokeWidth={2}
-                  dot={{ r: 3 }} activeDot={{ r: 5 }}
+                  dot={{ r: 3, fill: "#1D4ED8" }} activeDot={{ r: 5 }}
                 />
-              </LineChart>
+              </ComposedChart>
             </ResponsiveContainer>
             <p className="mt-3 text-caption text-muted-foreground">
-              Omsætning er steget 18 % i forhold til sidste måned.
+              Omsætning er steget 21 % sammenlignet med sidste år. Sommer er jeres største sæson.
             </p>
           </Card>
           <Card>
