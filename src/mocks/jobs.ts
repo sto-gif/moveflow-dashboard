@@ -1,6 +1,6 @@
 import { customers } from "./customers";
 import { crew } from "./crew";
-import { pick, randInt, daysFromNow, randomAddress } from "./_helpers";
+import { pick, randInt, daysFromNow, randomAddress, MOCK_TODAY } from "./_helpers";
 
 export type JobStatus = "planlagt" | "bekraeftet" | "i_gang" | "afsluttet" | "annulleret";
 
@@ -133,7 +133,7 @@ export const jobs: Job[] = Array.from({ length: 64 }, (_, i) => {
 });
 
 export const todaysJobs = () => {
-  const today = new Date();
+  const today = MOCK_TODAY;
   return jobs.filter(
     (j) =>
       j.date.getDate() === today.getDate() &&

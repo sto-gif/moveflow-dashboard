@@ -11,12 +11,21 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/page-header";
-import { todaysJobs, jobs, JOB_STATUS_LABELS, JOB_STATUS_COLORS } from "@/mocks/jobs";
+import { todaysJobs, jobs, JOB_STATUS_LABELS } from "@/mocks/jobs";
 import { customers } from "@/mocks/customers";
 import { leads, LEAD_STAGE_LABELS } from "@/mocks/leads";
 import { crew } from "@/mocks/crew";
+import { MOCK_TODAY } from "@/mocks/_helpers";
 import { dkk, pct, number } from "@/lib/format";
 import { cn } from "@/lib/utils";
+
+const JOB_STATUS_BADGE: Record<string, "success" | "warning" | "neutral" | "error"> = {
+  planlagt: "neutral",
+  bekraeftet: "warning",
+  i_gang: "warning",
+  afsluttet: "success",
+  annulleret: "error",
+};
 
 export const Route = createFileRoute("/_app/")({
   head: () => ({
@@ -31,7 +40,7 @@ export const Route = createFileRoute("/_app/")({
 function DashboardPage() {
   const today = todaysJobs();
   const completedThisMonth = jobs.filter(
-    (j) => j.status === "afsluttet" && j.date.getMonth() === new Date().getMonth(),
+    (j) => j.status === "afsluttet" && j.date.getMonth() === MOCK_TODAY.getMonth(),
   );
   const revenueMTD = completedThisMonth.reduce((s, j) => s + j.revenue, 0);
   const avgValue = completedThisMonth.length ? revenueMTD / completedThisMonth.length : 0;
@@ -41,7 +50,7 @@ function DashboardPage() {
   const utilization = 78.4;
 
   const revenueData = Array.from({ length: 12 }, (_, i) => {
-    const m = new Date();
+    const m = new Date(MOCK_TODAY);
     m.setMonth(m.getMonth() - (11 - i));
     return {
       m: m.toLocaleDateString("da-DK", { month: "short" }),
@@ -65,59 +74,69 @@ function DashboardPage() {
           </>
         }
       />
-      <div className="space-y-4 p-6">
-        {/* KPI strip */}
-        <div className="grid grid-cols-2 gap-3 lg:grid-cols-6">
-          <Kpi label="Omsætning MTD" value={dkk(revenueMTD)} delta="+12,4 %" up icon={Wallet} />
-          <Kpi label="Jobs udført" value={number(completedThisMonth.length)} delta="+8" up icon={Briefcase} />
-          <Kpi label="Crew-udnyttelse" value={pct(utilization)} delta="+3,1 %" up icon={Activity} />
-          <Kpi label="Gns. jobværdi" value={dkk(avgValue)} delta="-2,1 %" icon={TrendingUp} />
-          <Kpi label="Aktive jobs" value={number(activeJobs)} delta={`${today.length} i dag`} icon={Briefcase} />
-          <Kpi label="Konvertering" value={pct(conversion)} delta="+1,8 %" up icon={Users} />
+      <div className="space-y-8 p-6">
+        {/* Hero KPIs */}
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          <KpiHero label="Omsætning MTD" value={dkk(revenueMTD)} delta="+12,4 % vs. sidste måned" up icon={Wallet} />
+          <KpiHero label="Aktive jobs" value={number(activeJobs)} delta={`${today.length} starter i dag`} icon={Briefcase} />
+          <KpiHero label="Jobs udført" value={number(completedThisMonth.length)} delta="+8 vs. sidste måned" up icon={CheckCircle2} />
+        </div>
+
+        {/* Secondary KPIs */}
+        <div className="grid grid-cols-2 gap-6 md:grid-cols-3">
+          <KpiSmall label="Konvertering" value={pct(conversion)} delta="+1,8 %" up icon={Users} />
+          <KpiSmall label="Snit pr. job" value={dkk(avgValue)} delta="-2,1 %" icon={TrendingUp} />
+          <KpiSmall label="Crew-udnyttelse" value={pct(utilization)} delta="+3,1 %" up icon={Activity} />
         </div>
 
         {/* Charts row */}
-        <div className="grid gap-4 lg:grid-cols-3">
-          <Card className="lg:col-span-2 p-5">
+        <div className="grid gap-6 lg:grid-cols-3">
+          <Card className="lg:col-span-2">
             <div className="mb-4 flex items-center justify-between">
               <div>
-                <h3 className="text-sm font-semibold">Omsætning, sidste 12 mdr.</h3>
-                <p className="text-xs text-muted-foreground">DKK pr. måned</p>
+                <h3 className="text-section">Omsætning, sidste 12 mdr.</h3>
+                <p className="text-caption text-muted-foreground">DKK pr. måned</p>
               </div>
-              <Badge variant="secondary">+18,2 % YoY</Badge>
+              <Badge variant="success">+18,2 % YoY</Badge>
             </div>
             <ResponsiveContainer width="100%" height={240}>
               <LineChart data={revenueData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="oklch(0.92 0.01 255)" />
-                <XAxis dataKey="m" tick={{ fontSize: 11 }} stroke="oklch(0.5 0.02 257)" />
-                <YAxis tick={{ fontSize: 11 }} stroke="oklch(0.5 0.02 257)"
+                <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
+                <XAxis dataKey="m" tick={{ fontSize: 11 }} stroke="#94A3B8" />
+                <YAxis tick={{ fontSize: 11 }} stroke="#94A3B8"
                   tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
                 <Tooltip
                   formatter={(v: any) => dkk(Number(v))}
-                  contentStyle={{ borderRadius: 8, fontSize: 12, border: "1px solid oklch(0.92 0.01 255)" }}
+                  contentStyle={{ borderRadius: 8, fontSize: 12, border: "1px solid #E2E8F0" }}
                 />
                 <Line
                   type="monotone" dataKey="omsætning"
-                  stroke="oklch(0.487 0.214 264)" strokeWidth={2.5}
+                  stroke="#1D4ED8" strokeWidth={2}
                   dot={{ r: 3 }} activeDot={{ r: 5 }}
                 />
               </LineChart>
             </ResponsiveContainer>
+            <p className="mt-3 text-caption text-muted-foreground">
+              Omsætning er steget 18 % i forhold til sidste måned.
+            </p>
           </Card>
-          <Card className="p-5">
+          <Card>
             <div className="mb-4">
-              <h3 className="text-sm font-semibold">Lead funnel</h3>
-              <p className="text-xs text-muted-foreground">Antal leads pr. fase</p>
+              <h3 className="text-section">Lead funnel</h3>
+              <p className="text-caption text-muted-foreground">Antal leads pr. fase</p>
             </div>
             <ResponsiveContainer width="100%" height={240}>
               <BarChart data={funnel} layout="vertical" margin={{ left: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="oklch(0.92 0.01 255)" horizontal={false} />
-                <XAxis type="number" tick={{ fontSize: 11 }} stroke="oklch(0.5 0.02 257)" />
-                <YAxis type="category" dataKey="name" tick={{ fontSize: 11 }} width={90} stroke="oklch(0.5 0.02 257)" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" horizontal={false} />
+                <XAxis type="number" tick={{ fontSize: 11 }} stroke="#94A3B8" />
+                <YAxis type="category" dataKey="name" tick={{ fontSize: 11 }} width={90} stroke="#94A3B8" />
                 <Tooltip contentStyle={{ borderRadius: 8, fontSize: 12 }} />
-                <Bar dataKey="v" fill="oklch(0.487 0.214 264)" radius={[0, 4, 4, 0]} />
+                <Bar dataKey="v" fill="#1D4ED8" radius={[0, 4, 4, 0]} />
               </BarChart>
             </ResponsiveContainer>
+            <p className="mt-3 text-caption text-muted-foreground">
+              3 jobs mangler crew-tildeling denne uge.
+            </p>
           </Card>
         </div>
 
@@ -169,12 +188,12 @@ function DashboardPage() {
                           )}
                         </div>
                       </td>
-                      <td className="py-2.5">
-                        <Badge variant="outline" className={cn("text-[10px]", JOB_STATUS_COLORS[j.status])}>
+                      <td className="py-3">
+                        <Badge variant={JOB_STATUS_BADGE[j.status]}>
                           {JOB_STATUS_LABELS[j.status]}
                         </Badge>
                       </td>
-                      <td className="py-2.5 text-right font-medium">{dkk(j.revenue)}</td>
+                      <td className="py-3 text-right font-medium tabular-nums text-[#0F172A]">{dkk(j.revenue)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -230,25 +249,50 @@ function DashboardPage() {
   );
 }
 
-function Kpi({
-  label, value, delta, up, warn, icon: Icon,
+function KpiHero({
+  label, value, delta, up, icon: Icon,
 }: {
-  label: string; value: string; delta?: string; up?: boolean; warn?: boolean;
+  label: string; value: string; delta?: string; up?: boolean;
   icon: React.ComponentType<{ className?: string }>;
 }) {
   return (
-    <Card className="p-4">
+    <Card className="card-interactive p-6">
       <div className="flex items-center justify-between">
-        <span className="text-xs font-medium text-muted-foreground">{label}</span>
-        <Icon className={cn("h-4 w-4", warn ? "text-destructive" : "text-muted-foreground")} />
+        <span className="text-label text-muted-foreground">{label}</span>
+        <Icon className="h-5 w-5 text-muted-foreground" />
       </div>
-      <div className="mt-2 text-xl font-bold tracking-tight">{value}</div>
+      <div className="mt-3 text-3xl font-semibold tracking-tight tabular-nums text-foreground">{value}</div>
       {delta && (
         <div className={cn(
-          "mt-1 flex items-center gap-1 text-[11px] font-medium",
-          warn ? "text-destructive" : up ? "text-emerald-600" : "text-muted-foreground",
+          "mt-2 flex items-center gap-1 text-caption",
+          up ? "text-[#16A34A]" : "text-muted-foreground",
         )}>
-          {up ? <TrendingUp className="h-3 w-3" /> : warn ? <AlertTriangle className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+          {up ? <TrendingUp className="h-3.5 w-3.5" /> : <TrendingDown className="h-3.5 w-3.5" />}
+          {delta}
+        </div>
+      )}
+    </Card>
+  );
+}
+
+function KpiSmall({
+  label, value, delta, up, icon: Icon,
+}: {
+  label: string; value: string; delta?: string; up?: boolean;
+  icon: React.ComponentType<{ className?: string }>;
+}) {
+  return (
+    <Card className="card-interactive">
+      <div className="flex items-center justify-between">
+        <span className="text-caption text-muted-foreground">{label}</span>
+        <Icon className="h-4 w-4 text-muted-foreground" />
+      </div>
+      <div className="mt-2 text-xl font-semibold tracking-tight tabular-nums text-foreground">{value}</div>
+      {delta && (
+        <div className={cn(
+          "mt-1 text-caption",
+          up ? "text-[#16A34A]" : "text-muted-foreground",
+        )}>
           {delta}
         </div>
       )}
@@ -264,17 +308,17 @@ function Alert({
   title: string; meta: string;
 }) {
   const colors = {
-    warn: "bg-amber-50 text-amber-700 border-amber-200",
-    danger: "bg-rose-50 text-rose-700 border-rose-200",
-    info: "bg-blue-50 text-blue-700 border-blue-200",
-    ok: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    warn: "bg-[#FEF3C7] text-[#D97706] border-[#FDE68A]",
+    danger: "bg-[#FEE2E2] text-[#DC2626] border-[#FECACA]",
+    info: "bg-[#F1F5F9] text-[#475569] border-[#E2E8F0]",
+    ok: "bg-[#DCFCE7] text-[#16A34A] border-[#BBF7D0]",
   }[tone];
   return (
     <div className={cn("flex items-start gap-3 rounded-md border px-3 py-2.5", colors)}>
       <Icon className="mt-0.5 h-4 w-4 shrink-0" />
       <div className="flex-1 leading-snug">
-        <div className="text-sm font-medium">{title}</div>
-        <div className="text-xs opacity-80">{meta}</div>
+        <div className="text-body font-medium">{title}</div>
+        <div className="text-caption opacity-80">{meta}</div>
       </div>
     </div>
   );
