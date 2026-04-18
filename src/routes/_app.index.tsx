@@ -10,7 +10,7 @@ import { CreateDialog } from "@/components/create-dialog";
 import { useMockStore } from "@/store/mock-store";
 import {
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
-  BarChart, Bar,
+  BarChart, Bar, Area, ComposedChart,
 } from "recharts";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -56,19 +56,16 @@ function DashboardPage() {
     (customers.length / Math.max(1, customers.length + leads.length)) * 100;
   const utilization = 78.4;
 
-  // Growth trajectory with winter dip (Dec/Jan), peaks in summer moving season
+  // Healthy growing moving company: summer peak, winter dip, slight irregular noise per month
+  // Sequence (May → Apr): 165, 195, 220, 235, 210, 190, 175, 145, 140, 160, 185, 199 (k DKK)
+  const REV_SEQUENCE = [165, 195, 220, 235, 210, 190, 175, 145, 140, 160, 185, 199];
+  const NOISE = [-2, 3, -4, 2, -1, 4, -3, 2, -2, 3, -1, 0]; // ±2-4k jitter
   const revenueData = Array.from({ length: 12 }, (_, i) => {
     const m = new Date(MOCK_TODAY);
     m.setMonth(m.getMonth() - (11 - i));
-    const monthIdx = m.getMonth();
-    const base = 140000 + i * 17000;
-    const seasonal: Record<number, number> = {
-      0: -45000, 1: -35000, 2: -10000, 3: 5000, 4: 20000,
-      5: 40000, 6: 55000, 7: 50000, 8: 25000, 9: 5000, 10: -15000, 11: -40000,
-    };
     return {
       m: m.toLocaleDateString("da-DK", { month: "short" }),
-      omsætning: base + (seasonal[monthIdx] ?? 0),
+      omsætning: (REV_SEQUENCE[i]! + NOISE[i]!) * 1000,
     };
   });
 
