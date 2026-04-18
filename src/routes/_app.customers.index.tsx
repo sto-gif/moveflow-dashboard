@@ -181,7 +181,7 @@ function CustomersPage() {
                       <td className="px-4 py-2.5 text-muted-foreground tabular-nums">
                         {c.lastJobDate ? c.lastJobDate.toLocaleDateString("da-DK") : "—"}
                       </td>
-                      <td className="px-4 py-2.5">
+                      <td className="px-4 py-2.5" onClick={(e) => e.stopPropagation()}>
                         <StageSelect
                           value={c.stage}
                           options={STAGES}
@@ -199,6 +199,12 @@ function CustomersPage() {
           </TabsContent>
         </Tabs>
       </div>
+
+      <CustomerDrawer
+        customerId={drawerId}
+        open={drawerId !== null}
+        onOpenChange={(o) => { if (!o) setDrawerId(null); }}
+      />
     </div>
   );
 }
