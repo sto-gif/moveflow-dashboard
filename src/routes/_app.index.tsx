@@ -188,12 +188,12 @@ function DashboardPage() {
                           )}
                         </div>
                       </td>
-                      <td className="py-2.5">
-                        <Badge variant="outline" className={cn("text-[10px]", JOB_STATUS_COLORS[j.status])}>
+                      <td className="py-3">
+                        <Badge variant={JOB_STATUS_BADGE[j.status]}>
                           {JOB_STATUS_LABELS[j.status]}
                         </Badge>
                       </td>
-                      <td className="py-2.5 text-right font-medium">{dkk(j.revenue)}</td>
+                      <td className="py-3 text-right font-medium tabular-nums text-[#0F172A]">{dkk(j.revenue)}</td>
                     </tr>
                   ))}
                 </tbody>
