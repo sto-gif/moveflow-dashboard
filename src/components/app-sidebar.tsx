@@ -75,7 +75,7 @@ export function AppSidebar() {
           )}
         </div>
       </SidebarHeader>
-      <SidebarContent className={cn("overflow-y-auto", collapsed && "px-1.5")}>
+      <SidebarContent className={cn("overflow-y-auto", collapsed && "items-center px-0")}>
         {groups.map((group) => (
           <SidebarGroup key={group.label} className="py-1">
             {!collapsed && (
