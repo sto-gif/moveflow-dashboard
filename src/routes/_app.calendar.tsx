@@ -20,7 +20,7 @@ export const Route = createFileRoute("/_app/calendar")({
   component: CalendarPage,
 });
 
-const HOURS = Array.from({ length: 14 }, (_, i) => i + 7); // 07-20
+const HOURS = Array.from({ length: 24 }, (_, i) => i); // 00-23
 const WEEKDAYS = ["Man", "Tir", "Ons", "Tor", "Fre", "Lør", "Søn"];
 
 function CalendarPage() {
@@ -154,7 +154,7 @@ function WeekGrid({ cursor, jobs, onJobClick }: { cursor: Date; jobs: any[]; onJ
   });
 
   return (
-    <div className="overflow-x-auto">
+    <div className="max-h-[600px] overflow-auto">
       <div className="grid min-w-[800px]" style={{ gridTemplateColumns: "60px repeat(7, 1fr)" }}>
         <div />
         {days.map((d) => (
@@ -193,6 +193,7 @@ function WeekGrid({ cursor, jobs, onJobClick }: { cursor: Date; jobs: any[]; onJ
 function DayGrid({ cursor, jobs, onJobClick }: { cursor: Date; jobs: any[]; onJobClick: (id: string) => void }) {
   const dayJobs = jobs.filter((j) => isSameDay(j.date, cursor));
   return (
+    <div className="max-h-[600px] overflow-auto">
     <div className="grid" style={{ gridTemplateColumns: "70px 1fr" }}>
       {HOURS.map((h) => {
         const cellJobs = dayJobs.filter((j) => parseInt(j.startTime.split(":")[0], 10) === h);
@@ -215,6 +216,7 @@ function DayGrid({ cursor, jobs, onJobClick }: { cursor: Date; jobs: any[]; onJo
           </>
         );
       })}
+    </div>
     </div>
   );
 }
