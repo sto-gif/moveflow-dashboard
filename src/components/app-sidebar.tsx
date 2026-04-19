@@ -75,7 +75,7 @@ export function AppSidebar() {
           )}
         </div>
       </SidebarHeader>
-      <SidebarContent className={cn("overflow-y-auto", collapsed && "px-1.5")}>
+      <SidebarContent className={cn("overflow-y-auto", collapsed && "items-center px-0")}>
         {groups.map((group) => (
           <SidebarGroup key={group.label} className="py-1">
             {!collapsed && (
@@ -84,7 +84,7 @@ export function AppSidebar() {
               </SidebarGroupLabel>
             )}
             <SidebarGroupContent>
-              <SidebarMenu>
+              <SidebarMenu className={cn(collapsed && "items-center")}>
                 {group.items.map((item) => {
                   const active = isActive(item.url);
                   return (
