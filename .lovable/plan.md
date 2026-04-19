@@ -1,81 +1,19 @@
 
+## Issue
+The collapsed sidebar isn't scrolling because the shadcn `SidebarContent` primitive in `src/components/ui/sidebar.tsx` (line 399) hardcodes `group-data-[collapsible=icon]:overflow-hidden` when the sidebar is collapsed. This overrides the `overflow-y-auto` className we passed from `app-sidebar.tsx`, so scrolling is disabled exactly in the state where it's needed.
 
-## Goal
-Add a consistent **filter feature** alongside the existing search across the main list/kanban views (Leads, Jobs, Customers, Quotes, Brief, Tasks, Lager, etc.).
+## Fix
+Remove the forced `overflow-hidden` for the collapsed/icon state in `src/components/ui/sidebar.tsx` so the default `overflow-auto` (already on the same element) applies in both expanded and collapsed states.
 
-## Design
+Change in `src/components/ui/sidebar.tsx` (SidebarContent, ~line 399):
 
-A reusable **`FilterBar`** component placed next to the search input on each page. It opens a popover with checkbox groups. Active filters render as small dismissable chips below the search row.
+- Before: `"flex min-h-0 flex-1 flex-col gap-2 overflow-auto group-data-[collapsible=icon]:overflow-hidden"`
+- After: `"flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto"`
 
-```text
-[ Search…    ] [ ⏷ Filter (2) ]   ← in PageHeader actions
-[ Status: I gang ✕ ] [ Kilde: Google ✕ ] [ Ryd alle ]   ← chips row
-```
+Optionally hide the scrollbar visually for a cleaner look using `scrollbar-width: none` / `[&::-webkit-scrollbar]:hidden` while keeping scroll functional — only if you want it invisible.
 
-## Component API
+## Why this works
+- The sidebar wrapper is `fixed inset-y-0 h-svh`, and `SidebarContent` is `flex-1 min-h-0`, so it has a bounded height. Once `overflow-y-auto` is allowed in the collapsed state, the icon list will scroll naturally when it overflows the viewport (which is exactly what's happening on the small 284×585 viewport in your preview).
 
-```tsx
-<FilterBar
-  filters={[
-    { key: "status", label: "Status", options: [{value, label, count?}] },
-    { key: "source", label: "Kilde", options: [...] },
-    { key: "owner",  label: "Ejer",   options: [...] },
-  ]}
-  value={activeFilters}              // Record<string, string[]>
-  onChange={setActiveFilters}
-/>
-```
-
-Multi-select per group, OR within a group, AND across groups. Counts shown next to each option.
-
-## Per-page filter sets
-
-| Page | Filters |
-|---|---|
-| Leads | Status (stage), Kilde, Ejer, Type (privat/erhverv) |
-| Jobs | Status, Crew-medlem, Køretøj tildelt (ja/nej), Måned |
-| Customers | Stage, Kilde, By |
-| Quotes | Status, Pakke, Måned |
-| Brief | Status, Tildelt til |
-| Tasks | Status, Prioritet, Tildelt |
-| Lager / Inventory | Lokation, Status |
-
-Existing ad-hoc filters (e.g. Customers' privat/erhverv pill row) get folded into the unified FilterBar so there's only one place to filter.
-
-## URL persistence
-
-Filters serialize to search params via TanStack Router `validateSearch` + zod adapter (`fallback`/`default`), so filter state survives reloads and is shareable. Pattern:
-```ts
-validateSearch: zodValidator(z.object({
-  status: fallback(z.string().array(), []).default([]),
-  source: fallback(z.string().array(), []).default([]),
-}))
-```
-
-## Integration with existing pieces
-
-- `RowCount` already shows `(filtreret)` automatically when `shown !== total` — no change needed.
-- Kanban + Table both consume the same `filtered` array, so applying the new filter once filters both views.
-- Sticky-header tables stay as-is.
-
-## Files
-
-**Create**
-- `src/components/filter-bar.tsx` — popover + chips + clear-all
-- `src/hooks/use-filters.ts` — small helper to apply a filter map to a list
-
-**Edit (one page at a time, same pattern)**
-- `src/routes/_app.leads.index.tsx`
-- `src/routes/_app.jobs.tsx`
-- `src/routes/_app.customers.index.tsx`
-- `src/routes/_app.quotes.tsx`
-- `src/routes/_app.brief.index.tsx`
-- `src/routes/_app.tasks.tsx`
-- `src/routes/_app.lager.tsx`, `_app.inventory.tsx`
-
-## Rollout suggestion
-
-Ship in two steps to keep PRs reviewable:
-1. Build `FilterBar` + wire **Leads** and **Jobs** end-to-end (highest demo value).
-2. Roll out to Customers, Quotes, Brief, Tasks, Lager.
-
+## Verification
+After the change, collapse the sidebar on `/` at a short viewport — all icons from Dashboard down to Settings should be reachable by scrolling within the icon strip.
