@@ -94,10 +94,11 @@ export function AppSidebar() {
                           to={item.url}
                           className={cn(
                             "relative flex items-center gap-1.5 rounded-md",
+                            collapsed && "w-full justify-center gap-0",
                             active && "bg-[#EFF6FF] font-medium text-[#1D4ED8]",
                           )}
                         >
-                          {active && (
+                          {active && !collapsed && (
                             <span className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r bg-[#1D4ED8]" />
                           )}
                           <item.icon className={cn("h-3.5 w-3.5 shrink-0", active && "text-[#1D4ED8]")} strokeWidth={1.5} />
