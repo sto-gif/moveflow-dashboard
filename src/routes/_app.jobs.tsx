@@ -713,7 +713,7 @@ function CalendarGrid({ jobs, onJobClick }: { jobs: Job[]; onJobClick: (id: stri
       </div>
       <div className="grid grid-cols-7 gap-px overflow-hidden rounded-md border bg-border text-xs">
         {["Man", "Tir", "Ons", "Tor", "Fre", "Lør", "Søn"].map((d) => (
-          <div key={d} className="bg-muted px-2 py-1.5 font-semibold uppercase tracking-wide">{d}</div>
+          <div key={d} className="bg-background px-2 py-1.5 font-semibold uppercase tracking-wide text-muted-foreground">{d}</div>
         ))}
         {cells.map((d, i) => (
           <div key={i} className="min-h-[88px] bg-background p-1.5">
