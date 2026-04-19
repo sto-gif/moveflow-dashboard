@@ -67,9 +67,9 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="border-b border-sidebar-border">
-        <div className="flex items-center gap-2 px-2 py-1.5">
+        <div className={cn("flex items-center px-2 py-1.5", collapsed ? "justify-center px-0" : "gap-2") }>
           {collapsed ? (
-            <img src={iconUrl} alt="Movena" className="h-6 w-6" />
+            <img src={iconUrl} alt="Movena" className="h-8 w-8" />
           ) : (
             <img src={logoUrl} alt="Movena" className="h-6 w-auto" />
           )}
