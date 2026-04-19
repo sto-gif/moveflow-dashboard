@@ -84,7 +84,7 @@ export function AppSidebar() {
               </SidebarGroupLabel>
             )}
             <SidebarGroupContent>
-              <SidebarMenu>
+              <SidebarMenu className={cn(collapsed && "items-center")}>
                 {group.items.map((item) => {
                   const active = isActive(item.url);
                   return (
