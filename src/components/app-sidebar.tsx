@@ -75,7 +75,7 @@ export function AppSidebar() {
           )}
         </div>
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className={cn(collapsed && "px-1.5")}>
         {groups.map((group) => (
           <SidebarGroup key={group.label} className="py-1">
             {!collapsed && (
