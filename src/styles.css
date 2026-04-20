@@ -96,7 +96,7 @@
   --chart-4: oklch(0.617 0.165 145);       /* success */
   --chart-5: oklch(0.241 0.057 263);       /* navy */
 
-  --sidebar: #1d4ed8;
+  --sidebar: #0B1F3B;
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(1 0 0);
   --sidebar-primary-foreground: #1d4ed8;
