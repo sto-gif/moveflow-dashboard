@@ -95,13 +95,13 @@ export function AppSidebar() {
                           className={cn(
                             "relative flex items-center gap-1.5 rounded-md",
                             collapsed && "w-full justify-center gap-0",
-                            active && "bg-white font-medium text-[#1D4ED8] hover:bg-white hover:text-[#1D4ED8]",
+                            active && "bg-white/15 font-medium text-white hover:bg-white/15 hover:text-white",
                           )}
                         >
                           {active && !collapsed && (
                             <span className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r bg-white" />
                           )}
-                          <item.icon className={cn("h-3.5 w-3.5 shrink-0", active && "text-[#1D4ED8]")} strokeWidth={1.5} />
+                          <item.icon className={cn("h-3.5 w-3.5 shrink-0", active && "text-white")} strokeWidth={1.5} />
                           {!collapsed && <span>{item.title}</span>}
                         </Link>
                       </SidebarMenuButton>
